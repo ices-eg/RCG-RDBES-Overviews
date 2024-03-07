@@ -1,0 +1,11 @@
+# Contact Information {-}
+
+
+Contact person | E-mail |  Contact Issue
+----------------|--------|---------------
+Josefine Egekvist | jsv@aqua.dtu.dk | Questions regarding code lists
+Maciej Adamowicz | madamowicz@mir.gdynia.pl | Questions regarding the R-script
+
+<!-- Questions regarding code lists: Josefine Egekvist (jsv@aqua.dtu.dk) -->
+
+<!-- Questions regarding the R-script: Maciej Adamowicz (madamowicz@mir.gdynia.pl) -->

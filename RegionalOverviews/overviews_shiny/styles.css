@@ -1,0 +1,81 @@
+input[type="number"] {
+  max-width: 80%;
+}
+
+div.outer {
+  position: fixed;
+  top: 41px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+/* Customize fonts */
+body, label, input, button, select { 
+  font-family: 'Helvetica Neue', Helvetica;
+  font-weight: 200;
+}
+h1, h2, h3, h4 { font-weight: 400; }
+
+h1 {
+  font-size: 60px;
+}
+
+#controls {
+  /* Appearance */
+  background-color: white;
+  padding: 0px 60px 0px 60px;
+  cursor: move;
+  /* Fade out while not hovering */
+  opacity: 0.65;
+  zoom: 0.9;
+  transition: opacity 500ms 1s;
+}
+#controls:hover {
+  /* Fade in while hovering */
+  opacity: 0.95;
+  transition-delay: 0;
+}
+
+/* Position and style citation */
+#cite {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  font-size: 12px;
+}
+
+/* If not using map tiles, show a white background */
+.leaflet-container {
+  background-color: white !important;
+}
+
+.homeimage {
+
+	background-image: url('sea.jpg');
+	height: 350px;
+	width: inherit;
+
+	background-size: cover;
+	background-repeat: no-repeat;
+}
+
+.hometitle {
+	color: #ffffff;
+	text-shadow: 1px 1px #000000;
+	text-align: center;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	padding-right: 50px;
+	padding-left: 50px;
+	font-weight: lighter;
+	line-height: 100%;
+
+}
+
+.image:hover {
+opacity: 0.8;
+}
+.shiny-file-input-progress {display: none}
