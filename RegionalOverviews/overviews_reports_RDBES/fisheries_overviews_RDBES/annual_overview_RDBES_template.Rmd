@@ -1,0 +1,538 @@
+---
+title: "RDBES Catch and Effort Overview"
+date: "`r format(Sys.time(), '%d.%m.%Y')`"
+output:
+  html_document:
+    toc: true
+    
+params:
+  set_subtitle: "Title"
+  region: 'BA'
+  year: 2021
+  logo_path: "../../overviews_shiny/www/logo RCG BALTIC.PNG"
+  data_dir: '../../data_RDBES/002_prepared/20240129/RCG_BA'
+  data_dir_fleet: '../../RegionalOverviews/data/fleet_reg/output/2021'
+  RDBES_download_date: '01/01/2000'
+  CLfileName: 'RDBES_RCG_BA_CL_2021_2021_prepared_20240129'
+  CEfileName: 'RDBES_RCG_BA_CE_2021_2021_prepared_20240129'
+  
+---
+
+---
+subtitle: `r paste(dplyr::case_when(params$region=='BA'~'Baltic',params$region=='NA'~'North Atlantic',params$region=='NSEA'~'North Sea and Eastern Arctic'), params$year, sep = ", ")`
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+```
+
+```{r, echo=FALSE}
+  htmltools::img(src = knitr::image_uri(params$logo_path), 
+               alt = 'logo', 
+               style = 'position:absolute; top:0; right:0; padding:10px;',width="300px", height="100px")
+```
+
+```{r loadPackages, echo=FALSE, message=FALSE, warning=FALSE}
+# LOAD PACKAGES AND DEFINE EVAL_PARAMETERS IF NEEDED
+
+library(tidyverse)
+# library(car)
+# library(ggrepel)
+# library(knitr)
+# library(kableExtra)
+library(data.table)
+library(rnaturalearth)
+# library(magrittr)
+# library(plotly)
+# library(leaflet)
+library(ggplot2)
+
+ ## establish conditions  - can use it if for example some chunks should be run only for selected Regions, e.g. only Bal
+ eval_region_BA <- params$region=='BA' # when added to the chunk header, the chunk will be run only for BA report
+ eval_region_NA <- params$region=='NA' # when added to the chunk header, the chunk will be run only for NA report
+ eval_region_NSEA <- params$region=='NSEA' # when added to the chunk header, the chunk will be run only for NSEA report
+
+```
+
+
+```{r GlobalSettings, echo=FALSE}
+# DEFINE GLOBAL PARAMETERS/FUNCTIONS FOR DISPLAYING TABLES/PLOTS/MAPS/...
+
+```
+
+```{r loadFunctions, echo=FALSE}
+# LOAD FUNCTIONS GENERATING PLOTS/MAPS
+source("../../funs_RDBES/choroplethMap_func2.R", local = knitr::knit_global())
+
+#load barplot fuction
+source("../../funs_RDBES/func_barplot.R", local = knitr::knit_global())
+
+```
+
+```{r mapData, echo=FALSE}
+# LOAD DATA NEEDED FOR MAPS (shp, rdata, ...) FOR ALL RCGs
+
+```
+
+```{r mapDataBA, include = F, eval=eval_region_BA}
+# LOAD PREPARE DATA NEEDED FOR MAPS (shp, rdata, ...) ONLY FOR RCG BA
+StatRectshp  = sf::st_read("../../data/shapefiles/RCG_BA_ICESrect.shp")# for BA maps on DIVISIONS level -> WATCH OUT ...28.1/...28.2
+
+FAOshp  = sf::st_read("../../data/shapefiles/RCG_BA_FAOareas.shp") %>% filter(F_LEVEL == 'SUBDIVISION') # for BA maps on DIVISIONS level -> WATCH OUT ...28.1/...28.2
+```
+
+```{r mapDataNA,include = F, eval=eval_region_NA}
+# LOAD DATA NEEDED FOR MAPS (shp, rdata, ...) ONLY FOR RCG NA
+StatRectshp  = sf::st_read("../../data/shapefiles/RCG_NA_ICESrect.shp")
+
+FAOshp  = sf::st_read("../../data/shapefiles/RCG_NA_FAOareas.shp") %>% filter(F_LEVEL == 'DIVISION') # for NA maps on DIVISIONS level
+
+```
+
+```{r mapDataNSEA, include = F, eval=eval_region_NSEA}
+# LOAD DATA NEEDED FOR MAPS (shp, rdata, ...) ONLY FOR RCG NSEA
+StatRectshp  = sf::st_read("../../data/shapefiles/RCG_NSEA_ICESrect.shp")
+
+FAOshp  = sf::st_read("../../data/shapefiles/RCG_NSEA_FAOareas.shp") %>%  filter(F_LEVEL == 'DIVISION' |
+                                                                                   F_LEVEL == 'SUBAREA' |
+                                                                                   F_CODE == '27.3.a.20' | 
+                                                                                   F_CODE == '27.3.a.21')
+
+```
+
+```{r mapDataPrepare, echo=FALSE, warning = FALSE, message = FALSE}
+# PREPARE DATA NEEDED FOR MAPS (shp, rdata, ...)
+#StatRectshp %>% mutate(StatisticalRectangle = ICESNAME) -> StatRectshp
+StatRectshp = cbind(StatRectshp,  sf::st_coordinates(sf::st_centroid(StatRectshp$geometry))) %>% rename(lon = X, lat = Y)
+
+FAOshp = cbind(FAOshp,  sf::st_coordinates(sf::st_centroid(FAOshp$geometry))) %>% rename(lon = X, lat = Y)
+
+if(params$region=='BA'){ # fixed wrong calculation of centroid of 27.3.d.30
+  FAOshp = FAOshp %>%   
+    mutate(lon = ifelse(F_CODE=='27.3.d.30', 19.5 ,lon), lat =  ifelse(F_CODE=='27.3.d.30',62 ,lat))
+
+}
+
+```
+
+```{r loadPrepareData, echo=FALSE}
+# LOAD AND PREPARE DATA
+source('scripts/loadData.R', local = knitr::knit_global())
+  
+```
+
+```{r fleetRegisterData, echo=FALSE}
+# LOAD AND PREPARE FLEET REGISTER DATA
+
+```
+
+**Disclaimer**
+The tables and figures of the overviews presented in this document are made for the coordination of EU regional fisheries data collection purposes and are not designed for any other use. Data used for producing the outputs are extracted from the Regional Database and Estimating System (RDBES) and EU Fleet Register. Dates of data extractions are stated in Appendix A. Due to different aggregations and reporting authorities, data can differ from those used e.g. for assessments or technical reports. 
+
+Member States (MS) are responsible for uploading latest data and the latest year should be viewed as provisional. Data can be resubmitted by a MS for more than one previous year so there might be differences in earlier year reports, if countries update back in time. Responsibility for the quality of the data and comparability to other data sources lies with the MS that provided these data. The upload logs presented by MS regarding the data submitted to RDB can be found in the Share Point for Intersessional Work, under the folder "Data".
+
+The respective scripts and calculations used for data displaying are publicly available via the RCG GitHub (https://github.com/ices-eg/RCGs) and subject to change as the work of the group progresses.
+
+# Introduction
+put some text here
+
+## Reading the graphs
+### Barplots
+put some text here
+
+### Maps
+put some text here
+
+# Overall fleet evolution (All RCGs){.tabset}
+The tables included in this section present a summary of the information on licensed vessels from the European Union Fleet Register.
+
+## Number of vessels
+**Table 1.** Number of EU licensed vessels by flag country and vessel length class present in the EU fleet register (license indicator == “Y” in 1st January `r params$year`. Parentheses: variation relative to `r params$year-1`; red = number decreases; green = number increases; white = number maintains).
+```{r echo=FALSE, message=FALSE, warning = FALSE, out.width="90%", out.height="90%"}
+
+res_fleetreg<-table(Fleet$vesLenCat, Fleet$Country_Code,Fleet$Status)
+pyear<-as.data.frame.matrix(rbind(res_fleetreg[,,1],apply(res_fleetreg[,,1],2,sum)))
+year<-as.data.frame.matrix(rbind(res_fleetreg[,,2],apply(res_fleetreg[,,2],2,sum)))
+year_pyear<-as.data.frame.matrix(rbind((res_fleetreg[,,2]-res_fleetreg[,,1]),apply((res_fleetreg[,,2]-res_fleetreg[,,1]),2,sum)))
+ft<-func_table2(year,year_pyear)
+ft
+```
+
+## Power 
+**Table 2.** Power (1000*kW) of EU licensed vessels by flag country and vessel length class present in the EU fleet register (license indicator == “Y” in 1st January `r params$year`. Parentheses: variation relative to `r params$year-1`).
+```{r echo=FALSE, message=FALSE, warning = FALSE, out.width="90%", out.height="90%"}
+res_fleetreg_pwr<-tapply(Fleet$Power_Main, list(Fleet$vesLenCat,Fleet$Country_Code, Fleet$Status), sum)
+res_fleetreg_pwr[is.na(res_fleetreg_pwr)]<-0
+  pyear<-as.data.frame.matrix(round(rbind(res_fleetreg_pwr[,,1],apply(res_fleetreg_pwr[,,1],2,sum))/1000,1))
+  year<-as.data.frame.matrix(round(rbind(res_fleetreg_pwr[,,2],apply(res_fleetreg_pwr[,,2],2,sum))/1000,1))
+  year_pyear<-as.data.frame.matrix(round(rbind((res_fleetreg_pwr[,,2]-res_fleetreg_pwr[,,1]),apply((res_fleetreg_pwr[,,2]-res_fleetreg_pwr[,,1]),2,sum))/1000,1))
+ft<-func_table2(year,year_pyear)
+ft
+```
+
+
+## Gross tonnage
+**Table 3.** Gross Tonnage(1000*GT) of EU licensed vessels by flag country and vessel length class present in the EU fleet register (license indicator == “Y” in 1st January `r params$year`. Parentheses: variation relative to `r params$year-1`).
+```{r echo=FALSE, message=FALSE, warning = FALSE, out.width="90%", out.height="90%"}
+res_fleetreg_gt<-tapply(Fleet$Ton_Gt, list(Fleet$vesLenCat,Fleet$Country_Code, Fleet$Status), sum)  
+res_fleetreg_gt[is.na(res_fleetreg_gt)]<-0
+pyear<-as.data.frame.matrix(round(rbind(res_fleetreg_gt[,,1],apply(res_fleetreg_gt[,,1],2,sum))/1000,1))
+  year<-as.data.frame.matrix(round(rbind(res_fleetreg_gt[,,2],apply(res_fleetreg_gt[,,2],2,sum))/1000,1))
+  year_pyear<-as.data.frame.matrix(round(rbind((res_fleetreg_gt[,,2]-res_fleetreg_gt[,,1]),apply((res_fleetreg_gt[,,2]-res_fleetreg_gt[,,1]),2,sum))/1000,1))
+ft<-func_table2(year,year_pyear)
+ft
+```
+
+# Landings (CL)
+
+## Overall landings
+
+### Landings by species {.tabset}
+#### species
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+
+#species codes to names
+species_codes <- read.csv2("../../data/ASFIS_WoRMS_updt.csv")
+species_codes <- unique(species_codes[! is.na(species_codes$AphiaID) &
+                                        ! duplicated(species_codes$AphiaID), ]) 
+## some sort of duplicate issue her
+
+cl$AphiaID <- cl$CLspeciesCode
+cl <- merge(cl, species_codes, by = "AphiaID") 
+
+######
+# some filter for which species to show?
+cl2 <- cl[cl$CLspeciesCode %in% c(105801L, 107649L, 125613L, 125909L, 126175L, 126395L, 126417L, 
+126421L, 126425L, 126426L, 126439L, 126444L, 126716L, 126822L, 
+127023L, 127139L, 127419L, 138998L, 140480L, 140733L, 151174L, 
+158962L, 273303L)]
+######
+
+barplot(data = cl2, 
+      x = "Scientific_name",
+      y = "CLscientificWeight_1000ton",
+      titel = "Landings (1000 t) by Species",
+      ylab = "Sum of Landings (1000 t)")
+
+
+```
+
+#### species and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+
+barplot(data = cl2, #just to limeit the plots...
+      x = "Scientific_name",
+      y = "CLscientificWeight_1000ton",
+      group = "CLlandingCountry",
+      titel = "Landings (1000 t) by Species and Country",
+      ylab = "Proportion of Landings (1000 t)",
+      asPct = T)
+
+
+```
+
+### Landings by catch_group {.tabset}
+#### catch group
+#### catch_group and country
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+
+## add the catch group
+catch_group <- read.table("../../data/Table_Species_Categ.txt", header = T, sep = "\t")
+cl <- merge(cl, catch_group, by = "ISSCAAP")
+
+barplot(data = cl, 
+      x = "RCM_NSEA_categ",
+      y = "CLscientificWeight_1000ton",
+      titel = "Landings (1000 t) by Species and Country",
+      ylab = "Proportion of Landings (1000 t)")
+
+barplot(data = cl, 
+      x = "RCM_NSEA_categ",
+      y = "CLscientificWeight_1000ton",
+      group = "CLlandingCountry",
+      titel = "Landings (1000 t) by Species and Country",
+      ylab = "Proportion of Landings (1000 t)",
+      asPct = T)
+
+```
+
+
+### Landings by fleet
+
+### Landings by area {.tabset}
+#### area
+#### area and country
+#### country and area
+
+### Landings by metier {.tabset}
+#### metier lvl5
+#### metier lvl5 and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+
+## add metier lvl 5
+cl$CLmetier5 <- substr(cl$CLmetier6, 1, 7) #more filtration needed
+
+barplot(data = cl, 
+      x = "CLmetier5",
+      y = "CLscientificWeight_1000ton",
+      titel = "Landings (1000 t) by Species and Country",
+      ylab = "Proportion of Landings (1000 t)")
+
+barplot(data = cl, 
+      x = "CLmetier5",
+      y = "CLscientificWeight_1000ton",
+      group = "CLlandingCountry",
+      titel = "Landings (1000 t) by Species and Country",
+      ylab = "Proportion of Landings (1000 t)",
+      asPct = T)
+
+```
+
+#### metier lvl6
+#### metier lvl6 and country
+
+### Landings by harbour {.tabset}
+#### harbour
+#### harbour and flag country
+#### map - harbour
+#### map - harbour and flag country
+
+### Landings abroad
+
+### Spatial distribution of landings
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+# do we need information on for how many rows(%) there was a missing CLscientificWeight_ton? <-------------------------- to do
+
+# data prep
+cl %>%
+  group_by(CLyear, CLstatisticalRectangle) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA)-> df
+
+# map
+result = choroplethMap_func2(
+  df,
+  var_name = 'CLscientificWeight_ton',
+  var_spatial_name = 'CLstatisticalRectangle',
+  facet_name = 'CLyear',
+  spatial_dataset_name = 'StatRectshp',
+  spatial_dataset_var_name = 'ICESNAME',
+  spatial_dataset_labels = FALSE,
+  saveResults = FALSE,
+  outputPath,
+  displayInR = TRUE,
+  extraShp_name = 'FAOshp',
+  var_name_new = NA,
+  addToTitle = NA,
+  RCGregion = 'BA'
+)
+
+result[[1]]
+```
+
+## Small pelagics landings
+
+### Landings by country, small pelagics
+
+### Landings by species, small pelagics {.tabset}
+#### species
+#### species and country
+
+### Landings by fleet, small pelagics {.tabset}
+#### fleet
+#### country and fleet
+#### fleet and country
+
+### Landings by area, small pelagics {.tabset}
+#### area
+#### area and country
+#### country and area
+#### map area
+#### map area and flag country
+
+### Landings by metier, small pelagics {.tabset}
+#### metier lvl5
+#### metier lvl5 and country
+#### metier lvl6
+#### metier lvl6 and country
+
+### Landings by harbour, small pelagics {.tabset}
+#### harbour
+#### harbour and flag country
+#### map - harbour
+#### map - harbour and flag country
+
+### Landings abroad, small pelagics
+
+### Spatial distribution of landings, small pelagics
+
+
+## Demersal landings (without flatfish)
+
+### Landings by country, demersal (without flatfish)
+
+### Landings by species, demersal (without flatfish) {.tabset}
+#### species
+#### species and country
+
+### Landings by fleet, demersal (without flatfish) {.tabset}
+#### fleet
+#### country and fleet
+#### fleet and country
+
+### Landings by area, demersal (without flatfish) {.tabset}
+#### area
+#### area and country
+#### country and area
+#### map area
+#### map area and flag country
+
+### Landings by metier, demersal (without flatfish) {.tabset}
+#### metier lvl5
+#### metier lvl5 and country
+#### metier lvl6
+#### metier lvl6 and country
+
+### Landings by harbour, demersal (without flatfish) {.tabset}
+#### harbour
+#### harbour and flag country
+#### map - harbour
+#### map - harbour and flag country
+
+### Landings abroad, demersal (without flatfish)
+
+### Spatial distribution of landings, demersal (without flatfish)
+
+
+## Flatfish landings
+
+### Landings by country, flatfish
+
+### Landings by species, flatfish {.tabset}
+#### species
+#### species and country
+
+### Landings by fleet, flatfish {.tabset}
+#### fleet
+#### country and fleet
+#### fleet and country
+
+### Landings by area, flatfish {.tabset}
+#### area
+#### area and country
+#### country and area
+#### map area
+#### map area and flag country
+
+### Landings by metier, flatfish {.tabset}
+#### metier lvl5
+#### metier lvl5 and country
+#### metier lvl6
+#### metier lvl6 and country
+
+### Landings by harbour, flatfish {.tabset}
+#### harbour
+#### harbour and flag country
+#### map - harbour
+#### map - harbour and flag country
+
+### Landings abroad, flatfish
+
+### Spatial distribution of landings, flatfish
+
+
+# Effort (CE)
+
+## Effort by country {.tabset}
+### number of trips
+### days at sea
+### KW-days
+### GT-days
+
+## Effort by fleet {.tabset}
+### number of trips
+### number of trips by country and fleet
+### number of trips by fleet and country
+
+## Effort by area
+### Below 10 meters {.tabset}
+#### area
+#### area and country
+#### country and area
+
+### 10 meters and above {.tabset}
+#### area
+#### area and country
+#### country and area
+
+
+## Effort by metier
+### Below 10 meters  {.tabset}
+#### metier lvl 5
+#### metier lvl 5 and country
+#### statistical rectangle
+
+### 10 meteres and above  {.tabset}
+#### metier lvl 5
+#### metier lvl 5 and country
+#### statistical rectangle
+
+## Effort by harbour
+### Below 10 meters {.tabset}
+#### harbour
+#### harbour and country
+#### map - harbour
+
+### 10 meteres and above {.tabset}
+#### harbour
+#### harbour and country
+#### map - harbour
+
+## Spatal distribution on effort {.tabset}
+### Below 10 meters
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+# data prep
+ce %>%
+  filter(CEvesselLengthCategory %in% c("VL0006", "VL0608", "VL0810")) %>% 
+  group_by(CEyear, CEstatisticalRectangle) %>%
+  summarise(CEnumberOfDominantTrips = sum(CEnumberOfDominantTrips)) %>%
+  mutate(pr= CEnumberOfDominantTrips/sum(CEnumberOfDominantTrips, na.rm = TRUE)*100,
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA)-> df
+
+# map
+result = choroplethMap_func2(
+  df,
+  var_name = 'CEnumberOfDominantTrips',
+  var_spatial_name = 'CEstatisticalRectangle',
+  facet_name = 'CEyear',
+  spatial_dataset_name = 'StatRectshp',
+  spatial_dataset_var_name = 'ICESNAME',
+  spatial_dataset_labels = FALSE,
+  saveResults = FALSE,
+  outputPath,
+  displayInR = TRUE,
+  extraShp_name = 'FAOshp',
+  var_name_new = NA,
+  addToTitle = 'Below 10 meters',
+  RCGregion = 'BA'
+)
+
+result[[1]]
+```
+
+### 10 meters and above
+
+## Appendix A. Dates of data extraction
+## Appendix B. Catch groups
+## Appendix C. Mean Landings per stock, put years here
+## Appendix D. Summary information of the landings abroad (ton), by country and area
+## Appendix E. Glossary for the country codes
+
