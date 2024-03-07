@@ -1,0 +1,7 @@
+/Software/
+*.tiff
+RegionalOverviews/.Rhistory
+.Rproj.user
+RegionalOverviews/RegionalOverviews.Rproj
+.Rhistory
+*.bak
