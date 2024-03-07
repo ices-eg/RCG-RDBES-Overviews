@@ -1,0 +1,7 @@
+
+*.tiff
+RegionalOverviews/.Rhistory
+.Rproj.user
+RegionalOverviews/RegionalOverviews.Rproj
+RegionalOverviews/outputs
+RegionalOverviews/data/002_prepared
