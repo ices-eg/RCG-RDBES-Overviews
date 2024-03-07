@@ -1,0 +1,63 @@
+---
+output:
+  html_document:
+    df_print: paged
+    toc: true
+    toc_float: true
+    number_sections: true
+    theme: cosmo
+    highlight: default
+---
+
+
+<!-- \pagenumbering{gobble} -->
+
+```{r child = '01TitlePage.Rmd'}
+
+```
+
+<!-- \pagenumbering{gobble} -->
+
+<!-- \newpage  -->
+<!-- \tableofcontents -->
+
+<!-- \newpage -->
+<!-- \pagenumbering{arabic} -->
+
+```{r child = '02Background.Rmd'}
+
+```
+
+
+```{r child = '03InputFormatForTransversalData.Rmd'}
+
+```
+
+
+```{r child = '04ReferenceLists.Rmd'}
+
+```
+
+```{r child = '05MetierAssignementProcedure.Rmd'}
+
+```
+
+
+```{r child = '06RscriptM.Rmd'}
+
+```
+
+
+```{r child = '07Diagram.Rmd'}
+
+```
+
+
+```{r child = '08Annex.Rmd'}
+
+```
+
+
+```{r child = '09ContactPersons.Rmd'}
+
+```
