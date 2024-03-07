@@ -1,0 +1,72 @@
+---
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+output: 
+  pdf_document:
+    number_sections: true
+  toc: true
+urlcolor: blue
+linkcolor: 'black'
+---
+
+
+\pagenumbering{gobble}
+
+```{r child = '01TitlePage.Rmd'}
+
+```
+
+\pagenumbering{gobble}
+
+\newpage 
+\tableofcontents
+
+\newpage
+\pagenumbering{arabic}
+
+```{r child = '02Background.Rmd'}
+
+```
+
+\newpage
+
+
+```{r child = '03InputFormatForTransversalData.Rmd'}
+
+```
+
+
+
+```{r child = '04ReferenceLists.Rmd'}
+
+```
+
+```{r child = '05MetierAssignementProcedure.Rmd'}
+
+```
+
+\newpage
+
+```{r child = '06Rscript.Rmd'}
+
+```
+
+\newpage
+
+```{r child = '07Diagram.Rmd'}
+
+```
+
+\newpage
+
+```{r child = '08Annex.Rmd'}
+
+```
+
+\newpage
+
+```{r child = '09ContactPersons.Rmd'}
+
+```
