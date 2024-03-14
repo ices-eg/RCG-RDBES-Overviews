@@ -155,7 +155,7 @@ pyear<-as.data.frame.matrix(rbind(res_fleetreg[,,1],apply(res_fleetreg[,,1],2,su
 year<-as.data.frame.matrix(rbind(res_fleetreg[,,2],apply(res_fleetreg[,,2],2,sum)))
 year_pyear<-as.data.frame.matrix(rbind((res_fleetreg[,,2]-res_fleetreg[,,1]),apply((res_fleetreg[,,2]-res_fleetreg[,,1]),2,sum)))
 ft<-func_table2(year,year_pyear)
-ft
+autofit(ft)
 ```
 
 ## Power 
@@ -167,7 +167,7 @@ res_fleetreg_pwr[is.na(res_fleetreg_pwr)]<-0
   year<-as.data.frame.matrix(round(rbind(res_fleetreg_pwr[,,2],apply(res_fleetreg_pwr[,,2],2,sum))/1000,1))
   year_pyear<-as.data.frame.matrix(round(rbind((res_fleetreg_pwr[,,2]-res_fleetreg_pwr[,,1]),apply((res_fleetreg_pwr[,,2]-res_fleetreg_pwr[,,1]),2,sum))/1000,1))
 ft<-func_table2(year,year_pyear)
-ft
+autofit(ft)
 ```
 
 
@@ -180,7 +180,7 @@ pyear<-as.data.frame.matrix(round(rbind(res_fleetreg_gt[,,1],apply(res_fleetreg_
   year<-as.data.frame.matrix(round(rbind(res_fleetreg_gt[,,2],apply(res_fleetreg_gt[,,2],2,sum))/1000,1))
   year_pyear<-as.data.frame.matrix(round(rbind((res_fleetreg_gt[,,2]-res_fleetreg_gt[,,1]),apply((res_fleetreg_gt[,,2]-res_fleetreg_gt[,,1]),2,sum))/1000,1))
 ft<-func_table2(year,year_pyear)
-ft
+autofit(ft)
 ```
 
 # Landings (CL)

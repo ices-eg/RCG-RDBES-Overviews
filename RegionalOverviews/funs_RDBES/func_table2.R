@@ -26,16 +26,17 @@ func_table2<- function (year,year_pyear){
   }
   ft <- flextable(cbind(name_row,year_pyear))
   ft <- theme_box(ft)
-  ft<-fontsize(ft, part = "all", size = 6)
+  ft<-fontsize(ft, part = "all", size = 8)
   ft<-bold(ft,part="header")
   ft<-bg(ft,part="header",bg="#F4F3F7")
   ft<-bg(ft,j="name_row",bg="#F4F3F7")
   ft<-color(ft,j=1,part="header",color="#F4F3F7")
   ft <- align(ft, align = "center", part = "all")
   for (k in 1:ncol(minus_i)){
-    ft<-bg(ft,i=minus_i[k],j=minus_j[k]+1,bg="#fcbfbc")}
+    ft<-color(ft,i=minus_i[k],j=minus_j[k]+1,color="#cc0000")}
   for (l in 1:ncol(plus_i)){
-    ft<-bg(ft,i=plus_i[l],j=plus_j[l]+1,bg="#89ff89")}
+    ft<-color(ft,i=plus_i[l],j=plus_j[l]+1,color="#005b00")}
+  
   ft<-bold(ft,i=8)
   
   ft<-width(ft, width = 0.42)
