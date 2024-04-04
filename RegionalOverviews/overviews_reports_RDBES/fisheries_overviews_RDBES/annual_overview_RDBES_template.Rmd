@@ -46,6 +46,7 @@ library(rnaturalearth)
 # library(plotly)
 # library(leaflet)
 library(ggplot2)
+library(patchwork)
 
  ## establish conditions  - can use it if for example some chunks should be run only for selected Regions, e.g. only Bal
  eval_region_BA <- params$region=='BA' # when added to the chunk header, the chunk will be run only for BA report
@@ -192,7 +193,7 @@ autofit(ft)
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
 
 #species codes to names
-species_codes <- read.csv2("../../data/ASFIS_WoRMS_updt.csv")
+species_codes <-read.csv2("../../data/ASFIS_WoRMS_updt.csv")
 species_codes <- unique(species_codes[! is.na(species_codes$AphiaID) &
                                         ! duplicated(species_codes$AphiaID), ]) 
 ## some sort of duplicate issue her
@@ -211,7 +212,7 @@ cl2 <- cl[cl$CLspeciesCode %in% c(105801L, 107649L, 125613L, 125909L, 126175L, 1
 barplot(data = cl2, 
       x = "Scientific_name",
       y = "CLscientificWeight_1000ton",
-      titel = "Landings (1000 t) by Species",
+      title = "Landings (1000 t) by Species",
       ylab = "Sum of Landings (1000 t)")
 
 
@@ -224,7 +225,7 @@ barplot(data = cl2, #just to limeit the plots...
       x = "Scientific_name",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      titel = "Landings (1000 t) by Species and Country",
+      title = "Landings (1000 t) by Catch Group",
       ylab = "Proportion of Landings (1000 t)",
       asPct = T)
 
@@ -233,25 +234,28 @@ barplot(data = cl2, #just to limeit the plots...
 
 ### Landings by catch_group {.tabset}
 #### catch group
-#### catch_group and country
-
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
 
 ## add the catch group
 catch_group <- read.table("../../data/Table_Species_Categ.txt", header = T, sep = "\t")
-cl <- merge(cl, catch_group, by = "ISSCAAP")
+cl_catch <- merge(cl, catch_group, by = "ISSCAAP")
 
-barplot(data = cl, 
+barplot(data = cl_catch, 
       x = "RCM_NSEA_categ",
       y = "CLscientificWeight_1000ton",
-      titel = "Landings (1000 t) by Species and Country",
+      title = "Landings (1000 t) by Catch Group",
       ylab = "Proportion of Landings (1000 t)")
+```
 
-barplot(data = cl, 
+#### catch_group and country
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+
+barplot(data = cl_catch, 
       x = "RCM_NSEA_categ",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      titel = "Landings (1000 t) by Species and Country",
+      title = "Landings (1000 t) by Catch Group and Country",
       ylab = "Proportion of Landings (1000 t)",
       asPct = T)
 
@@ -267,23 +271,38 @@ barplot(data = cl,
 
 ### Landings by metier {.tabset}
 #### metier lvl5
-#### metier lvl5 and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
 
 ## add metier lvl 5
 cl$CLmetier5 <- substr(cl$CLmetier6, 1, 7) #more filtration needed
 
-barplot(data = cl, 
+#data prep
+cl_metier_lv5 <- cl%>%
+  group_by(CLyear, CLmetier5) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20)
+
+
+barplot(data = cl_metier_lv5,
       x = "CLmetier5",
       y = "CLscientificWeight_1000ton",
-      titel = "Landings (1000 t) by Species and Country",
+      title = "Landings (1000 t) by Metier Lvl5",
       ylab = "Proportion of Landings (1000 t)")
+```
 
-barplot(data = cl, 
+#### metier lvl5 and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#data prep
+cl_metier_lv5_c <- cl%>%
+  group_by(CLyear, CLmetier5,CLlandingCountry) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20)
+
+barplot(data = cl_metier_lv5_c, 
       x = "CLmetier5",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      titel = "Landings (1000 t) by Species and Country",
+      title = "Landings (1000 t) by Metier Lvl5 and Country",
       ylab = "Proportion of Landings (1000 t)",
       asPct = T)
 
@@ -299,6 +318,20 @@ barplot(data = cl,
 #### map - harbour and flag country
 
 ### Landings abroad
+```{r riverplot aborad, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+paste("River plot of CLscientificWeight_ton between CLvesselFlagCountry (left) and CLlandingCountry (right). Width of line is proportional to landings", sep="")  
+    
+# cl %>%
+#   group_by(CLyear, CLlandingCountry, CLvesselFlagCountry) %>%
+#   summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+#   mutate(CLlandingCountry=paste(CLlandingCountry, " ", sep=""))-> df
+# 
+# result=func_StankeyDiagram(df = df,
+#            left = 'CLvesselFlagCountry',
+#            right = 'CLlandingCountry',
+#            value = 'CLscientificWeight_ton')
+# result
+```
 
 ### Spatial distribution of landings
 
