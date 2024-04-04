@@ -1,4 +1,10 @@
-
+# Authors: 
+# - Jonathan Stounberg
+# - Kasia Krakówka
+# 
+# Dev. notes: 
+#
+# - 20240404: Added subplot
 
 barplot <- function(data = data,
                      x = "",
