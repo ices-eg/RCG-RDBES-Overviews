@@ -9,7 +9,7 @@ params:
   set_subtitle: "Title"
   region: 'BA'
   year: 2021
-  logo_path: "../../overviews_shiny/www/logo RCG BALTIC.PNG"
+  logo_path: "../../data/logo/logo RCG BALTIC.PNG"
   data_dir: '../../data_RDBES/002_prepared/20240129/RCG_BA'
   data_dir_fleet: '../../RegionalOverviews/data/fleet_reg/output/2021'
   RDBES_download_date: '01/01/2000'
@@ -53,7 +53,6 @@ library(ggplot2)
  eval_region_NSEA <- params$region=='NSEA' # when added to the chunk header, the chunk will be run only for NSEA report
 
 ```
-
 
 ```{r GlobalSettings, echo=FALSE}
 # DEFINE GLOBAL PARAMETERS/FUNCTIONS FOR DISPLAYING TABLES/PLOTS/MAPS/...
