@@ -16,6 +16,7 @@
 # 
 # - 20240207: Created based on annual_overview_RDBES.R
 # - 20240220: Added fleet register directory
+# - 20240404: The logo depends on the selected region
 #
 ###################################################################
 
@@ -29,7 +30,7 @@ assign("last.warning", NULL, envir = baseenv()) # Credits: https://stackoverflow
 params <- list(
   year = yearSelected,
   region = regionSelected, 
-  logo_path = ifelse(regionSelected=='BA',file.path("../../data/logo/logo RCG BALTIC.PNG"),file.path("../../data/logo/logo RCG NA NS_EA.PNG")), # move it to the rmd part <----------------- to do 
+  logo_path = ifelse(regionSelected=='BA',file.path("../../data/logo/logo RCG BALTIC.PNG"),file.path("../../data/logo/logo RCG NA NS_EA.PNG")),
   data_dir = paste0(getwd(), '/RegionalOverviews/data_RDBES/002_prepared/', dataprepDate, '/RCG_', regionSelected),
   data_dir_fleet = paste0(getwd(), '/RegionalOverviews/data/fleet_reg/output/', yearSelected),
   CLfileName = paste0('RDBES_RCG_', regionSelected, '_CL_2021_2021_prepared_', dataprepDate),
