@@ -66,7 +66,7 @@ barplot <- function(data = data,
       t2 <- t1[names(t1) %in% sub_t1] 
       unique_x<-unique(data$x)
       col2<-subset(colours, select = colour5)
-      col2<-distinct(a)
+      col2<-distinct(col2)
       col2 <- as.data.table(cbind(col2[1:length(unique_x),c("colour5")], unique_x))
       col2 <- setNames(object = col2$V1, nm = col2$unique_x)
       ### to co było
