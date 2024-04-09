@@ -47,6 +47,7 @@ library(rnaturalearth)
 # library(leaflet)
 library(ggplot2)
 library(patchwork)
+library(networkD3)
 
  ## establish conditions  - can use it if for example some chunks should be run only for selected Regions, e.g. only Bal
  eval_region_BA <- params$region=='BA' # when added to the chunk header, the chunk will be run only for BA report
@@ -316,7 +317,7 @@ cl_metier_lvl6<- cl%>%
 barplot(data = cl_metier_lvl6, 
       x = "CLmetier6",
       y = "CLscientificWeight_1000ton",
-      titel = "Landings (1000 t) by Metier Lvl6",
+      title = "Landings (1000 t) by Metier Lvl6",
       ylab = "Proportion of Landings (1000 t)")
 ```
 
@@ -340,7 +341,7 @@ cl_metier_lvl6_c_top <- cl_metier_lvl6_c_top %>%
 barplot(data = cl_metier_lvl6_c_top, 
         x = "CLmetier6",
         y = "CLscientificWeight_1000ton_total",
-        titel = "Landings (1000 t) by Metier Lvl6 and Country",
+        title = "Landings (1000 t) by Metier Lvl6 and Country",
         group = "CLlandingCountry",
         ylab = "Proportion of Landings (1000 t)",
         asPct = T)
