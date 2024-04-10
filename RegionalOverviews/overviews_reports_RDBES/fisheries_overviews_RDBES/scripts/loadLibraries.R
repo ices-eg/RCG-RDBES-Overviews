@@ -32,6 +32,7 @@ suppressPackageStartupMessages(library(magrittr))
 suppressPackageStartupMessages(library(plotly))
 suppressPackageStartupMessages(library(crayon))
 suppressPackageStartupMessages(library(flextable))
+suppressPackageStartupMessages(library(networkD3))
 
 # Print end message
 if(is_empty(warnings())){
