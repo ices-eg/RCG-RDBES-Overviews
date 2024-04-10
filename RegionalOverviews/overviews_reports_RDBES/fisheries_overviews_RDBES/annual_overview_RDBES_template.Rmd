@@ -319,14 +319,14 @@ cl$CLmetier5 <- substr(cl$CLmetier6, 1, 7) #more filtration needed
 barplot(data = cl, 
       x = "CLmetier5",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Species and Country",
+      title = "Landings (1000 t) by Metier Lvl5",
       ylab = "Proportion of Landings (1000 t)")
 
 barplot(data = cl, 
       x = "CLmetier5",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      title = "Landings (1000 t) by Species and Country",
+      title = "Landings (1000 t) by Metier Lvl5 and Country",
       ylab = "Proportion of Landings (1000 t)",
       asPct = T)
 
