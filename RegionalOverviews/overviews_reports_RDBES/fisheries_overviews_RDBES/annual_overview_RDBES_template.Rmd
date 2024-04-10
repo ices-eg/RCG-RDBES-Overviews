@@ -225,7 +225,7 @@ barplot(data = cl2, #just to limeit the plots...
       x = "Scientific_name",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      title = "Landings (1000 t) by Catch Group",
+      title = "Landings (1000 t) by Species and Country",
       ylab = "Proportion of Landings (1000 t)",
       asPct = T)
 
@@ -359,7 +359,7 @@ barplot(data = cl_metier_lvl6,
       x = "CLmetier6",
       y = "CLscientificWeight_1000ton",
       title = "Landings (1000 t) by Metier Lvl6",
-      ylab = "Proportion of Landings (1000 t)")
+      ylab = "Sum of Landings (1000 t)")
 ```
 
 #### metier lvl6 and country
