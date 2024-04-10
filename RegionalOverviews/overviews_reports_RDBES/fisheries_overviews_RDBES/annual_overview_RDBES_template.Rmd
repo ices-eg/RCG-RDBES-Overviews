@@ -210,7 +210,7 @@ cl2 <- cl[cl$CLspeciesCode %in% c(105801L, 107649L, 125613L, 125909L, 126175L, 1
 barplot(data = cl2, 
       x = "Scientific_name",
       y = "CLscientificWeight_1000ton",
-      titel = "Landings (1000 t) by Species",
+      title = "Landings (1000 t) by Species",
       ylab = "Sum of Landings (1000 t)")
 
 
@@ -223,7 +223,7 @@ barplot(data = cl2, #just to limeit the plots...
       x = "Scientific_name",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      titel = "Landings (1000 t) by Species and Country",
+      title = "Landings (1000 t) by Species and Country",
       ylab = "Proportion of Landings (1000 t)",
       asPct = T)
 
@@ -241,7 +241,7 @@ cl_catch <- merge(cl, catch_group, by = "ISSCAAP")
 barplot(data = cl_catch, 
       x = "RCM_NSEA_categ",
       y = "CLscientificWeight_1000ton",
-      titel = "Landings (1000 t) by Catch Group",
+      title = "Landings (1000 t) by Catch Group",
       ylab = "Proportion of Landings (1000 t)")
 ```
 
@@ -252,7 +252,7 @@ barplot(data = cl_catch,
       x = "RCM_NSEA_categ",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      titel = "Landings (1000 t) by Catch Group and Country",
+      title = "Landings (1000 t) by Catch Group and Country",
       ylab = "Proportion of Landings (1000 t)",
       asPct = T)
 
@@ -265,7 +265,7 @@ barplot(data = cl,
       x = "CLvesselLengthCategory",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      titel = "Landings (1000 t) by Vessel Length Category and Country",
+      title = "Landings (1000 t) by Vessel Length Category and Country",
       ylab = "Proportion of Landings (1000 t)",
       asPct = T)
 
@@ -278,7 +278,7 @@ barplot(data = cl,
 barplot(data = cl, 
       x = "CLarea",
       y = "CLscientificWeight_1000ton",
-      titel = "Landings (1000 t) by Area",
+      title = "Landings (1000 t) by Area",
       ylab = "Sum of Landings (1000 t)")
 
 ```
@@ -289,7 +289,7 @@ barplot(data = cl,
       x = "CLarea",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      titel = "Landings (1000 t) by Area and Country",
+      title = "Landings (1000 t) by Area and Country",
       ylab = "Proportion of Landings (1000 t)",
       asPct = T)
 
@@ -301,7 +301,7 @@ barplot(data = cl,
       x = "CLlandingCountry",
       y = "CLscientificWeight_1000ton",
       group = "CLarea",
-      titel = "Landings (1000 t) by Country and Area",
+      title = "Landings (1000 t) by Country and Area",
       ylab = "Proportion of Landings (1000 t)",
       asPct = T)
 
@@ -319,14 +319,14 @@ cl$CLmetier5 <- substr(cl$CLmetier6, 1, 7) #more filtration needed
 barplot(data = cl, 
       x = "CLmetier5",
       y = "CLscientificWeight_1000ton",
-      titel = "Landings (1000 t) by Species and Country",
+      title = "Landings (1000 t) by Species and Country",
       ylab = "Proportion of Landings (1000 t)")
 
 barplot(data = cl, 
       x = "CLmetier5",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      titel = "Landings (1000 t) by Species and Country",
+      title = "Landings (1000 t) by Species and Country",
       ylab = "Proportion of Landings (1000 t)",
       asPct = T)
 
@@ -342,7 +342,7 @@ cl_metier_lvl6<- cl%>%
 barplot(data = cl_metier_lvl6, 
       x = "CLmetier6",
       y = "CLscientificWeight_1000ton",
-      titel = "Landings (1000 t) by Metier Lvl6",
+      title = "Landings (1000 t) by Metier Lvl6",
       ylab = "Sum of Landings (1000 t)")
 ```
 
@@ -366,7 +366,7 @@ cl_metier_lvl6_c_top <- cl_metier_lvl6_c_top %>%
 barplot(data = cl_metier_lvl6_c_top, 
         x = "CLmetier6",
         y = "CLscientificWeight_1000ton_total",
-        titel = "Landings (1000 t) by Metier Lvl6 and Country",
+        title = "Landings (1000 t) by Metier Lvl6 and Country",
         group = "CLlandingCountry",
         ylab = "Proportion of Landings (1000 t)",
         asPct = T)
@@ -383,7 +383,7 @@ cl_harbour<- cl%>%
 barplot(data = cl_harbour, 
       x = "CLlandingLocation",
       y = "CLscientificWeight_1000ton",
-      titel = "Landings (1000 t) by Harbours",
+      title = "Landings (1000 t) by Harbours",
       ylab = "Sum of Landings (1000 t)")
 ```
 #### harbour and flag country
@@ -406,7 +406,7 @@ cl_harbour_fc_top <- cl_harbour_fc_top %>%
 barplot(data = cl_harbour_fc_top, 
         x = "CLlandingLocation",
         y = "CLscientificWeight_1000ton_total",
-        titel = "Landings (1000 t) by Harbour and Flag Country",
+        title = "Landings (1000 t) by Harbour and Flag Country",
         group = "CLvesselFlagCountry",
         ylab = "Proportion of Landings (1000 t)",
         asPct = T)
@@ -478,7 +478,7 @@ cl_spf<- cl%>%
 barplot(data = cl_spf, 
       x = "CLlandingCountry",
       y = "CLscientificWeight_1000ton",
-      titel = "Landings (1000 t) by Country",
+      title = "Landings (1000 t) by Country",
       ylab = "Sum of Landings (1000 t)")
 ```
 
@@ -495,7 +495,7 @@ cl_spf<- cl%>%
 barplot(data = cl_spf, 
       x = "CLspeciesFaoCode",
       y = "CLscientificWeight_1000ton",
-      titel = "Landings (1000 t) by Species",
+      title = "Landings (1000 t) by Species",
       ylab = "Sum of Landings (1000 t)")
 ```
 

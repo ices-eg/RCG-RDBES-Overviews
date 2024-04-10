@@ -5,7 +5,7 @@ barplot <- function(data = data,
                      y = "", 
                      group = "",
                      asPct = F,
-                     titel = "",
+                     title = "",
                      ylab = "",
                      xlab = "",
                      save_plot_to_list=TRUE){
@@ -46,7 +46,7 @@ barplot <- function(data = data,
       geom_bar(stat="identity") +
       theme_bw() +
       theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-      ggtitle(paste(titel)) +
+      ggtitle(paste(title)) +
       xlab(paste(xlab)) +
       ylab(paste(ylab))
     
@@ -56,7 +56,7 @@ barplot <- function(data = data,
       geom_bar(stat="identity") +
       theme_bw() +
       theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-      ggtitle(paste(titel)) +
+      ggtitle(paste(title)) +
       xlab(paste(xlab)) +
       ylab(paste(ylab))
   }
