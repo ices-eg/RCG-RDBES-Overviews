@@ -46,6 +46,8 @@ library(rnaturalearth)
 # library(plotly)
 # library(leaflet)
 library(ggplot2)
+library(patchwork)
+library(networkD3)
 
  ## establish conditions  - can use it if for example some chunks should be run only for selected Regions, e.g. only Bal
  eval_region_BA <- params$region=='BA' # when added to the chunk header, the chunk will be run only for BA report
@@ -200,6 +202,7 @@ autofit(ft)
 # cl <- cl%>% left_join(species_codes, by = "AphiaID") 
 # 
 # ######
+
 # some filter for which species to show?
 # cl2 <- cl[cl$CLspeciesCode %in% c(105801L, 107649L, 125613L, 125909L, 126175L, 126395L, 126417L, 
 # 126421L, 126425L, 126426L, 126439L, 126444L, 126716L, 126822L, 
@@ -260,6 +263,7 @@ barplot(data = cl,
 #### catch_group and country
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+
 barplot(data = cl, 
       x = "CatchGroup",
       y = "CLscientificWeight_1000ton",
@@ -321,20 +325,33 @@ barplot(data = cl,
 
 ### Landings by metier {.tabset}
 #### metier lvl5
-
-#### metier lvl5 and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
-
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
 ## add metier lvl 5
 cl$CLmetier5 <- substr(cl$CLmetier6, 1, 7) #more filtration needed
 
-barplot(data = cl, 
+#data prep
+cl_metier_lv5 <- cl%>%
+  group_by(CLyear, CLmetier5) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20)
+
+
+barplot(data = cl_metier_lv5,
       x = "CLmetier5",
       y = "CLscientificWeight_1000ton",
       title = "Landings (1000 t) by Metier Lvl5",
       ylab = "Proportion of Landings (1000 t)")
+```
 
-barplot(data = cl, 
+#### metier lvl5 and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#data prep
+cl_metier_lv5_c <- cl%>%
+  group_by(CLyear, CLmetier5,CLlandingCountry) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20)
+
+barplot(data = cl_metier_lv5_c, 
       x = "CLmetier5",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
@@ -439,7 +456,6 @@ result<-func_riverplot(df = cl_river,
             right = 'CLlandingCountry',
             value = 'CLscientificWeight_ton')
 result
-
 ```
 
 ### Spatial distribution of landings
