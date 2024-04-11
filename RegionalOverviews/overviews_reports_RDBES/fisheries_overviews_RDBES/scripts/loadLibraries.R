@@ -14,7 +14,7 @@
 # 
 # - 20240207: Created based on annual_overview_RDBES.R
 # - 20240222: Added flextable
-#
+# - 20240320: Added patchwork ->subplot
 ###################################################################
 
 # Print start message
@@ -32,6 +32,7 @@ suppressPackageStartupMessages(library(magrittr))
 suppressPackageStartupMessages(library(plotly))
 suppressPackageStartupMessages(library(crayon))
 suppressPackageStartupMessages(library(flextable))
+suppressPackageStartupMessages(library(patchwork))
 suppressPackageStartupMessages(library(networkD3))
 
 # Print end message
