@@ -192,25 +192,29 @@ autofit(ft)
 #### species
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
 
-#species codes to names
-species_codes <-read.csv2("../../data/ASFIS_WoRMS_updt.csv")
-species_codes <- unique(species_codes[! is.na(species_codes$AphiaID) &
-                                        ! duplicated(species_codes$AphiaID), ]) 
-## some sort of duplicate issue her
+# #species codes to names
+# species_codes <- read.csv2("../../data/ASFIS_WoRMS.csv")
+# species_codes <- unique(species_codes[! is.na(species_codes$AphiaID) &
+#                                         ! duplicated(species_codes$AphiaID), ]) 
+# ## some sort of duplicate issue her
+# 
+# cl$AphiaID <- cl$CLspeciesCode
+# cl <- cl%>% left_join(species_codes, by = "AphiaID") 
+# 
+# ######
 
-cl$AphiaID <- cl$CLspeciesCode
-cl <- merge(cl, species_codes, by = "AphiaID") 
-
-######
 # some filter for which species to show?
-cl2 <- cl[cl$CLspeciesCode %in% c(105801L, 107649L, 125613L, 125909L, 126175L, 126395L, 126417L, 
-126421L, 126425L, 126426L, 126439L, 126444L, 126716L, 126822L, 
-127023L, 127139L, 127419L, 138998L, 140480L, 140733L, 151174L, 
-158962L, 273303L)]
-######
-
-barplot(data = cl2, 
-      x = "Scientific_name",
+# cl2 <- cl[cl$CLspeciesCode %in% c(105801L, 107649L, 125613L, 125909L, 126175L, 126395L, 126417L, 
+# 126421L, 126425L, 126426L, 126439L, 126444L, 126716L, 126822L, 
+# 127023L, 127139L, 127419L, 138998L, 140480L, 140733L, 151174L, 
+# 158962L, 273303L)]
+# ######
+cl_species<- cl%>%
+  group_by(CLyear, CLspeciesCode) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20, wt=CLscientificWeight_1000ton)
+barplot(data = cl_species, 
+      x = "CLspeciesCode",
       y = "CLscientificWeight_1000ton",
       title = "Landings (1000 t) by Species",
       ylab = "Sum of Landings (1000 t)")
@@ -220,9 +224,22 @@ barplot(data = cl2,
 
 #### species and country
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+cl_species_c<- cl%>%
+  group_by(CLyear, CLspeciesCode, CLlandingCountry) %>%
+  summarise(CLscientificWeight_1000ton_total = sum(CLscientificWeight_1000ton))
 
-barplot(data = cl2, #just to limeit the plots...
-      x = "Scientific_name",
+cl_species_top <- cl_species %>%
+  arrange(desc(CLscientificWeight_1000ton)) %>%
+  top_n(20)
+
+cl_species_top$Top <- "TOP"
+cl_species_c_top <- left_join(cl_species_c,cl_species_top,by="CLspeciesCode")
+
+cl_species_c_top <- cl_species_c_top %>%
+  filter(Top=='TOP')
+
+barplot(data = cl_species_c_top,
+      x = "CLspeciesCode",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
       title = "Landings (1000 t) by Species and Country",
@@ -236,12 +253,8 @@ barplot(data = cl2, #just to limeit the plots...
 #### catch group
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
 
-## add the catch group
-catch_group <- read.table("../../data/Table_Species_Categ.txt", header = T, sep = "\t")
-cl_catch <- merge(cl, catch_group, by = "ISSCAAP")
-
-barplot(data = cl_catch, 
-      x = "RCM_NSEA_categ",
+barplot(data = cl, 
+      x = "CatchGroup",
       y = "CLscientificWeight_1000ton",
       title = "Landings (1000 t) by Catch Group",
       ylab = "Proportion of Landings (1000 t)")
@@ -251,8 +264,8 @@ barplot(data = cl_catch,
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
 
-barplot(data = cl_catch, 
-      x = "RCM_NSEA_categ",
+barplot(data = cl, 
+      x = "CatchGroup",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
       title = "Landings (1000 t) by Catch Group and Country",
