@@ -1,6 +1,11 @@
 # based on the 001_read_and_prepare_data_rdb_2009_2021_CL_CE.r
 # script prepares datasets for further analysis
+
+#dev notes
+# 11.04.2024 catch group 
+# 11.04.2024 species scientific name
 setwd("Path to RCGs local repo")
+#setwd("D:/RCG-RDBES-Overviews") #Kasia
 rm(list=ls())
 library(data.table)
 gc()
@@ -20,8 +25,8 @@ getwd()
 ## ======================== 
 
 target_region <- "RCG_NSEA" # RCG_BA, RCG_NA, RCG_NSEA
-year_start <- 2021
-year_end <- 2021
+year_start <- 2023
+year_end <- 2023
 time_tag<-format(Sys.time(), "%Y%m%d")
 
 ## ====================== 
@@ -61,6 +66,9 @@ download_data_from_sharepoint(
 # reads aux_countries dataset
 aux_countries<-read.table("RegionalOverviews//data//aux_countries.txt", sep=",", header=T, colClasses="character", na.strings = "")
 
+# reads aux_species dataset (scientific name, catch group)
+aux_species<-read.table("RegionalOverviews//data//ASFIS_WoRMS.csv", sep=",", header=T, colClasses="character", na.strings = "")
+
 # reads RDBES data
 RDBESdataPath = 'RegionalOverviews/data_RDBES/001_raw'
 
@@ -68,8 +76,8 @@ file_cl <- paste(RDBESdataPath, "/RDBES CL/CommercialLanding.csv", sep = '')
 file_ce <- paste(RDBESdataPath, "/RDBES CE/CommercialEffort.csv" , sep = '')
 
 # read data
-ce<-data.table::fread(file_ce, stringsAsFactors=FALSE, verbose=FALSE, fill=TRUE, sep=",", na.strings="NULL")
-cl<-data.table::fread(file_cl, stringsAsFactors=FALSE, verbose=FALSE, fill=TRUE, sep=",", na.strings="NULL")
+ce<-data.table::fread(file_ce, stringsAsFactors=FALSE, verbose=FALSE, sep=",", na.strings="NULL",quote = "")
+cl<-data.table::fread(file_cl, stringsAsFactors=FALSE, verbose=FALSE, sep=",", na.strings="NULL",quote = "")
 
 # QCA: duplicates (eliminates if existing)
 dim(cl); cl<-unique(cl); dim(cl)
@@ -89,7 +97,7 @@ ce<- ce[CEyear >= year_start & CEyear <= year_end]
 # this should be fulfilled after generating the first versions of the overviews
 # when some issues to be fixed are noticed 
 
-# should this part be in this script or a separate one not to mess here every year?
+# should this part be in this script or a separate one not to mess here every year? KK: in my opinion separate
 
 
 ################################################################################################################################################################
@@ -301,28 +309,30 @@ if(target_region=="RCG_NA")
 ################################################################################
 ################################################################################
 #
-#                                 CATCH GROUP <------------------------------------------------------------ WORK ON IT
+#             CATCH GROUP
 #
 ################################################################################
 ################################################################################
 
-# to assign Catch group to the RDBES data, we're using a table produced by ISSG metiers
-# https://github.com/ices-eg/RCGs/blob/master/Metiers/Reference_lists/Metier%20Subgroup%20Species%202020%20cleaned%20version.xlsx
-
-MetierGroupSpecies = openxlsx::read.xlsx('Metiers/Reference_lists/Metier Subgroup Species 2020 cleaned version.xlsx')
-
-# For now, we merge the dataset using FAO code, but this variable is optional <-------------------------------- IMPORTANT!
-# So additional table would be needed: WORMS - FAO (where to find it? any official source?)
-# then merge with MetierGroupSpecies by FAO key and we get for each row Catch group
-# another option? WORMS - ISSCAAP? TaxoCode ? ...?
-
-cl_rcg[,CatchGroup:=MetierGroupSpecies$`Grouping.2.(TO.BE.USED)`[match(cl_rcg$CLspeciesFaoCode, MetierGroupSpecies$FAOcode)]]
+cl_rcg[,CatchGroup:=aux_species$CatchGroup[match(cl_rcg$CLspeciesCode, aux_species$AphiaID_accepted)]]
 # QCA: should yield TRUE otherwise debug
 nrow(cl_rcg[is.na(CatchGroup),]) == 0
 cl_rcg[is.na(CatchGroup),]
 
-# IF NEEDED -> Full name of the catch group might be taken from this table
-# icesVocab::getCodeList("TargetSpecies")
+################################################################################
+################################################################################
+#
+#             SPECIES SCIENTIFIC NAME
+#
+################################################################################
+################################################################################
+
+
+cl_rcg[,SpeciesLaName:=aux_species$ScientificName[match(cl_rcg$CLspeciesCode, aux_species$AphiaID_accepted)]]
+# QCA: should yield TRUE otherwise debug
+nrow(cl_rcg[is.na(SpeciesLaName),]) == 0
+cl_rcg[is.na(SpeciesLaName),]
+
 
 ################################################################################
 ################################################################################
@@ -356,4 +366,4 @@ file_info_ce<-file.info(file_ce)
 save(cl_rcg, file_info_cl, file = paste(dir_output_rcg, paste("//RDBES",target_region,"CL", year_start, year_end, "prepared",time_tag, sep="_"),".Rdata", sep=""))
 save(ce_rcg, file_info_ce, file = paste(dir_output_rcg, paste("//RDBES",target_region,"CE", year_start, year_end, "prepared",time_tag, sep="_"),".Rdata", sep=""))
 save(cl, file_info_cl, file = paste(dir_output_all, paste("//RDBES","All_Regions","CL", year_start, year_end, "prepared",time_tag, sep="_"),".Rdata", sep=""))
-save(ce, file_info_ce, file = paste(dir_output_all, paste("//RDBES","All_Regions","CE", year_start, year_end, "prepared",time_tag, sep="_"),".Rdata", sep=""))	
+save(ce, file_info_ce, file = paste(dir_output_all, paste("//RDBES","All_Regions","CE", year_start, year_end, "prepared",time_tag, sep="_"),".Rdata", sep=""))
