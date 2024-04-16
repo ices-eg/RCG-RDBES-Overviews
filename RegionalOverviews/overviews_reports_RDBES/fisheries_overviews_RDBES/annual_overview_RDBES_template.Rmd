@@ -775,8 +775,13 @@ barplot(data = cl %>%
 ### Landings by species, demersal (without flatfish) {.tabset}
 #### species
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+sub_cl_top<- cl%>%
+  filter(CatchGroup=='demersal')%>%
+  group_by(CLyear, SpeciesLaName) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton))%>%
+  top_n(20, wt=CLscientificWeight_1000ton)
 
-barplot(data = cl[CatchGroup=='demersal',], 
+barplot(data = sub_cl_top, 
       x = "SpeciesLaName",
       y = "CLscientificWeight_1000ton",
       title = "Landings (1000 t) by Species",
@@ -785,7 +790,19 @@ barplot(data = cl[CatchGroup=='demersal',],
 
 #### species and country
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
-barplot(data = cl[CatchGroup=='demersal',], 
+#data prep
+sub_cl_2 <- cl%>%
+  filter(CatchGroup == 'demersal') %>%
+  group_by(CLyear, SpeciesLaName, CLlandingCountry) %>%
+  summarise(CLscientificWeight_1000ton_total = sum(CLscientificWeight_1000ton))
+
+sub_cl_top$Top <- "TOP"
+sub_cl_2_top <- left_join(sub_cl_2,sub_cl_top,by="SpeciesLaName")
+
+sub_cl_2_top <- sub_cl_2_top %>%
+  filter(Top=='TOP')
+
+barplot(data = sub_cl_2_top, 
       x = "SpeciesLaName",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
@@ -888,7 +905,7 @@ barplot(data = sub_cl_top,
       x = "CLmetier5",
       y = "CLscientificWeight_1000ton",
       title = "Landings (1000 t) by Metier Lvl5",
-      ylab = "Proportion of Landings (1000 t)")
+      ylab = "Sum of Landings (1000 t)")
 ```
 
 #### metier lvl5 and country
@@ -1174,7 +1191,7 @@ barplot(data = sub_cl_top,
       x = "CLmetier5",
       y = "CLscientificWeight_1000ton",
       title = "Landings (1000 t) by Metier Lvl5",
-      ylab = "Proportion of Landings (1000 t)")
+      ylab = "Sum of Landings (1000 t)")
 ```
 
 #### metier lvl5 and country
@@ -1424,24 +1441,169 @@ barplot(data = ce,
 ## Effort by area
 ### Below 10 meters {.tabset}
 #### area
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+
+barplot(data = ce%>%filter(CEvesselLengthCategory %in% c("VL0006", "VL0608", "VL0810")), 
+      x = "CEarea",
+      y = "CEnumberOfDominantTrips",
+      title = "Number of trips by Area",
+      ylab = "Sum of Number of trips")
+
+```
+
 #### area and country
-#### country and area
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+
+barplot(data = ce%>%filter(CEvesselLengthCategory %in% c("VL0006", "VL0608", "VL0810")), 
+      x = "CEarea",
+      y = "CEnumberOfDominantTrips",
+      title = "Number of trips by Area",
+      ylab = "Sum of Number of trips")
+
+```
+
+#### area and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+
+barplot(data = ce%>%filter(CEvesselLengthCategory %in% c("VL0006", "VL0608", "VL0810")),
+      x = "CEarea",
+      y = "CEnumberOfDominantTrips",
+      group = "CEvesselFlagCountry",
+      title = "Number of trips by Area and Country",
+      ylab = "Proportion of Number of trips",
+      asPct = T)
+
+```
+
 
 ### 10 meters and above {.tabset}
 #### area
-#### area and country
-#### country and area
 
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+
+barplot(data = ce%>%filter(CEvesselLengthCategory %in% c("VL1012", "VL1215", "VL1518","VL1824","VL2440","VL40XX")), 
+      x = "CEarea",
+      y = "CEnumberOfDominantTrips",
+      title = "Number of trips by Area",
+      ylab = "Sum of Number of trips")
+
+```
+
+#### area and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+
+barplot(data = ce%>%filter(CEvesselLengthCategory %in% c("VL1012", "VL1215", "VL1518","VL1824","VL2440","VL40XX")),
+      x = "CEarea",
+      y = "CEnumberOfDominantTrips",
+      group = "CEvesselFlagCountry",
+      title = "Number of trips by Area and Country",
+      ylab = "Proportion of Number of trips",
+      asPct = T)
+
+```
+
+#### country and area
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+
+barplot(data = ce%>%filter(CEvesselLengthCategory %in% c("VL1012", "VL1215", "VL1518","VL1824","VL2440","VL40XX")),
+      x = "CEvesselFlagCountry",
+      y = "CEnumberOfDominantTrips",
+      group = "CEarea",
+      title = "Number of trips by Country and Area",
+      ylab = "Proportion of Number of trips",
+      asPct = T)
+
+```
 
 ## Effort by metier
 ### Below 10 meters  {.tabset}
-#### metier lvl 5
-#### metier lvl 5 and country
+#### metier lvl5
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#data prep
+sub_ce_top <- ce%>%
+  filter(CEvesselLengthCategory %in% c("VL0006", "VL0608", "VL0810"))%>%
+  mutate(CEmetier5 = substr(CEmetier6, 1, 7))%>%
+  group_by(CEyear, CEmetier5) %>%
+  summarise(CEnumberOfDominantTrips = sum(CEnumberOfDominantTrips)) %>%
+  top_n(20)
+
+barplot(data = sub_ce_top,
+      x = "CEmetier5",
+      y = "CEnumberOfDominantTrips",
+      title = "Number of trips by Metier Lvl5",
+      ylab = "Sum of Number of trips")
+```
+
+#### metier lvl5 and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#data prep
+sub_ce_2 <- ce%>%
+  filter(CEvesselLengthCategory %in% c("VL0006", "VL0608", "VL0810"))%>%
+    mutate(CEmetier5 = substr(CEmetier6, 1, 7))%>%
+  group_by(CEyear, CEmetier5, CEvesselFlagCountry) %>%
+  summarise(CEnumberOfDominantTrips_total = sum(CEnumberOfDominantTrips))
+
+sub_ce_top$Top <- "TOP"
+sub_ce_2_top <- left_join(sub_ce_2,sub_ce_top,by="CEmetier5")
+
+sub_ce_2_top <- sub_ce_2_top %>%
+  filter(Top=='TOP')
+
+barplot(data = sub_ce_2_top, 
+      x = "CEmetier5",
+      y = "CEnumberOfDominantTrips",
+      group = "CEvesselFlagCountry",
+      title = "Number of trips by Metier Lvl5 and Country",
+      ylab = "Proportion of Number of trips",
+      asPct = T)
+
+```
+
 #### statistical rectangle
 
 ### 10 meteres and above  {.tabset}
-#### metier lvl 5
-#### metier lvl 5 and country
+#### metier lvl5
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#data prep
+sub_ce_top <- ce%>%
+  filter(CEvesselLengthCategory %in% c("VL1012", "VL1215", "VL1518","VL1824","VL2440","VL40XX"))%>%
+  mutate(CEmetier5 = substr(CEmetier6, 1, 7))%>%
+  group_by(CEyear, CEmetier5) %>%
+  summarise(CEnumberOfDominantTrips = sum(CEnumberOfDominantTrips)) %>%
+  top_n(20)
+
+barplot(data = sub_ce_top,
+      x = "CEmetier5",
+      y = "CEnumberOfDominantTrips",
+      title = "Number of trips by Metier Lvl5",
+      ylab = "Sum of Number of trips")
+```
+
+#### metier lvl5 and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#data prep
+sub_ce_2 <- ce%>%
+  filter(CEvesselLengthCategory %in% c("VL1012", "VL1215", "VL1518","VL1824","VL2440","VL40XX"))%>%
+    mutate(CEmetier5 = substr(CEmetier6, 1, 7))%>%
+  group_by(CEyear, CEmetier5, CEvesselFlagCountry) %>%
+  summarise(CEnumberOfDominantTrips_total = sum(CEnumberOfDominantTrips))
+
+sub_ce_top$Top <- "TOP"
+sub_ce_2_top <- left_join(sub_ce_2,sub_ce_top,by="CEmetier5")
+
+sub_ce_2_top <- sub_ce_2_top %>%
+  filter(Top=='TOP')
+
+barplot(data = sub_ce_2_top, 
+      x = "CEmetier5",
+      y = "CEnumberOfDominantTrips",
+      group = "CEvesselFlagCountry",
+      title = "Number of trips by Metier Lvl5 and Country",
+      ylab = "Proportion of Number of trips",
+      asPct = T)
+
+```
+
 #### statistical rectangle
 
 ## Effort by harbour
@@ -1491,6 +1653,38 @@ result[[1]]
 ```
 
 ### 10 meters and above
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+# data prep
+ce %>%
+  filter(CEvesselLengthCategory %in% c("VL1012", "VL1215", "VL1518","VL1824","VL2440","VL40XX")) %>% 
+  group_by(CEyear, CEstatisticalRectangle) %>%
+  summarise(CEnumberOfDominantTrips = sum(CEnumberOfDominantTrips)) %>%
+  mutate(pr= CEnumberOfDominantTrips/sum(CEnumberOfDominantTrips, na.rm = TRUE)*100,
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA)-> df
+
+# map
+result = choroplethMap_func2(
+  df,
+  var_name = 'CEnumberOfDominantTrips',
+  var_spatial_name = 'CEstatisticalRectangle',
+  facet_name = 'CEyear',
+  spatial_dataset_name = 'StatRectshp',
+  spatial_dataset_var_name = 'ICESNAME',
+  spatial_dataset_labels = FALSE,
+  saveResults = FALSE,
+  outputPath,
+  displayInR = TRUE,
+  extraShp_name = 'FAOshp',
+  var_name_new = NA,
+  addToTitle = '10 meters and above',
+  RCGregion = 'BA'
+)
+
+result[[1]]
+```
 
 ## Appendix A. Dates of data extraction
 ## Appendix B. Catch groups
