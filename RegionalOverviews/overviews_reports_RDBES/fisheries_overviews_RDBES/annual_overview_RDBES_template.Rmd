@@ -1764,6 +1764,27 @@ result[[1]]
 
 ## Appendix A. Dates of data extraction
 ## Appendix B. Catch groups
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+# data prep
+cl%>%
+  mutate(Region = params$region,
+         CLyear = as.factor(CLyear))%>%
+  group_by(Region,CLyear,SpeciesLaName,CatchGroup)%>%
+  summarise(CLscientificWeight_ton_total=sum(CLscientificWeight_ton))%>%
+  mutate(CLscientificWeight_ton_total = round(CLscientificWeight_ton_total,0))%>%
+  arrange(CatchGroup,SpeciesLaName, .locale = 'en')%>%
+  rename(Period = CLyear,
+         Species = SpeciesLaName,
+         `Catch group` = CatchGroup,
+         `Landings (t)` = CLscientificWeight_ton_total) -> df
+
+  ft <- flextable(df)
+  ft <- fontsize(ft, part = "all", size = 8)
+  ft <- bold(ft,part="header")
+  
+  autofit(ft)
+```
+
 ## Appendix C. Mean Landings per stock, put years here
 ## Appendix D. Summary information of the landings abroad (ton), by country and area
 ## Appendix E. Glossary for the country codes
