@@ -1609,12 +1609,88 @@ barplot(data = sub_ce_2_top,
 ## Effort by harbour
 ### Below 10 meters {.tabset}
 #### harbour
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#data prep
+sub_ce_top <- ce%>%
+  filter(CEvesselLengthCategory %in% c("VL0006", "VL0608", "VL0810"))%>%
+  group_by(CEyear, CElandingLocation) %>%
+  summarise(CEnumberOfDominantTrips = sum(CEnumberOfDominantTrips)) %>%
+  top_n(20)
+
+barplot(data = sub_ce_top,
+      x = "CElandingLocation",
+      y = "CEnumberOfDominantTrips",
+      title = "Number of trips by Harbours",
+      ylab = "Sum of Number of trips")
+```
+
 #### harbour and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#data prep
+sub_ce_2 <- ce%>%
+  filter(CEvesselLengthCategory %in% c("VL0006", "VL0608", "VL0810"))%>%
+  group_by(CEyear, CElandingLocation, CEvesselFlagCountry) %>%
+  summarise(CEnumberOfDominantTrips_total = sum(CEnumberOfDominantTrips))
+
+sub_ce_top$Top <- "TOP"
+sub_ce_2_top <- left_join(sub_ce_2,sub_ce_top,by="CElandingLocation")
+
+sub_ce_2_top <- sub_ce_2_top %>%
+  filter(Top=='TOP')
+
+barplot(data = sub_ce_2_top, 
+      x = "CElandingLocation",
+      y = "CEnumberOfDominantTrips",
+      group = "CEvesselFlagCountry",
+      title = "Number of trips by Harbours and Country",
+      ylab = "Proportion of Number of trips",
+      asPct = T)
+
+```
+
 #### map - harbour
 
 ### 10 meteres and above {.tabset}
 #### harbour
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#data prep
+sub_ce_top <- ce%>%
+  filter(CEvesselLengthCategory %in% c("VL1012", "VL1215", "VL1518","VL1824","VL2440","VL40XX"))%>%
+  group_by(CEyear, CElandingLocation) %>%
+  summarise(CEnumberOfDominantTrips = sum(CEnumberOfDominantTrips)) %>%
+  top_n(20)
+
+barplot(data = sub_ce_top,
+      x = "CElandingLocation",
+      y = "CEnumberOfDominantTrips",
+      title = "Number of trips by Harbours",
+      ylab = "Sum of Number of trips")
+```
+
 #### harbour and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#data prep
+sub_ce_2 <- ce%>%
+  filter(CEvesselLengthCategory %in% c("VL1012", "VL1215", "VL1518","VL1824","VL2440","VL40XX"))%>%
+  group_by(CEyear, CElandingLocation, CEvesselFlagCountry) %>%
+  summarise(CEnumberOfDominantTrips_total = sum(CEnumberOfDominantTrips))
+
+sub_ce_top$Top <- "TOP"
+sub_ce_2_top <- left_join(sub_ce_2,sub_ce_top,by="CElandingLocation")
+
+sub_ce_2_top <- sub_ce_2_top %>%
+  filter(Top=='TOP')
+
+barplot(data = sub_ce_2_top, 
+      x = "CElandingLocation",
+      y = "CEnumberOfDominantTrips",
+      group = "CEvesselFlagCountry",
+      title = "Number of trips by Harbours and Country",
+      ylab = "Proportion of Number of trips",
+      asPct = T)
+
+```
+
 #### map - harbour
 
 ## Spatal distribution on effort {.tabset}
@@ -1688,6 +1764,27 @@ result[[1]]
 
 ## Appendix A. Dates of data extraction
 ## Appendix B. Catch groups
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+# data prep
+cl%>%
+  mutate(Region = params$region,
+         CLyear = as.factor(CLyear))%>%
+  group_by(Region,CLyear,SpeciesLaName,CatchGroup)%>%
+  summarise(CLscientificWeight_ton_total=sum(CLscientificWeight_ton))%>%
+  mutate(CLscientificWeight_ton_total = round(CLscientificWeight_ton_total,0))%>%
+  arrange(CatchGroup,SpeciesLaName, .locale = 'en')%>%
+  rename(Period = CLyear,
+         Species = SpeciesLaName,
+         `Catch group` = CatchGroup,
+         `Landings (t)` = CLscientificWeight_ton_total) -> df
+
+  ft <- flextable(df)
+  ft <- fontsize(ft, part = "all", size = 8)
+  ft <- bold(ft,part="header")
+  
+  autofit(ft)
+```
+
 ## Appendix C. Mean Landings per stock, put years here
 ## Appendix D. Summary information of the landings abroad (ton), by country and area
 ## Appendix E. Glossary for the country codes
