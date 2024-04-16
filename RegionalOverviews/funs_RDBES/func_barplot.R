@@ -14,6 +14,7 @@ barplot <- function(data = data,
                      title = "",
                      ylab = "",
                      xlab = "",
+                     col_cou= F,
                      save_plot_to_list=TRUE){
   
   
@@ -54,10 +55,10 @@ barplot <- function(data = data,
       theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
       ggtitle(paste(title)) +
       xlab(paste(xlab)) +
-      ylab(paste(ylab))
+      ylab(paste(ylab)) + labs(fill = group)
     
   } else {
-    ####test part
+
     t1<-tapply(data[,y], list(data[,x]), sum, na.rm=T)
     t1<-sort(t1, decreasing=T)
     t1[is.na(t1)]<-0
@@ -69,7 +70,7 @@ barplot <- function(data = data,
       col2<-distinct(col2)
       col2 <- as.data.table(cbind(col2[1:length(unique_x),c("colour5")], unique_x))
       col2 <- setNames(object = col2$V1, nm = col2$unique_x)
-      ### to co było
+      
       #plot struff
       p1 <- ggplot(data=data, aes(x = reorder(x, -y), y = y, fill = grp)) +
         geom_bar(stat="identity") +
@@ -100,8 +101,7 @@ barplot <- function(data = data,
       
       
       p<- p1 + inset_element(p2, left = 0.4, bottom = 0.4, right = 0.99, top = 0.99)
-
-      ######koniec 
+      
     }else{
     #plot struff
     p <- ggplot(data=data, aes(x = reorder(x, -y), y = y, fill = grp)) +
@@ -114,7 +114,7 @@ barplot <- function(data = data,
     }
     }
   
-  if (group %like% "Country")
+  if (group %like% "Country" || col_cou == T)
     p <- p + scale_fill_manual(values = col)
   
   if (group == "")
