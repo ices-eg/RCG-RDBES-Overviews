@@ -231,25 +231,25 @@ barplot(data = sub_cl_2_top,
       asPct = T)
 ```
 
-### Landings by catch_group {.tabset}
-#### catch group
+### Landings by catch species group {.tabset}
+#### catch species group
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
 
 barplot(data = cl, 
       x = "CatchGroup",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Catch Group",
+      title = "Landings (1000 t) by Catch Species Group",
       ylab = "Proportion of Landings (1000 t)")
 ```
 
-#### catch_group and country
+#### catch species group and country
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
 
 barplot(data = cl, 
       x = "CatchGroup",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      title = "Landings (1000 t) by Catch Group and Country",
+      title = "Landings (1000 t) by Catch Species Group and Country",
       ylab = "Proportion of Landings (1000 t)",
       asPct = T)
 
@@ -1763,7 +1763,7 @@ result[[1]]
 ```
 
 ## Appendix A. Dates of data extraction
-## Appendix B. Catch groups
+## Appendix B. Catch species groups
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
 # data prep
 cl%>%
