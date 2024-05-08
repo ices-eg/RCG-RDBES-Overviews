@@ -421,15 +421,15 @@ barplot(data = sub_cl_2_top,
 
 ### Landings abroad
 ```{r riverplot aborad, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9}
-paste("River plot of CLscientificWeight_ton between CLvesselFlagCountry (left) and CLlandingCountry (right). Width of line is proportional to landings", sep="")  
+paste("River plot of CLscientificWeight_ton between CLvesselFlagCountry (left) and Harbour (right). Width of line is proportional to landings", sep="")  
     
 cl %>%
-  group_by(CLyear, CLlandingCountry, CLvesselFlagCountry) %>%
+  group_by(CLyear, HarbourCountry2, CLvesselFlagCountry) %>%
   summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
 
 result<-func_riverplot(df = cl_river,
             left = 'CLvesselFlagCountry',
-            right = 'CLlandingCountry',
+            right = 'HarbourCountry2',
             value = 'CLscientificWeight_ton')
 result
 ```
@@ -710,16 +710,16 @@ barplot(data = sub_cl_2_top,
 
 ### Landings abroad, small pelagics
 ```{r riverplot aborad sp, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9}
-paste("River plot of CLscientificWeight_ton of small pelagic between CLvesselFlagCountry (left) and CLlandingCountry (right). Width of line is proportional to landings", sep="")  
+paste("River plot of CLscientificWeight_ton of small pelagic between CLvesselFlagCountry (left) and Harbour (right). Width of line is proportional to landings", sep="")  
     
 cl %>%
   filter(CatchGroup == 'small pelagic')%>%
-  group_by(CLyear, CLlandingCountry, CLvesselFlagCountry) %>%
+  group_by(CLyear, HarbourCountry2, CLvesselFlagCountry) %>%
   summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
 
 result<-func_riverplot(df = cl_river,
             left = 'CLvesselFlagCountry',
-            right = 'CLlandingCountry',
+            right = 'HarbourCountry2',
             value = 'CLscientificWeight_ton')
 result
 ```
@@ -1014,16 +1014,16 @@ barplot(data = sub_cl_2_top,
 
 ### Landings abroad, demersal (without flatfish)
 ```{r riverplot aborad demersal, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9}
-paste("River plot of CLscientificWeight_ton of demersal between CLvesselFlagCountry (left) and CLlandingCountry (right). Width of line is proportional to landings", sep="")  
+paste("River plot of CLscientificWeight_ton of demersal between CLvesselFlagCountry (left) and Harbour (right). Width of line is proportional to landings", sep="")  
     
 cl %>%
   filter(CatchGroup == 'demersal')%>%
-  group_by(CLyear, CLlandingCountry, CLvesselFlagCountry) %>%
+  group_by(CLyear, HarbourCountry2, CLvesselFlagCountry) %>%
   summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
 
 result<-func_riverplot(df = cl_river,
             left = 'CLvesselFlagCountry',
-            right = 'CLlandingCountry',
+            right = 'HarbourCountry2',
             value = 'CLscientificWeight_ton')
 result
 ```
@@ -1301,16 +1301,16 @@ barplot(data = sub_cl_2_top,
 
 ### Landings abroad, flatfish
 ```{r riverplot aborad flatfish, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9}
-paste("River plot of CLscientificWeight_ton of flatfish between CLvesselFlagCountry (left) and CLlandingCountry (right). Width of line is proportional to landings", sep="")  
+paste("River plot of CLscientificWeight_ton of flatfish between CLvesselFlagCountry (left) and Harbour (right). Width of line is proportional to landings", sep="")  
     
 cl %>%
   filter(CatchGroup == 'flatfish')%>%
-  group_by(CLyear, CLlandingCountry, CLvesselFlagCountry) %>%
+  group_by(CLyear, HarbourCountry2, CLvesselFlagCountry) %>%
   summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
 
 result<-func_riverplot(df = cl_river,
             left = 'CLvesselFlagCountry',
-            right = 'CLlandingCountry',
+            right = 'HarbourCountry2',
             value = 'CLscientificWeight_ton')
 result
 ```
