@@ -3,7 +3,6 @@ title: "RDBES Catch and Effort Overview"
 date: "`r format(Sys.time(), '%d.%m.%Y')`"
 output:
   html_document:
-    toc: true
     
 params:
   set_subtitle: "Title"
@@ -231,25 +230,25 @@ barplot(data = sub_cl_2_top,
       asPct = T)
 ```
 
-### Landings by catch species group {.tabset}
-#### catch species group
+### Landings by species catch group {.tabset}
+#### species catch group
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
 
 barplot(data = cl, 
       x = "CatchGroup",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Catch Species Group",
+      title = "Landings (1000 t) by Species Catch Group",
       ylab = "Proportion of Landings (1000 t)")
 ```
 
-#### catch species group and country
+#### species catch group and country
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
 
 barplot(data = cl, 
       x = "CatchGroup",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      title = "Landings (1000 t) by Catch Species Group and Country",
+      title = "Landings (1000 t) by Species Catch Group and Country",
       ylab = "Proportion of Landings (1000 t)",
       asPct = T)
 
@@ -1763,7 +1762,7 @@ result[[1]]
 ```
 
 ## Appendix A. Dates of data extraction
-## Appendix B. Catch species groups
+## Appendix B. Species catch groups
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
 # data prep
 cl%>%
