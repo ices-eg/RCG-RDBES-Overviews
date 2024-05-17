@@ -12,7 +12,19 @@ pointsMap_func2 <- function(df,
                             RCGregion = NA,
                             spatial_dataset_name,
                             spatial_dataset_var_name) {
-  require(rlang)
+  # Marta Szymańska
+  # NMFRI
+  # msuska@mir.gdynia.pl
+  # edited by:
+  # Iga Gaca
+  # NMFRI
+  # igaca@mir.gdynia.pl
+  
+  ######################################
+  # load packages
+  ######################################
+  
+   require(rlang)
   require(ggplot2)
   require(sf)
   require(rnaturalearth)
@@ -29,11 +41,11 @@ pointsMap_func2 <- function(df,
   newVarName = NA
   addToTitle = NA
   RCGregion = 'BA'
-  # Wczytaj mapę świata
+  # load worldmap
   ne_countries <- ne_countries(scale = "medium", returnclass = "sf")
   
   ######################################
-  # cgeck parameters
+  # check parameters
   ######################################
   
   if (is.null(df)) {
