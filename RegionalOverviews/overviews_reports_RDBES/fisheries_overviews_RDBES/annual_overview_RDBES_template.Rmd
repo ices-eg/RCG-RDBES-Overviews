@@ -301,6 +301,7 @@ barplot(data = cl,
       ylab = "Proportion of Landings (1000 t)",
       asPct = T)
 
+
 ```
 
 ### Landings by metier {.tabset}
