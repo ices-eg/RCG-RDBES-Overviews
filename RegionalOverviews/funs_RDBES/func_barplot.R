@@ -32,6 +32,10 @@ barplot <- function(data = data,
   data$x <- data[, x]
   data$y <- data[, y]
   
+  if(is.factor(data$x)){
+    data$x<-as.character(data$x)
+  }
+  
   if (group != "") {
     data$grp <- as.factor(data[, group])
   } else {
