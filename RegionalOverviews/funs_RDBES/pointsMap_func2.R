@@ -21,7 +21,7 @@ pointsMap_func2 <- function(df,
   # igaca@mir.gdynia.pl
   
   ######################################
-  # load packages
+  # load packages #
   ######################################
   
    require(rlang)
