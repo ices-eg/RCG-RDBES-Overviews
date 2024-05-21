@@ -64,7 +64,7 @@ library(networkD3)
 ```{r loadFunctions, echo=FALSE}
 # LOAD FUNCTIONS GENERATING PLOTS/MAPS
 source("../../funs_RDBES/choroplethMap_func2.R", local = knitr::knit_global())
-
+source("D:/RCG-RDBES-Overviews/RegionalOverviews/funs_RDBES/pointsMap_func2.R", local = knitr::knit_global())
 #load barplot fuction
 source("../../funs_RDBES/func_barplot.R", local = knitr::knit_global())
 
@@ -418,6 +418,34 @@ barplot(data = sub_cl_2_top,
 ```
 
 #### map - harbour
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+sub_cl_top %>%  mutate(
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA
+       )-> df
+
+
+result <- pointsMap_func2(df,
+                          var_name = 'CLscientificWeight_1000ton',
+                          facet_name = 'CLyear',  # Poprawiono
+                          var_spatial_name = 'CLlandingLocation',
+                          spatial_dataset_name = 'Harbours',
+                          spatial_dataset_var_name = 'Harbour',
+                          plot_labels = FALSE,
+                          saveResults = FALSE,
+                          outputPath,
+                          Catch_group_name = NA,
+                          extraShp_name = 'StatRectshp',
+                          newVarName = NA,
+                          addToTitle = NA,
+                          RCGregion = 'BA')
+
+  
+result
+
+
+```
 #### map - harbour and flag country
 
 ### Landings abroad
