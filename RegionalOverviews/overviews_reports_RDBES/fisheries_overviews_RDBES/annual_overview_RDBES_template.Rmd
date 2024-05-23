@@ -72,7 +72,10 @@ source("../../funs_RDBES/func_barplot.R", local = knitr::knit_global())
 
 ```{r mapData, echo=FALSE}
 # LOAD DATA NEEDED FOR MAPS (shp, rdata, ...) FOR ALL RCGs
-
+UNLOCODE %>%
+  mutate(Harbour = loCode) %>%
+  filter(!is.na(Harbour)) %>%
+  select(Harbour, lat, lon) -> Harbours
 ```
 
 ```{r mapDataBA, include = F, eval=eval_region_BA}
@@ -427,6 +430,7 @@ sub_cl_top %>%  mutate(
 
 
 result <- pointsMap_func2(df,
+                          title = 'Landings (1000 t) by Harbour',
                           var_name = 'CLscientificWeight_1000ton',
                           facet_name = 'CLyear',  # Poprawiono
                           var_spatial_name = 'CLlandingLocation',
