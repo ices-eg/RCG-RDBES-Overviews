@@ -3,7 +3,7 @@ pointsMap_func2 <- function(df,
                             var_name,
                             facet_name,
                             var_spatial_name,
-                            plot_labels = FALSE,
+                            plot_labels = TRUE,
                             saveResults = FALSE,
                             outputPath,
                             Catch_group_name = NA,
@@ -12,7 +12,8 @@ pointsMap_func2 <- function(df,
                             addToTitle = NA,
                             RCGregion = NA,
                             spatial_dataset_name,
-                            spatial_dataset_var_name) {
+                            spatial_dataset_var_name
+                           ) {
   # Marta Szymańska
   # NMFRI
   # msuska@mir.gdynia.pl
@@ -157,50 +158,58 @@ pointsMap_func2 <- function(df,
 #   }
   #
   # # If there is any additional information to the title
-  if(!is.na(addToTitle)){ title = paste(title, ' (',addToTitle, ')', sep ='')}
-  # 
+ # if(!is.na(addToTitle)){ title = paste(title, ' (',addToTitle, ')', sep ='')}
+  # Removing missing values
+  # Removing missing values
+  df_spatial <- df_spatial[!is.na(df_spatial$lat) & !is.na(df_spatial$lon), ]
   
+  # Creating the plot
   plt <- ggplot() +
-    geom_sf(data = ne_countries, fill = "antiquewhite", linewidth = 0.5) +
-    coord_sf(crs = "+init=epsg:4326", ylim = c(min_lat, max_lat), xlim = c(min_lon, max_lon), expand = FALSE) +
-    labs(title = title, x = 'Longitude', y = 'Latitude') +  # Adjust title as needed
-    theme_classic() +
+    geom_sf(data = ne_countries, fill = "antiquewhite", linewidth = 0.5) +  # Adding the world map
+    coord_sf(crs = "+init=epsg:4326", ylim = c(min_lat, max_lat), xlim = c(min_lon, max_lon), expand = TRUE) +  # Specifying map coordinates
+    labs(title = title, x = 'Longitude', y = 'Latitude') +  # Adding title and axis labels
+    theme_classic() +  # Applying classic theme
     theme(
-      text = element_text(color = "#22211d"),
-      plot.background = element_rect(fill = "#ffffff", color = NA),
-      panel.background = element_rect(fill = "aliceblue", color = NA),
-      legend.background = element_rect(fill = "#ffffff", color = NA),
-      panel.border = element_rect(colour = "black", fill = NA, size = 1.5),
-      panel.grid.major = element_line(color = gray(.8), linetype = 'dashed', size = 0.5)
-    ) 
-  
-  # Add points
-  plt <- plt +
-    geom_point(data = df_spatial, aes(x = lon, y = lat, size = var, color = var), alpha = 0.75) +
-    scale_color_gradient(low = "yellow", high = "navy", name = "Landings (1000 t)") +
-    scale_size(range = c(0, 20), guide = FALSE) +
-    viridis::scale_fill_viridis(option = "viridis", begin = 1, end = 0, name = "Landings (1000 t)")
-  
-  #Add labels
-  if (plot_labels) {
-    plt <- plt + ggrepel::geom_label_repel(
-      data = df_spatial,
-      aes(x = lon, y = lat, label = as.character(Harbour)),  # Convert Harbour to character
-      box.padding = unit(0.2, "lines"),
-      point.padding = unit(0.2, "lines"),
-      color = 'black',
-      segment.color = gray(0.3),
-      size = 2,
-      fontface = 'bold',
-      arrow = arrow(length = unit(0.02, "npc"))
+      text = element_text(color = "#22211d"),  # Setting text color
+      plot.background = element_rect(fill = "#ffffff", color = NA),  # Setting plot background color
+      panel.background = element_rect(fill = "aliceblue", color = NA),  # Setting panel background color
+      legend.background = element_rect(fill = "#ffffff", color = NA),  # Setting legend background color
+      panel.border = element_rect(colour = "black", fill = NA, size = 1.5),  # Setting panel border
+      panel.grid.major = element_line(color = gray(.8), linetype = 'dashed', size = 0.5)  # Adding major grid lines
     )
-  }
-
-  # Add facet if necessary
-  if (!is.na(facet_name)) {
-    plt <- plt + facet_wrap(vars(facet))
-  }
-
+  
+  # Adding points
+  plt <- plt +
+    geom_point(data = df_spatial, aes(x = lon, y = lat, size = var, color = var), alpha = 0.75) +  # Adding points with size and color mapped to 'var'
+    scale_color_gradient(low = "yellow", high = "navy", name = "Landings (1000 t)") +  # Setting color scale
+    scale_size(range = c(0, 20), guide = FALSE) +  # Setting size scale
+    viridis::scale_fill_viridis(option = "viridis", begin = 1, end = 0, name = "Landings (1000 t)")  # Setting fill scale
+  
+  # Adding labels with filled background
+  plt <- plt + ggrepel::geom_label_repel(
+    data = df_spatial,
+    aes(x = lon, y = lat, label = var_spatial), 
+    box.padding = unit(0.2, "lines"), 
+    point.padding = unit(0.2, "lines"),  
+    color = 'black',  
+    size = 2,  
+    fontface = 'bold', 
+    fill = "white", 
+    alpha = 0.9,  
+    label.padding = unit(0.2, "lines"), 
+    label.r = unit(0.1, "lines"),  
+    arrow = arrow(length = unit(0.02, "npc"), type = "closed"), 
+    segment.color = 'black'  
+  )
+  
+  
+  # Adding facet if necessary
+ 
+   # plt <- plt + facet_wrap(vars(facet))  # Adding facet
+ 
+  
   return(plt)
+  
+  
 }
 

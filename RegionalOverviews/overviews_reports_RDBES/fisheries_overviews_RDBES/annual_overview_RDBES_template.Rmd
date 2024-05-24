@@ -436,14 +436,15 @@ result <- pointsMap_func2(df,
                           var_spatial_name = 'CLlandingLocation',
                           spatial_dataset_name = 'Harbours',
                           spatial_dataset_var_name = 'Harbour',
-                          plot_labels = FALSE,
+                          plot_labels = TRUE,
                           saveResults = FALSE,
                           outputPath,
                           Catch_group_name = NA,
                           extraShp_name = 'StatRectshp',
                           newVarName = NA,
                           addToTitle = NA,
-                          RCGregion = 'BA')
+                          RCGregion = 'BA'
+                         )
 
   
 result
