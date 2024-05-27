@@ -95,7 +95,8 @@ func_riverplot <-
                     sinksRight=FALSE, 
                     colourScale=flow_color,
                     NodeGroup = "group",
-                    nodeWidth=40, fontSize=13, nodePadding=20#,                    LinkGroup = "left"
+                    nodeWidth=40, fontSize=13, nodePadding=20,
+                    LinkGroup = "left"
                     )
       
     }else{

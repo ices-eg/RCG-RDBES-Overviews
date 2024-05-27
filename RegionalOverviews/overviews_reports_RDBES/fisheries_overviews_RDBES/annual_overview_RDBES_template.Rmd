@@ -4,6 +4,7 @@ date: "`r format(Sys.time(), '%d.%m.%Y')`"
 output:
   html_document:
     toc: true
+    fig_caption: yes
     
 params:
   set_subtitle: "Title"
@@ -193,7 +194,7 @@ autofit(ft)
 
 ### Landings by species {.tabset}
 #### species
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure**: Landings (1000 t) in the 20 main Species.'}
 
 sub_cl<- cl%>%
   group_by(CLyear,SpeciesLaName) %>%
@@ -205,11 +206,10 @@ barplot(data = sub_cl,
       title = "Landings (1000 t) by Species",
       ylab = "Sum of Landings (1000 t)")
 
-
 ```
 
 #### species and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure**: Landings (1000 t) by 20 main Species and Country.'}
 
 sub_cl_2<- cl%>%
   group_by(CLyear, SpeciesLaName, CLlandingCountry) %>%
@@ -454,17 +454,20 @@ result
 #### map - harbour and flag country
 
 ### Landings abroad
-```{r riverplot aborad, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9}
-paste("River plot of CLscientificWeight_ton between CLvesselFlagCountry (left) and Harbour (right). Width of line is proportional to landings", sep="")  
+Plot below shows the CLscientificWeight_ton between CLvesselFlagCountry (left), Harbour Country * (center) and CLlandingCountry(right).
+
+```{r riverplot aborad, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9, fig.cap = '**Figure**:River plot of Landings (1000t) between vessel Flag Country (left), Harbour Country (center) and landing Country(right). Width of line is proportional to landings. Harbour Country is the Country from the CLlandingLocation.'}
     
 cl %>%
-  group_by(CLyear, HarbourCountry2, CLvesselFlagCountry) %>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
   summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
 
 result<-func_riverplot(df = cl_river,
-            left = 'CLvesselFlagCountry',
-            right = 'HarbourCountry2',
-            value = 'CLscientificWeight_ton')
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
 result
 ```
 
@@ -743,18 +746,20 @@ barplot(data = sub_cl_2_top,
 #### map - harbour and flag country
 
 ### Landings abroad, small pelagics
-```{r riverplot aborad sp, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9}
-paste("River plot of CLscientificWeight_ton of small pelagic between CLvesselFlagCountry (left) and Harbour (right). Width of line is proportional to landings", sep="")  
+Plot below shows the Landing (1000t) of small pelagic between CLvesselFlagCountry (left), Harbour Country * (center) and CLlandingCountry(right).
+```{r riverplot aborad sp, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9, fig.cap = '**Figure**:River plot of Landings (1000t) of small pelagic between vessel Flag Country (left), Harbour Country (center) and landing Country(right). Width of line is proportional to landings. Harbour Country is the Country from the CLlandingLocation.'}
     
 cl %>%
   filter(CatchGroup == 'small pelagic')%>%
-  group_by(CLyear, HarbourCountry2, CLvesselFlagCountry) %>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
   summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
 
 result<-func_riverplot(df = cl_river,
-            left = 'CLvesselFlagCountry',
-            right = 'HarbourCountry2',
-            value = 'CLscientificWeight_ton')
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
 result
 ```
 
@@ -1047,18 +1052,20 @@ barplot(data = sub_cl_2_top,
 #### map - harbour and flag country
 
 ### Landings abroad, demersal (without flatfish)
-```{r riverplot aborad demersal, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9}
-paste("River plot of CLscientificWeight_ton of demersal between CLvesselFlagCountry (left) and Harbour (right). Width of line is proportional to landings", sep="")  
-    
+Plot below shows the Landing (1000t) of demersal between CLvesselFlagCountry (left), Harbour Country * (center) and CLlandingCountry(right).
+```{r riverplot aborad demersal, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9, fig.cap = '**Figure**:River plot of Landings (1000t) of demersal between vessel Flag Country (left), Harbour Country (center) and landing Country(right). Width of line is proportional to landings. Harbour Country is the Country from the CLlandingLocation.'}
+
 cl %>%
   filter(CatchGroup == 'demersal')%>%
-  group_by(CLyear, HarbourCountry2, CLvesselFlagCountry) %>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
   summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
 
 result<-func_riverplot(df = cl_river,
-            left = 'CLvesselFlagCountry',
-            right = 'HarbourCountry2',
-            value = 'CLscientificWeight_ton')
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
 result
 ```
 
@@ -1334,18 +1341,23 @@ barplot(data = sub_cl_2_top,
 #### map - harbour and flag country
 
 ### Landings abroad, flatfish
-```{r riverplot aborad flatfish, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9}
-paste("River plot of CLscientificWeight_ton of flatfish between CLvesselFlagCountry (left) and Harbour (right). Width of line is proportional to landings", sep="")  
+
+Plot below shows the Landing (1000t) of flatfish between CLvesselFlagCountry (left), Harbour Country * (center) and CLlandingCountry(right).
+
+```{r riverplot aborad flatfish, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9, fig.cap = '**Figure**:River plot of Landings (1000t) of flatfish between vessel Flag Country (left), Harbour Country (center) and landing Country (right). Width of line is proportional to landings. Harbour Country is the Country from the CLlandingLocation.'}
+
     
 cl %>%
   filter(CatchGroup == 'flatfish')%>%
-  group_by(CLyear, HarbourCountry2, CLvesselFlagCountry) %>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
   summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
 
 result<-func_riverplot(df = cl_river,
-            left = 'CLvesselFlagCountry',
-            right = 'HarbourCountry2',
-            value = 'CLscientificWeight_ton')
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
 result
 ```
 
