@@ -130,13 +130,21 @@ source('scripts/loadData.R', local = knitr::knit_global())
 **Disclaimer**
 The tables and figures of the overviews presented in this document are made for the coordination of EU regional fisheries data collection purposes and are not designed for any other use. Data used for producing the outputs are extracted from the Regional Database and Estimating System (RDBES) and EU Fleet Register. Dates of data extractions are stated in Appendix A. Due to different aggregations and reporting authorities, data can differ from those used e.g. for assessments or technical reports. 
 
-Member States (MS) are responsible for uploading latest data and the latest year should be viewed as provisional. Data can be resubmitted by a MS for more than one previous year so there might be differences in earlier year reports, if countries update back in time. Responsibility for the quality of the data and comparability to other data sources lies with the MS that provided these data. The upload logs presented by MS regarding the data submitted to RDB can be found in the Share Point for Intersessional Work, under the folder "Data".
+Member States (MS) are responsible for uploading latest data and the latest year should be viewed as provisional. Data can be resubmitted by a MS for more than one previous year so there might be differences in earlier year reports, if countries update back in time. Responsibility for the quality of the data and comparability to other data sources lies with the MS that provided these data. The upload logs presented by MS regarding the data submitted to RDBES should be found in the SharePoint for Intersessional Work, under the folder "Data".
 
-The respective scripts and calculations used for data displaying are publicly available via the RCG GitHub (https://github.com/ices-eg/RCGs) and subject to change as the work of the group progresses.
+The respective scripts and calculations used for data displaying are publicly available via the RCG GitHub (https://github.com/ices-eg/RCG-RDBES-Overviews) and subject to change as the work of the group progresses.
 
 # Introduction
-put some text here
+The RDBES data model is an evolution of the work already done in defining and using the previous Regional Database (RDB) and the COST data models and functions.
+The aims of the RDBES are:
+1)	To ensure that data can be made available for the coordination of regional fisheries data sampling plans, in particular for the EU DC-MAP Regional Coordination Groups (RCGs),
+2)	To provide a regional estimation system such that statistical estimates of quantities of interest can be produced from sample data,
+3)	To increase the data quality, documentation of data and ensuring of approved estimation methods are used,
+4)	To serve and facilitate the production of fisheries management advice and status reports,
+5)	To increase the awareness of fisheries data collected by the users of the RDBES and the overall usage of these data.
 
+In the RDBES data model the aggregated  effort and landings data are kept in the commercial landings (CL) and commercial effort (CE) tables. 
+These data formats are collecting aggregated data from national commercial fisheries. It allows for both official and scientific estimates of landings and effort in order to have transparency in what is scientific estimates. The scientific estimates will be used for scientific work, e.g, stock assessment, and the official will be used for reference to compare with other data sources, and to illustrate what are scientific estimates.
 ## Reading the graphs
 ### Barplots
 put some text here
