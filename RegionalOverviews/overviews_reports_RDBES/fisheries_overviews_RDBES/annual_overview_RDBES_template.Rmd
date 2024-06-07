@@ -4,6 +4,7 @@ date: "`r format(Sys.time(), '%d.%m.%Y')`"
 output:
   html_document:
     toc: true
+    fig_caption: yes
     
 params:
   set_subtitle: "Title"
@@ -65,14 +66,20 @@ library(networkD3)
 # LOAD FUNCTIONS GENERATING PLOTS/MAPS
 source("../../funs_RDBES/choroplethMap_func2.R", local = knitr::knit_global())
 
+source("../../funs_RDBES/pointsMap_func2.R", local = knitr::knit_global())
+
 #load barplot fuction
 source("../../funs_RDBES/func_barplot.R", local = knitr::knit_global())
+
 
 ```
 
 ```{r mapData, echo=FALSE}
 # LOAD DATA NEEDED FOR MAPS (shp, rdata, ...) FOR ALL RCGs
-
+UNLOCODE %>%
+  mutate(Harbour = loCode) %>%
+  filter(!is.na(Harbour)) %>%
+  select(Harbour, lat, lon) -> Harbours
 ```
 
 ```{r mapDataBA, include = F, eval=eval_region_BA}
@@ -130,27 +137,25 @@ source('scripts/loadData.R', local = knitr::knit_global())
 **Disclaimer**
 The tables and figures of the overviews presented in this document are made for the coordination of EU regional fisheries data collection purposes and are not designed for any other use. Data used for producing the outputs are extracted from the Regional Database and Estimating System (RDBES) and EU Fleet Register. Dates of data extractions are stated in Appendix A. Due to different aggregations and reporting authorities, data can differ from those used e.g. for assessments or technical reports. 
 
-Member States (MS) are responsible for uploading latest data and the latest year should be viewed as provisional. Data can be resubmitted by a MS for more than one previous year so there might be differences in earlier year reports, if countries update back in time. Responsibility for the quality of the data and comparability to other data sources lies with the MS that provided these data. The upload logs presented by MS regarding the data submitted to RDBES should be found in the SharePoint for Intersessional Work, under the folder "Data".
+Member States (MS) are responsible for uploading latest data and the latest year should be viewed as provisional. Data can be resubmitted by a MS for more than one previous year so there might be differences in earlier year reports, if countries update back in time. Responsibility for the quality of the data and comparability to other data sources lies with the MS that provided these data. The upload logs presented by MS regarding the data submitted to RDB can be found in the Share Point for Intersessional Work, under the folder "Data".
 
-The respective scripts and calculations used for data displaying are publicly available via the RCG GitHub (https://github.com/ices-eg/RCG-RDBES-Overviews) and subject to change as the work of the group progresses.
+The respective scripts and calculations used for data displaying are publicly available via the RCG GitHub (https://github.com/ices-eg/RCGs) and subject to change as the work of the group progresses.
 
 # Introduction
-The RDBES data model is an evolution of the work already done in defining and using the previous Regional Database (RDB) and the COST data models and functions.
-The aims of the RDBES are:
-1)	To ensure that data can be made available for the coordination of regional fisheries data sampling plans, in particular for the EU DC-MAP Regional Coordination Groups (RCGs),
-2)	To provide a regional estimation system such that statistical estimates of quantities of interest can be produced from sample data,
-3)	To increase the data quality, documentation of data and ensuring of approved estimation methods are used,
-4)	To serve and facilitate the production of fisheries management advice and status reports,
-5)	To increase the awareness of fisheries data collected by the users of the RDBES and the overall usage of these data.
+
+The present Catch and Effort Overview displays summary information on EU commercial landings (CL) and fishing effort (CE) statistics included in the Regional Data Base and Estimation System (RDBES), which is used to store detailed commercial fisheries and sampling data. These reports present summary information on landings volume and species composition and also the fishing effort of the EU fisheries by region, for 2023.
+
+The information included in the RDBES have improved when comparing with the previous Regional Database (RDB), and the outcomes of the data reported to RDBES can also result in more detailed information which may be very useful for different purposes and end users.
 
 In the RDBES data model the aggregated  effort and landings data are kept in the commercial landings (CL) and commercial effort (CE) tables. 
-These data formats are collecting aggregated data from national commercial fisheries. It allows for both official and scientific estimates of landings and effort in order to have transparency in what is scientific estimates. The scientific estimates will be used for scientific work, e.g, stock assessment, and the official will be used for reference to compare with other data sources, and to illustrate what are scientific estimates.
+These data formats are collecting aggregated data from national commercial fisheries. It allows for both official data and scientific estimates of landings and effort in order to have transparency in what is scientific estimates. In the present data model, the scientific estimates are the mandatory fields (and not the official data). For this reason, those scientific estimates are the ones used to produce the figures presented in this overview. 
+
+The preparation of these reports, using the new RDBES data format, is still in development and more improvements are expected to be achieved in the following years.
+
 ## Reading the graphs
-### Barplots
-put some text here
 
 ### Maps
-put some text here
+The maps are generated based on complete and available data from the RDBES. The subtitles of the header refer to the sub-selection that is displayed (e.g. “all Data”, “pelagics”, etc.).  If the data cannot be shown on a map (e.g. due to missing information on the area or harbour code), the missing values are given in the figure text below. 
 
 # Overall fleet evolution (All RCGs){.tabset}
 The tables included in this section present a summary of the information on licensed vessels from the European Union Fleet Register.
@@ -194,11 +199,13 @@ autofit(ft)
 
 # Landings (CL)
 
+In this section it is presented the summary information of the overall landings, and also of four species catch groups present in the landings: small pelagics, demersal, flatfish and crustaceans.  
+
 ## Overall landings
 
 ### Landings by species {.tabset}
-#### species
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Species
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 1**: Landings of the 20 main species present in the region.'}
 
 sub_cl<- cl%>%
   group_by(CLyear,SpeciesLaName) %>%
@@ -207,14 +214,13 @@ sub_cl<- cl%>%
 barplot(data = sub_cl, 
       x = "SpeciesLaName",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Species",
-      ylab = "Sum of Landings (1000 t)")
-
+      #title = "Landings (1000 t) by Species",
+      ylab = "Landings (1000 t)")
 
 ```
 
-#### species and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Species and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 2**: Proportion of countries landings per main species landed (top 20).'}
 
 sub_cl_2<- cl%>%
   group_by(CLyear, SpeciesLaName, CLlandingCountry) %>%
@@ -234,86 +240,87 @@ barplot(data = sub_cl_2_top,
       x = "SpeciesLaName",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      title = "Landings (1000 t) by Species and Country",
-      ylab = "Proportion of Landings (1000 t)",
+      #title = "Landings (1000 t) by Species and Country",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
 ```
 
 ### Landings by species catch group {.tabset}
-#### species catch group
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Species catch group
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 3**: Sum of the landings by species catch group.'}
 
 barplot(data = cl, 
       x = "CatchGroup",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Species Catch Group",
-      ylab = "Proportion of Landings (1000 t)")
+      #title = "Landings (1000 t) by Species Catch Group",
+      ylab = "Landings (1000 t)")
 ```
 
-#### species catch group and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Species catch group and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 4**: Proportion of countries landings by species catch group.'}
 
 barplot(data = cl, 
       x = "CatchGroup",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      title = "Landings (1000 t) by Species Catch Group and Country",
-      ylab = "Proportion of Landings (1000 t)",
+      #title = "Landings (1000 t) by Species Catch Group and Country",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
 
 ```
 
 
-### Landings by fleet
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+### Landings by fleet segment
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 5**: Proportion of countries landings by vessel length category.'}
 barplot(data = cl, 
       x = "CLvesselLengthCategory",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      title = "Landings (1000 t) by Vessel Length Category and Country",
-      ylab = "Proportion of Landings (1000 t)",
+     # title = "Landings (1000 t) by Vessel Length Category and Country",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
 
 ```
 
 ### Landings by area {.tabset}
-#### area
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Area
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 6**: Landings (all species) distribution by area.'}
 barplot(data = cl, 
       x = "CLarea",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Area",
-      ylab = "Sum of Landings (1000 t)")
+    #  title = "Landings (1000 t) by Area",
+      ylab = "Landings (1000 t)")
 
 ```
 
-#### area and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Area and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 7**: Proportion of countries total landings by area.'}
 barplot(data = cl, 
       x = "CLarea",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      title = "Landings (1000 t) by Area and Country",
-      ylab = "Proportion of Landings (1000 t)",
+      #title = "Landings (1000 t) by Area and Country",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
 
 ```
 
-#### country and area
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Country and area
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 8**: Proportion of the total landings per area, by country.'}
 barplot(data = cl, 
       x = "CLlandingCountry",
       y = "CLscientificWeight_1000ton",
       group = "CLarea",
-      title = "Landings (1000 t) by Country and Area",
-      ylab = "Proportion of Landings (1000 t)",
+    #  title = "Landings (1000 t) by Country and Area",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
+
 
 ```
 
 ### Landings by metier {.tabset}
-#### metier lvl5
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#### Metier lvl5
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap='**Figure 9**: Total landings by metier level 5 (top 20).'}
 #data prep
 sub_cl_top <- cl%>%
   mutate(CLmetier5 = substr(CLmetier6, 1, 7))%>%
@@ -325,12 +332,12 @@ sub_cl_top <- cl%>%
 barplot(data = sub_cl_top,
       x = "CLmetier5",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Metier Lvl5",
-      ylab = "Proportion of Landings (1000 t)")
+    #  title = "Landings (1000 t) by Metier Lvl5",
+      ylab = "Landings (1000 t)")
 ```
 
-#### metier lvl5 and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#### Metier lvl5 and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap='**Figure 10**: Proportion of countries landings by metier level 5 (top 20).'}
 #data prep
 sub_cl_2<- cl%>%
   mutate(CLmetier5 = substr(CLmetier6, 1, 7))%>%
@@ -347,14 +354,14 @@ barplot(data = sub_cl_2_top,
       x = "CLmetier5",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      title = "Landings (1000 t) by Metier Lvl5 and Country",
-      ylab = "Proportion of Landings (1000 t)",
+    #  title = "Landings (1000 t) by Metier Lvl5 and Country",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
 
 ```
 
-#### metier lvl6
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Metier lvl6
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 11**: Total landings by metier level 6 (top 20).'}
 sub_cl_top<- cl%>%
   group_by(CLyear, CLmetier6) %>%
   summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
@@ -363,12 +370,12 @@ sub_cl_top<- cl%>%
 barplot(data = sub_cl_top, 
       x = "CLmetier6",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Metier Lvl6",
-      ylab = "Sum of Landings (1000 t)")
+      #title = "Landings (1000 t) by Metier Lvl6",
+      ylab = "Landings (1000 t)")
 ```
 
-#### metier lvl6 and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Metier lvl6 and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 12**: Proportion of countries landings by metier level 6 (top 20).'}
 sub_cl_2<- cl%>%
   group_by(CLyear, CLmetier6, CLlandingCountry) %>%
   summarise(CLscientificWeight_1000ton_total = sum(CLscientificWeight_1000ton))
@@ -382,15 +389,15 @@ sub_cl_2_top <- sub_cl_2_top %>%
 barplot(data = sub_cl_2_top, 
         x = "CLmetier6",
         y = "CLscientificWeight_1000ton_total",
-        title = "Landings (1000 t) by Metier Lvl6 and Country",
+     #   title = "Landings (1000 t) by Metier Lvl6 and Country",
         group = "CLlandingCountry",
-        ylab = "Proportion of Landings (1000 t)",
+        ylab = "Proportion of Landings (%))",
         asPct = T)
 ```
 
 ### Landings by harbour {.tabset}
-#### harbour
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Harbour
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 13**: Total landings of the main harbours (top 20).'}
 sub_cl_top<- cl%>%
   group_by(CLyear, CLlandingLocation) %>%
   summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
@@ -399,12 +406,12 @@ sub_cl_top<- cl%>%
 barplot(data = sub_cl_top, 
       x = "CLlandingLocation",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Harbours",
-      ylab = "Sum of Landings (1000 t)")
+    # title = "Landings (1000 t) by Harbours",
+      ylab = "Landings (1000 t)")
 ```
 
-#### harbour and flag country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Harbour and flag country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 14**: Proportion of flag country landings by harbour (top 20).'}
 sub_cl_2 <- cl%>%
   group_by(CLyear, CLlandingLocation, CLvesselFlagCountry) %>%
   summarise(CLscientificWeight_1000ton_total = sum(CLscientificWeight_1000ton))
@@ -418,33 +425,68 @@ sub_cl_2_top <- sub_cl_2_top %>%
 barplot(data = sub_cl_2_top, 
         x = "CLlandingLocation",
         y = "CLscientificWeight_1000ton_total",
-        title = "Landings (1000 t) by Harbour and Flag Country",
+    #    title = "Landings (1000 t) by Harbour and Flag Country",
         group = "CLvesselFlagCountry",
-        ylab = "Proportion of Landings (1000 t)",
+        ylab = "Proportion of Landings (%)",
         asPct = T)
 ```
 
-#### map - harbour
-#### map - harbour and flag country
+#### Map - harbour
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 15**: Map with the landing weight by main harbours (top 20).'}
+
+sub_cl_top %>%  mutate(
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA
+       )-> df
+
+
+result <- pointsMap_func2(df,
+                          title = '', #Landings (1000 t) by Harbour
+                          var_name = 'CLscientificWeight_1000ton',
+                          facet_name = 'CLyear',  # Poprawiono
+                          var_spatial_name = 'CLlandingLocation',
+                          spatial_dataset_name = 'Harbours',
+                          spatial_dataset_var_name = 'Harbour',
+                          plot_labels = TRUE,
+                          saveResults = FALSE,
+                          outputPath,
+                          Catch_group_name = NA,
+                          extraShp_name = 'StatRectshp',
+                          newVarName = NA,
+                          addToTitle = NA,
+                          RCGregion = 'BA'
+                         )
+
+  
+result
+
+```
+#### Map - harbour and flag country
+
+To be prepared for the next year.
 
 ### Landings abroad
-```{r riverplot aborad, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9}
-paste("River plot of CLscientificWeight_ton between CLvesselFlagCountry (left) and Harbour (right). Width of line is proportional to landings", sep="")  
+The plot below shows the flow of the landings between the vessel Flag Country (left), Harbour Country (center) and the Landing Country (right).
+
+```{r riverplot aboard, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9, fig.cap = '**Figure 16**: River plot of total landings between vessel Flag Country (left), Harbour Country (center) and landing Country (right). Width of each line is proportional to landings proportion. Harbour Country is the country code obtained from the CLlandingLocation.'}
     
 cl %>%
-  group_by(CLyear, HarbourCountry2, CLvesselFlagCountry) %>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
   summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
 
 result<-func_riverplot(df = cl_river,
-            left = 'CLvesselFlagCountry',
-            right = 'HarbourCountry2',
-            value = 'CLscientificWeight_ton')
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
 result
 ```
 
 ### Spatial distribution of landings
 
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 17**: Spatial distribution of the landings by statistical rectangle.'}
 # do we need information on for how many rows(%) there was a missing CLscientificWeight_ton? <-------------------------- to do
 
 # data prep
@@ -479,44 +521,68 @@ result[[1]]
 
 
 ## Small pelagics landings
+
 ### Landings by country, small pelagics
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 18**: Landings of small pelagic species by country.'}
 
 barplot(data = cl %>%
   filter(CatchGroup=='small pelagic'), 
       x = "CLlandingCountry",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Country",
-      ylab = "Sum of Landings (1000 t)",
+   #   title = "Landings (1000 t) by Country",
+      ylab = "Landings (1000 t)",
       col_cou = T )
 ```
 
 ### Landings by species, small pelagics {.tabset}
-#### species
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Species
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 19**: Landings of the main landed species (top 20) from the small pelagic species catch group.'}
 
-barplot(data = cl%>%
-  filter(CatchGroup=='small pelagic'), 
+smallPelag <- cl%>% filter(CatchGroup=='small pelagic')
+
+sub_cl<- smallPelag %>%
+  group_by(CLyear,SpeciesLaName) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20, wt=CLscientificWeight_1000ton)
+
+barplot(data = sub_cl, 
       x = "SpeciesLaName",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Species",
-      ylab = "Sum of Landings (1000 t)")
+      #title = "Landings (1000 t) by Species",
+      ylab = "Landings (1000 t)")
+
+
 ```
 
-#### species and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
-barplot(data = cl%>%filter(CatchGroup=='small pelagic'), 
+#### Species and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 20**: Proportion of countries with small pelagics landings by species (top 20).'}
+
+sub_cl_2<- smallPelag%>%
+  group_by(CLyear, SpeciesLaName, CLlandingCountry) %>%
+  summarise(CLscientificWeight_1000ton_total = sum(CLscientificWeight_1000ton))
+
+sub_cl_top <- sub_cl %>%
+  arrange(desc(CLscientificWeight_1000ton)) %>%
+  top_n(20)
+
+sub_cl_top$Top <- "TOP"
+sub_cl_2_top <- left_join(sub_cl_2,sub_cl_top,by="SpeciesLaName")
+
+sub_cl_2_top <- sub_cl_2_top %>%
+  filter(Top=='TOP')
+
+barplot(data = sub_cl_2_top,
       x = "SpeciesLaName",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      title = "Landings (1000 t) by Species and Country",
-      ylab = "Proportion of Landings (1000 t)",
+     # title = "Landings (1000 t) by Species and Country",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
 ```
 
 ### Landings by fleet, small pelagics {.tabset}
-#### fleet
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Fleet
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 21**: Landings of small pelagics by the combined country*vessel fleet segment (top 20).'}
 
 sub_cl_top<- cl%>%
   filter(CatchGroup=='small pelagic')%>%
@@ -527,75 +593,81 @@ sub_cl_top<- cl%>%
 barplot(data = sub_cl_top, 
       x = "FlagCountry_Loa",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Species",
-      ylab = "Sum of Landings (1000 t)")
+     # title = "Landings (1000 t) by Species",
+      ylab = "Landings (1000 t)")
 ```
 
-#### country and fleet
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Country and fleet
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6,fig.height=6, fig.cap = '**Figure 22**: Proportion of the small pelagics landings of the countries by vessel fleet segment.'}
 
 barplot(data = cl%>%filter(CatchGroup=='small pelagic'),
       x = "CLvesselLengthCategory",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      title = "Landings (1000 t) by Vessel Length Category and Country",
-      ylab = "Proportion of Landings (1000 t)",
+      # title = "Landings (1000 t) by Vessel Length Category and Country",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
 ```
 
-#### fleet and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Fleet and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 23**: Proportion of the vessel fleet segments with landings of small pelagics, by country.'}
 
 barplot(data = cl%>%filter(CatchGroup=='small pelagic'),
       x = "CLlandingCountry",
       y = "CLscientificWeight_1000ton",
       group = "CLvesselLengthCategory",
-      title = "Landings (1000 t) by Country and Vessel Length Category",
-      ylab = "Proportion of Landings (1000 t)",
+      # title = "Landings (1000 t) by Country and Vessel Length Category",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
 ```
 
 ### Landings by area, small pelagics {.tabset}
-#### area
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Area
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 24**: Landings distribution of small pelagics, by area.'}
+
 barplot(data = cl%>%filter(CatchGroup == 'small pelagic'), 
       x = "CLarea",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Area",
-      ylab = "Sum of Landings (1000 t)")
+   #   title = "Landings (1000 t) by Area",
+      ylab = "Landings (1000 t)")
 
 ```
 
-#### area and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Area and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 25**: Proportion of countries landings of small pelagics by area.'}
 barplot(data = cl%>%filter(CatchGroup == 'small pelagic'), 
       x = "CLarea",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      title = "Landings (1000 t) by Area and Country",
-      ylab = "Proportion of Landings (1000 t)",
+    #  title = "Landings (1000 t) by Area and Country",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
 
 ```
 
-#### country and area
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Country and area
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 26**: Proportion of small pelagics landings per area, by country.'}
 barplot(data = cl%>%filter(CatchGroup == 'small pelagic'),
       x = "CLlandingCountry",
       y = "CLscientificWeight_1000ton",
       group = "CLarea",
       title = "Landings (1000 t) by Country and Area",
-      ylab = "Proportion of Landings (1000 t)",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
 
 ```
 
-#### map area
-#### map area and flag country
+#### Map area
+
+To be prepared for the next year.
+
+#### Map area and flag country
+
+To be prepared for the next year.
 
 ### Landings by metier, small pelagics {.tabset}
-#### metier lvl5
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#### Metier lvl5
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap = '**Figure 27**: Small pelagics landings by metier level 5 (top 20).'}
 #data prep
 sub_cl_top <- cl%>%
   filter(CatchGroup == 'small pelagic')%>%
@@ -607,12 +679,12 @@ sub_cl_top <- cl%>%
 barplot(data = sub_cl_top,
       x = "CLmetier5",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Metier Lvl5",
-      ylab = "Proportion of Landings (1000 t)")
+    #  title = "Landings (1000 t) by Metier Lvl5",
+      ylab = "Landings (1000 t)")
 ```
 
-#### metier lvl5 and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#### Metier lvl5 and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap='**Figure 28**: Proportion of countries landings of small pelagics by metier level 5 (top 20).'}
 #data prep
 sub_cl_2 <- cl%>%
   filter(CatchGroup == 'small pelagic') %>%
@@ -630,14 +702,14 @@ barplot(data = sub_cl_2_top,
       x = "CLmetier5",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      title = "Landings (1000 t) by Metier Lvl5 and Country",
-      ylab = "Proportion of Landings (1000 t)",
+    # title = "Landings (1000 t) by Metier Lvl5 and Country",
+      ylab = "Proportion of Landings (#)",
       asPct = T)
 
 ```
 
-#### metier lvl6
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Metier lvl6
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 29**: Small pelagics landings by metier level 6 (top 20).'}
 sub_cl_top <- cl%>%
   filter(CatchGroup == 'small pelagic')%>%
   group_by(CLyear, CLmetier6) %>%
@@ -651,8 +723,8 @@ barplot(data = sub_cl_top,
       ylab = "Sum of Landings (1000 t)")
 ```
 
-#### metier lvl6 and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Metier lvl6 and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 30**: Proportion of countries landings of small pelagics by metier level 6 (top 20).'}
 sub_cl_2<- cl%>%
   filter(CatchGroup == 'small pelagic') %>%
   group_by(CLyear, CLmetier6, CLlandingCountry) %>%
@@ -667,16 +739,16 @@ sub_cl_2_top <- sub_cl_2_top %>%
 barplot(data = sub_cl_2_top, 
         x = "CLmetier6",
         y = "CLscientificWeight_1000ton_total",
-        title = "Landings (1000 t) by Metier Lvl6 and Country",
+    #  title = "Landings (1000 t) by Metier Lvl6 and Country",
         group = "CLlandingCountry",
-        ylab = "Proportion of Landings (1000 t)",
+        ylab = "Proportion of Landings (%)",
         asPct = T)
 ```
 
 
 ### Landings by harbour, small pelagics {.tabset}
-#### harbour
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Harbour
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 31**: Small pelagics landings in the main harbours (top 20).'}
 sub_cl_top  <- cl %>%
   filter(CatchGroup == 'small pelagic') %>%
   group_by(CLyear, CLlandingLocation) %>%
@@ -686,12 +758,12 @@ sub_cl_top  <- cl %>%
 barplot(data = sub_cl_top, 
       x = "CLlandingLocation",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Harbours",
-      ylab = "Sum of Landings (1000 t)")
+   # title = "Landings (1000 t) by Harbours",
+      ylab = "Landings (1000 t)")
 ```
 
-#### harbour and flag country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Harbour and flag country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 32**: Proportion of small pelagics landings by flag country and harbour.'}
 sub_cl_2<- cl%>%
   filter(CatchGroup == 'small pelagic')%>%
   group_by(CLyear, CLlandingLocation, CLvesselFlagCountry) %>%
@@ -707,33 +779,72 @@ sub_cl_2_top <- sub_cl_2_top %>%
 barplot(data = sub_cl_2_top, 
         x = "CLlandingLocation",
         y = "CLscientificWeight_1000ton_total",
-        title = "Landings (1000 t) by Harbour and Flag Country",
+       # title = "Landings (1000 t) by Harbour and Flag Country",
         group = "CLvesselFlagCountry",
-        ylab = "Proportion of Landings (1000 t)",
+        ylab = "Proportion of Landings (%)",
         asPct = T)
 ```
 
-#### map - harbour
-#### map - harbour and flag country
+#### Map - harbour
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 33**: Map with the landing weight of small pelagics by main harbours (top 20).'}
+
+sub_cl_top %>%  mutate(
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA
+       )-> df
+
+
+result <- pointsMap_func2(df,
+                          title = '', #Landings (1000 t) by Harbour
+                          var_name = 'CLscientificWeight_1000ton',
+                          facet_name = 'CLyear',  # Poprawiono
+                          var_spatial_name = 'CLlandingLocation',
+                          spatial_dataset_name = 'Harbours',
+                          spatial_dataset_var_name = 'Harbour',
+                          plot_labels = TRUE,
+                          saveResults = FALSE,
+                          outputPath,
+                          Catch_group_name = NA,
+                          extraShp_name = 'StatRectshp',
+                          newVarName = NA,
+                          addToTitle = NA,
+                          RCGregion = 'BA'
+                         )
+
+  
+result
+
+```
+
+
+#### Map - harbour and flag country
+
+To be prepared for the next year.
 
 ### Landings abroad, small pelagics
-```{r riverplot aborad sp, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9}
-paste("River plot of CLscientificWeight_ton of small pelagic between CLvesselFlagCountry (left) and Harbour (right). Width of line is proportional to landings", sep="")  
+
+The plot below shows the flow of the small pelagics landings between the vessel Flag Country (left), Harbour Country (center) and the Landing Country (right).
+
+```{r riverplot aborad sp, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9, fig.cap = '**Figure 34**: River plot of small pelagics landings between vessel Flag Country (left), Harbour Country (center) and landing Country (right). Width of each line is proportional to landings proportion. Harbour Country is the country code obtained from the CLlandingLocation. '}
     
 cl %>%
   filter(CatchGroup == 'small pelagic')%>%
-  group_by(CLyear, HarbourCountry2, CLvesselFlagCountry) %>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
   summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
 
 result<-func_riverplot(df = cl_river,
-            left = 'CLvesselFlagCountry',
-            right = 'HarbourCountry2',
-            value = 'CLscientificWeight_ton')
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
 result
 ```
 
 ### Spatial distribution of landings, small pelagics
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 35**: Spatial distribution of the small pelagics landings by statistical rectangle.'}
 # do we need information on for how many rows(%) there was a missing CLscientificWeight_ton? <-------------------------- to do
 
 # data prep
@@ -769,20 +880,21 @@ result[[1]]
 
 ## Demersal landings (without flatfish)
 ### Landings by country, demersal (without flatfish)
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 36**: Landings of demersal species by country.'}
 
 barplot(data = cl %>%
   filter(CatchGroup=='demersal'), 
       x = "CLlandingCountry",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Country",
-      ylab = "Sum of Landings (1000 t)",
+     # title = "Landings (1000 t) by Country",
+      ylab = "Landings (1000 t)",
       col_cou = T )
 ```
 
 ### Landings by species, demersal (without flatfish) {.tabset}
-#### species
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Species
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 37**: Landings of the main landed species (top 20) from the demersal species catch group.'}
+
 sub_cl_top<- cl%>%
   filter(CatchGroup=='demersal')%>%
   group_by(CLyear, SpeciesLaName) %>%
@@ -792,12 +904,12 @@ sub_cl_top<- cl%>%
 barplot(data = sub_cl_top, 
       x = "SpeciesLaName",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Species",
-      ylab = "Sum of Landings (1000 t)")
+     #title = "Landings (1000 t) by Species",
+      ylab = "Landings (1000 t)")
 ```
 
-#### species and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Species and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 38**: Proportion of countries with demersal species landings by species (top 20).'}
 #data prep
 sub_cl_2 <- cl%>%
   filter(CatchGroup == 'demersal') %>%
@@ -814,14 +926,14 @@ barplot(data = sub_cl_2_top,
       x = "SpeciesLaName",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      title = "Landings (1000 t) by Species and Country",
-      ylab = "Proportion of Landings (1000 t)",
+    # title = "Landings (1000 t) by Species and Country",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
 ```
 
 ### Landings by fleet, demersal (without flatfish) {.tabset}
 #### fleet
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 39**: Landings of demersal species by the combined country*vessel fleet segment (top 20).'}
 
 sub_cl_top<- cl%>%
   filter(CatchGroup=='demersal')%>%
@@ -832,75 +944,81 @@ sub_cl_top<- cl%>%
 barplot(data = sub_cl_top, 
       x = "FlagCountry_Loa",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Species",
-      ylab = "Sum of Landings (1000 t)")
+ #   title = "Landings (1000 t) by Species",
+      ylab = "Landings (1000 t)")
 ```
 
-#### country and fleet
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Country and fleet
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 40**: Proportion of demersal species landings of the countries by vessel fleet segment.'}
 
 barplot(data = cl[CatchGroup=='demersal',],
       x = "CLvesselLengthCategory",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
       title = "Landings (1000 t) by Vessel Length Category and Country",
-      ylab = "Proportion of Landings (1000 t)",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
 ```
 
-#### fleet and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Fleet and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 41**: Proportion of the vessel fleet segments with landings of demersal species, by country.'}
 
 barplot(data = cl[CatchGroup=='demersal',],
       x = "CLlandingCountry",
       y = "CLscientificWeight_1000ton",
       group = "CLvesselLengthCategory",
-      title = "Landings (1000 t) by Country and Vessel Length Category",
-      ylab = "Proportion of Landings (1000 t)",
+ #   title = "Landings (1000 t) by Country and Vessel Length Category",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
 ```
 
 ### Landings by area, demersal (without flatfish) {.tabset}
-#### area
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Area
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 42**: Landings distribution of demersal species, by area.'}
 barplot(data = cl[CatchGroup=='demersal',], 
       x = "CLarea",
       y = "CLscientificWeight_1000ton",
       title = "Landings (1000 t) by Area",
-      ylab = "Sum of Landings (1000 t)")
+      ylab = "Landings (1000 t)")
 
 ```
 
-#### area and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Area and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 43**: Proportion of countries landings of demersal species by area.'}
 barplot(data = cl[CatchGroup=='demersal',],
       x = "CLarea",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      title = "Landings (1000 t) by Area and Country",
-      ylab = "Proportion of Landings (1000 t)",
+  #   title = "Landings (1000 t) by Area and Country",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
 
 ```
 
-#### country and area
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Country and area
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 44**: Proportion of demersal species landings per area, by country.'}
+
 barplot(data = cl[CatchGroup=='demersal',],
       x = "CLlandingCountry",
       y = "CLscientificWeight_1000ton",
       group = "CLarea",
       title = "Landings (1000 t) by Country and Area",
-      ylab = "Proportion of Landings (1000 t)",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
 
 ```
 
-#### map area
-#### map area and flag country
+#### Map area
+
+To be prepared for the next year.
+
+#### Map area and flag country
+
+To be prepared for the next year.
 
 ### Landings by metier, demersal (without flatfish) {.tabset}
-#### metier lvl5
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#### Metier lvl5
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap='**Figure 45**: Demersal species landings by metier level 5 (top 20).'}
 #data prep
 sub_cl_top <- cl%>%
   filter(CatchGroup == 'demersal')%>%
@@ -912,12 +1030,12 @@ sub_cl_top <- cl%>%
 barplot(data = sub_cl_top,
       x = "CLmetier5",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Metier Lvl5",
-      ylab = "Sum of Landings (1000 t)")
+  #   title = "Landings (1000 t) by Metier Lvl5",
+      ylab = "Landings (1000 t)")
 ```
 
-#### metier lvl5 and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#### Metier lvl5 and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap='**Figure 46**: Proportion of countries landings of demersal species by metier level 5 (top 20).'}
 #data prep
 sub_cl_2 <- cl%>%
   filter(CatchGroup == 'demersal') %>%
@@ -935,14 +1053,15 @@ barplot(data = sub_cl_2_top,
       x = "CLmetier5",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      title = "Landings (1000 t) by Metier Lvl5 and Country",
-      ylab = "Proportion of Landings (1000 t)",
+ #     title = "Landings (1000 t) by Metier Lvl5 and Country",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
 
 ```
 
-#### metier lvl6
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Metier lvl6
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 47**: Demersal species landings by metier level 6 (top 20).'}
+
 sub_cl_top <- cl%>%
   filter(CatchGroup == 'demersal')%>%
   group_by(CLyear, CLmetier6) %>%
@@ -952,12 +1071,13 @@ sub_cl_top <- cl%>%
 barplot(data = sub_cl_top, 
       x = "CLmetier6",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Metier Lvl6",
-      ylab = "Sum of Landings (1000 t)")
+ #     title = "Landings (1000 t) by Metier Lvl6",
+      ylab = "Landings (1000 t)")
 ```
 
-#### metier lvl6 and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Metier lvl6 and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 48**: Proportion of countries landings of demersal species by metier level 6 (top 20).'}
+
 sub_cl_2<- cl%>%
   filter(CatchGroup == 'demersal') %>%
   group_by(CLyear, CLmetier6, CLlandingCountry) %>%
@@ -972,15 +1092,15 @@ sub_cl_2_top <- sub_cl_2_top %>%
 barplot(data = sub_cl_2_top, 
         x = "CLmetier6",
         y = "CLscientificWeight_1000ton_total",
-        title = "Landings (1000 t) by Metier Lvl6 and Country",
+   #     title = "Landings (1000 t) by Metier Lvl6 and Country",
         group = "CLlandingCountry",
-        ylab = "Proportion of Landings (1000 t)",
+        ylab = "Proportion of Landings (%)",
         asPct = T)
 ```
 
 ### Landings by harbour, demersal (without flatfish) {.tabset}
-#### harbour
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Harbour
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 49**: Demersal species landings in the main harbours (top 20).'}
 sub_cl_top  <- cl %>%
   filter(CatchGroup == 'demersal') %>%
   group_by(CLyear, CLlandingLocation) %>%
@@ -990,12 +1110,13 @@ sub_cl_top  <- cl %>%
 barplot(data = sub_cl_top, 
       x = "CLlandingLocation",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Harbours",
-      ylab = "Sum of Landings (1000 t)")
+  #   title = "Landings (1000 t) by Harbours",
+      ylab = "Landings (1000 t)")
 ```
 
-#### harbour and flag country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Harbour and flag country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 50**: Proportion of demersal species landings by flag country and harbour.'}
+
 sub_cl_2<- cl%>%
   filter(CatchGroup == 'demersal')%>%
   group_by(CLyear, CLlandingLocation, CLvesselFlagCountry) %>%
@@ -1011,33 +1132,70 @@ sub_cl_2_top <- sub_cl_2_top %>%
 barplot(data = sub_cl_2_top, 
         x = "CLlandingLocation",
         y = "CLscientificWeight_1000ton_total",
-        title = "Landings (1000 t) by Harbour and Flag Country",
+  #     title = "Landings (1000 t) by Harbour and Flag Country",
         group = "CLvesselFlagCountry",
-        ylab = "Proportion of Landings (1000 t)",
+        ylab = "Proportion of Landings (%)",
         asPct = T)
 ```
 
-#### map - harbour
-#### map - harbour and flag country
+#### Map - harbour
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 51**: Map with the landing weight of demersal species by main harbours (top 20).'}
+
+sub_cl_top %>%  mutate(
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA
+       )-> df
+
+result <- pointsMap_func2(df,
+                          title = '', #Landings (1000 t) by Harbour
+                          var_name = 'CLscientificWeight_1000ton',
+                          facet_name = 'CLyear',  # Poprawiono
+                          var_spatial_name = 'CLlandingLocation',
+                          spatial_dataset_name = 'Harbours',
+                          spatial_dataset_var_name = 'Harbour',
+                          plot_labels = TRUE,
+                          saveResults = FALSE,
+                          outputPath,
+                          Catch_group_name = NA,
+                          extraShp_name = 'StatRectshp',
+                          newVarName = NA,
+                          addToTitle = NA,
+                          RCGregion = 'BA'
+                         )
+
+  
+result
+
+```
+
+#### Map - harbour and flag country
+
+To be prepared for the next year.
 
 ### Landings abroad, demersal (without flatfish)
-```{r riverplot aborad demersal, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9}
-paste("River plot of CLscientificWeight_ton of demersal between CLvesselFlagCountry (left) and Harbour (right). Width of line is proportional to landings", sep="")  
-    
+
+The plot below shows the flow of the demersal species landings between the vessel Flag Country (left), Harbour Country (center) and the Landing Country (right).
+
+```{r riverplot aborad demersal, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9, fig.cap = '**Figure 52**: River plot of demersal species landings between vessel Flag Country (left), Harbour Country (center) and landing Country (right). Width of each line is proportional to landings proportion. Harbour Country is the country code obtained from the CLlandingLocation. '}
+
 cl %>%
   filter(CatchGroup == 'demersal')%>%
-  group_by(CLyear, HarbourCountry2, CLvesselFlagCountry) %>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
   summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
 
 result<-func_riverplot(df = cl_river,
-            left = 'CLvesselFlagCountry',
-            right = 'HarbourCountry2',
-            value = 'CLscientificWeight_ton')
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
 result
 ```
 
 ### Spatial distribution of landings, demersal (without flatfish)
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 53**: Spatial distribution of the demersal species landings by statistical rectangle.'}
+
 # do we need information on for how many rows(%) there was a missing CLscientificWeight_ton? <-------------------------- to do
 
 # data prep
@@ -1073,41 +1231,62 @@ result[[1]]
 
 ## Flatfish landings
 ### Landings by country, flatfish
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 54**: Landings of flatfish species by country.'}
 
 barplot(data = cl[CatchGroup=='flatfish',], 
       x = "CLlandingCountry",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Country",
-      ylab = "Sum of Landings (1000 t)",
+ #   title = "Landings (1000 t) by Country",
+      ylab = "Landings (1000 t)",
       col_cou = T )
 ```
 
 ### Landings by species, flatfish {.tabset}
-#### species
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Species
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 55**:  Landings of the main landed species (top 20) from the flatfish species catch group.'}
 
-barplot(data = cl[CatchGroup=='flatfish',], 
+sub_cl_top<- cl%>%
+  filter(CatchGroup=='flatfish')%>%
+  group_by(CLyear, SpeciesLaName) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton))%>%
+  top_n(20, wt=CLscientificWeight_1000ton)
+
+barplot(data = sub_cl_top, 
       x = "SpeciesLaName",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Species",
-      ylab = "Sum of Landings (1000 t)")
+     #title = "Landings (1000 t) by Species",
+      ylab = "Landings (1000 t)")
+
 ```
 
-#### species and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
-barplot(data = cl[CatchGroup=='flatfish',], 
+#### Species and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 56**:  Proportion of countries with flatfish species landings by species (top 20).'}
+
+sub_cl_2 <- cl%>%
+  filter(CatchGroup == 'flatfish') %>%
+  group_by(CLyear, SpeciesLaName, CLlandingCountry) %>%
+  summarise(CLscientificWeight_1000ton_total = sum(CLscientificWeight_1000ton))
+
+sub_cl_top$Top <- "TOP"
+sub_cl_2_top <- left_join(sub_cl_2,sub_cl_top,by="SpeciesLaName")
+
+sub_cl_2_top <- sub_cl_2_top %>%
+  filter(Top=='TOP')
+
+barplot(data = sub_cl_2_top, 
       x = "SpeciesLaName",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      title = "Landings (1000 t) by Species and Country",
-      ylab = "Proportion of Landings (1000 t)",
+    # title = "Landings (1000 t) by Species and Country",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
+
+
 ```
 
 ### Landings by fleet, flatfish {.tabset}
-#### fleet
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Fleet
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 57**:  Landings of flatfish species by the combined country*vessel fleet segment (top 20).'}
 
 sub_cl_top<- cl%>%
   filter(CatchGroup=='flatfish')%>%
@@ -1118,75 +1297,80 @@ sub_cl_top<- cl%>%
 barplot(data = sub_cl_top, 
       x = "FlagCountry_Loa",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Species",
-      ylab = "Sum of Landings (1000 t)")
+ #   title = "Landings (1000 t) by Species",
+      ylab = "Landings (1000 t)")
 ```
 
-#### country and fleet
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Country and fleet
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 58**:  Proportion of flatfish species landings of the countries by vessel fleet segment.'}
 
 barplot(data = cl[CatchGroup=='flatfish',],
       x = "CLvesselLengthCategory",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
       title = "Landings (1000 t) by Vessel Length Category and Country",
-      ylab = "Proportion of Landings (1000 t)",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
 ```
 
-#### fleet and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Fleet and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 59**:  Proportion of flatfish species landings of the countries by vessel fleet segment.'}
 
 barplot(data = cl[CatchGroup=='flatfish',],
       x = "CLlandingCountry",
       y = "CLscientificWeight_1000ton",
       group = "CLvesselLengthCategory",
-      title = "Landings (1000 t) by Country and Vessel Length Category",
-      ylab = "Proportion of Landings (1000 t)",
+   # title = "Landings (1000 t) by Country and Vessel Length Category",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
 ```
 
 ### Landings by area, flatfish {.tabset}
-#### area
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Area
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 60**:  Landings distribution of flatfish species, by area.'}
 barplot(data = cl[CatchGroup=='flatfish',], 
       x = "CLarea",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Area",
-      ylab = "Sum of Landings (1000 t)")
+  #   title = "Landings (1000 t) by Area",
+      ylab = "Landings (1000 t)")
 
 ```
 
-#### area and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Area and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 61**:  Proportion of countries landings of flatfish species by area.'}
 barplot(data = cl[CatchGroup=='flatfish',],
       x = "CLarea",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      title = "Landings (1000 t) by Area and Country",
-      ylab = "Proportion of Landings (1000 t)",
+#     title = "Landings (1000 t) by Area and Country",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
 
 ```
 
-#### country and area
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Country and area
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 62**:  Proportion of flatfish species landings per area, by country.'}
 barplot(data = cl[CatchGroup=='flatfish',],
       x = "CLlandingCountry",
       y = "CLscientificWeight_1000ton",
       group = "CLarea",
-      title = "Landings (1000 t) by Country and Area",
-      ylab = "Proportion of Landings (1000 t)",
+ #   title = "Landings (1000 t) by Country and Area",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
 
 ```
 
-#### map area
-#### map area and flag country
+#### Map area
+
+To be prepared for the next year.
+
+#### Map area and flag country
+
+To be prepared for the next year.
 
 ### Landings by metier, flatfish {.tabset}
-#### metier lvl5
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#### Metier lvl5
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap = '**Figure 63**:  Flatfish species landings by metier level 5 (top 20).'}
 #data prep
 sub_cl_top <- cl%>%
   filter(CatchGroup == 'flatfish')%>%
@@ -1198,12 +1382,12 @@ sub_cl_top <- cl%>%
 barplot(data = sub_cl_top,
       x = "CLmetier5",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Metier Lvl5",
-      ylab = "Sum of Landings (1000 t)")
+#     title = "Landings (1000 t) by Metier Lvl5",
+      ylab = "Landings (1000 t)")
 ```
 
-#### metier lvl5 and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#### Metier lvl5 and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap = '**Figure 64**:  Proportion of countries landings of flatfish species by metier level 5 (top 20).'}
 #data prep
 sub_cl_2 <- cl%>%
   filter(CatchGroup == 'flatfish') %>%
@@ -1221,14 +1405,14 @@ barplot(data = sub_cl_2_top,
       x = "CLmetier5",
       y = "CLscientificWeight_1000ton",
       group = "CLlandingCountry",
-      title = "Landings (1000 t) by Metier Lvl5 and Country",
-      ylab = "Proportion of Landings (1000 t)",
+   # title = "Landings (1000 t) by Metier Lvl5 and Country",
+      ylab = "Proportion of Landings (%)",
       asPct = T)
 
 ```
 
-#### metier lvl6
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Metier lvl6
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 65**:  Flatfish species landings by metier level 6 (top 20).'}
 sub_cl_top <- cl%>%
   filter(CatchGroup == 'flatfish')%>%
   group_by(CLyear, CLmetier6) %>%
@@ -1238,12 +1422,13 @@ sub_cl_top <- cl%>%
 barplot(data = sub_cl_top, 
       x = "CLmetier6",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Metier Lvl6",
-      ylab = "Sum of Landings (1000 t)")
+  #   title = "Landings (1000 t) by Metier Lvl6",
+      ylab = "Landings (1000 t)")
 ```
 
-#### metier lvl6 and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Metier lvl6 and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 66**:  Proportion of countries landings of flatfish species by metier level 6 (top 20).'}
+
 sub_cl_2<- cl%>%
   filter(CatchGroup == 'flatfish') %>%
   group_by(CLyear, CLmetier6, CLlandingCountry) %>%
@@ -1258,16 +1443,17 @@ sub_cl_2_top <- sub_cl_2_top %>%
 barplot(data = sub_cl_2_top, 
         x = "CLmetier6",
         y = "CLscientificWeight_1000ton_total",
-        title = "Landings (1000 t) by Metier Lvl6 and Country",
+ #     title = "Landings (1000 t) by Metier Lvl6 and Country",
         group = "CLlandingCountry",
-        ylab = "Proportion of Landings (1000 t)",
+        ylab = "Proportion of Landings (%)",
         asPct = T)
 ```
 
 
 ### Landings by harbour, flatfish {.tabset}
-#### harbour
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Harbour
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 67**:  Flatfish species landings in the main harbours (top 20).'}
+
 sub_cl_top  <- cl %>%
   filter(CatchGroup == 'flatfish') %>%
   group_by(CLyear, CLlandingLocation) %>%
@@ -1277,12 +1463,12 @@ sub_cl_top  <- cl %>%
 barplot(data = sub_cl_top, 
       x = "CLlandingLocation",
       y = "CLscientificWeight_1000ton",
-      title = "Landings (1000 t) by Harbours",
-      ylab = "Sum of Landings (1000 t)")
+ #     title = "Landings (1000 t) by Harbours",
+      ylab = "Landings (1000 t)")
 ```
 
-#### harbour and flag country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Harbour and flag country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 68**:  Proportion of flatfish species landings by flag country and harbour.'}
 sub_cl_2<- cl%>%
   filter(CatchGroup == 'flatfish')%>%
   group_by(CLyear, CLlandingLocation, CLvesselFlagCountry) %>%
@@ -1298,33 +1484,69 @@ sub_cl_2_top <- sub_cl_2_top %>%
 barplot(data = sub_cl_2_top, 
         x = "CLlandingLocation",
         y = "CLscientificWeight_1000ton_total",
-        title = "Landings (1000 t) by Harbour and Flag Country",
+#       title = "Landings (1000 t) by Harbour and Flag Country",
         group = "CLvesselFlagCountry",
-        ylab = "Proportion of Landings (1000 t)",
+        ylab = "Proportion of Landings (%)",
         asPct = T)
 ```
 
-#### map - harbour
-#### map - harbour and flag country
+#### Map - harbour
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 69**: Map with the landing weight of flatfish species by main harbours (top 20).'}
+
+sub_cl_top %>%  mutate(
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA
+       )-> df
+
+result <- pointsMap_func2(df,
+                          title = '', #Landings (1000 t) by Harbour
+                          var_name = 'CLscientificWeight_1000ton',
+                          facet_name = 'CLyear',  # Poprawiono
+                          var_spatial_name = 'CLlandingLocation',
+                          spatial_dataset_name = 'Harbours',
+                          spatial_dataset_var_name = 'Harbour',
+                          plot_labels = TRUE,
+                          saveResults = FALSE,
+                          outputPath,
+                          Catch_group_name = NA,
+                          extraShp_name = 'StatRectshp',
+                          newVarName = NA,
+                          addToTitle = NA,
+                          RCGregion = 'BA'
+                         )
+
+  
+result
+
+```
+
+#### Map - harbour and flag country
+
+To be prepared for the next year.
 
 ### Landings abroad, flatfish
-```{r riverplot aborad flatfish, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9}
-paste("River plot of CLscientificWeight_ton of flatfish between CLvesselFlagCountry (left) and Harbour (right). Width of line is proportional to landings", sep="")  
+
+The plot below shows the flow of the flatfish species landings between the vessel Flag Country (left), Harbour Country (center) and the Landing Country (right).
+```{r riverplot aborad flatfish, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9, fig.cap = '**Figure 70**: River plot of flatfish species landings between vessel Flag Country (left), Harbour Country (center) and landing Country (right). Width of each line is proportional to landings proportion. Harbour Country is the country code obtained from the CLlandingLocation.'}
+
     
 cl %>%
   filter(CatchGroup == 'flatfish')%>%
-  group_by(CLyear, HarbourCountry2, CLvesselFlagCountry) %>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
   summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
 
 result<-func_riverplot(df = cl_river,
-            left = 'CLvesselFlagCountry',
-            right = 'HarbourCountry2',
-            value = 'CLscientificWeight_ton')
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
 result
 ```
 
 ### Spatial distribution of landings, flatfish
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 71**: Spatial distribution of the flatfish landings by statistical rectangle.'}
 # do we need information on for how many rows(%) there was a missing CLscientificWeight_ton? <-------------------------- to do
 
 # data prep
@@ -1358,59 +1580,412 @@ result = choroplethMap_func2(
 result[[1]]
 ```
 
+## Crustaceans landings
+### Landings by country, crustaceans
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 72**: Landings of crustacean species by country.'}
+
+barplot(data = cl[CatchGroup=='crustaceans',], 
+      x = "CLlandingCountry",
+      y = "CLscientificWeight_1000ton",
+ #   title = "Landings (1000 t) by Country",
+      ylab = "Landings (1000 t)",
+      col_cou = T )
+```
+
+### Landings by species, crustaceans {.tabset}
+#### Species
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 73**:  Landings of the main landed species (top 20) from the crustacean species catch group.'}
+
+sub_cl_top<- cl%>%
+  filter(CatchGroup=='crustaceans')%>%
+  group_by(CLyear, SpeciesLaName) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton))%>%
+  top_n(20, wt=CLscientificWeight_1000ton)
+
+barplot(data = sub_cl_top, 
+      x = "SpeciesLaName",
+      y = "CLscientificWeight_1000ton",
+     #title = "Landings (1000 t) by Species",
+      ylab = "Landings (1000 t)")
+
+```
+
+#### Species and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 74**:  Proportion of countries with crustacean species landings by species (top 20).'}
+
+sub_cl_2 <- cl%>%
+  filter(CatchGroup == 'crustaceans') %>%
+  group_by(CLyear, SpeciesLaName, CLlandingCountry) %>%
+  summarise(CLscientificWeight_1000ton_total = sum(CLscientificWeight_1000ton))
+
+sub_cl_top$Top <- "TOP"
+sub_cl_2_top <- left_join(sub_cl_2,sub_cl_top,by="SpeciesLaName")
+
+sub_cl_2_top <- sub_cl_2_top %>%
+  filter(Top=='TOP')
+
+barplot(data = sub_cl_2_top, 
+      x = "SpeciesLaName",
+      y = "CLscientificWeight_1000ton",
+      group = "CLlandingCountry",
+    # title = "Landings (1000 t) by Species and Country",
+      ylab = "Proportion of Landings (%)",
+      asPct = T)
+
+
+```
+
+### Landings by fleet, crustaceans {.tabset}
+#### Fleet
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 75**:  Landings of crustacean species by the combined country*vessel fleet segment (top 20).'}
+
+sub_cl_top<- cl%>%
+  filter(CatchGroup=='crustaceans')%>%
+  group_by(CLyear, FlagCountry_Loa) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton))%>%
+  top_n(20, wt=CLscientificWeight_1000ton)
+
+barplot(data = sub_cl_top, 
+      x = "FlagCountry_Loa",
+      y = "CLscientificWeight_1000ton",
+ #   title = "Landings (1000 t) by Species",
+      ylab = "Landings (1000 t)")
+```
+
+#### Country and fleet
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 76**:  Proportion of crustacean species landings of the countries by vessel fleet segment.'}
+
+barplot(data = cl[CatchGroup=='crustaceans',],
+      x = "CLvesselLengthCategory",
+      y = "CLscientificWeight_1000ton",
+      group = "CLlandingCountry",
+      title = "Landings (1000 t) by Vessel Length Category and Country",
+      ylab = "Proportion of Landings (%)",
+      asPct = T)
+```
+
+#### Fleet and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 77**:  Proportion of crustacean species landings of the countries by vessel fleet segment.'}
+
+barplot(data = cl[CatchGroup=='crustaceans',],
+      x = "CLlandingCountry",
+      y = "CLscientificWeight_1000ton",
+      group = "CLvesselLengthCategory",
+   # title = "Landings (1000 t) by Country and Vessel Length Category",
+      ylab = "Proportion of Landings (%)",
+      asPct = T)
+```
+
+### Landings by area, crustaceans {.tabset}
+#### Area
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 78**:  Landings distribution of crustacean species, by area.'}
+barplot(data = cl[CatchGroup=='crustaceans',], 
+      x = "CLarea",
+      y = "CLscientificWeight_1000ton",
+  #   title = "Landings (1000 t) by Area",
+      ylab = "Landings (1000 t)")
+
+```
+
+#### Area and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 79**:  Proportion of countries landings of crustacean species by area.'}
+barplot(data = cl[CatchGroup=='crustaceans',],
+      x = "CLarea",
+      y = "CLscientificWeight_1000ton",
+      group = "CLlandingCountry",
+#     title = "Landings (1000 t) by Area and Country",
+      ylab = "Proportion of Landings (%)",
+      asPct = T)
+
+```
+
+#### Country and area
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 80**:  Proportion of crustacean species landings per area, by country.'}
+barplot(data = cl[CatchGroup=='crustaceans',],
+      x = "CLlandingCountry",
+      y = "CLscientificWeight_1000ton",
+      group = "CLarea",
+ #   title = "Landings (1000 t) by Country and Area",
+      ylab = "Proportion of Landings (%)",
+      asPct = T)
+
+```
+
+#### Map area
+
+To be prepared for the next year.
+
+#### Map area and flag country
+
+To be prepared for the next year.
+
+### Landings by metier, crustaceans {.tabset}
+#### Metier lvl5
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap = '**Figure 81**:  Crustacean species landings by metier level 5 (top 20).'}
+#data prep
+sub_cl_top <- cl%>%
+  filter(CatchGroup == 'crustaceans')%>%
+  mutate(CLmetier5 = substr(CLmetier6, 1, 7))%>%
+  group_by(CLyear, CLmetier5) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20)
+
+barplot(data = sub_cl_top,
+      x = "CLmetier5",
+      y = "CLscientificWeight_1000ton",
+#     title = "Landings (1000 t) by Metier Lvl5",
+      ylab = "Landings (1000 t)")
+```
+
+#### Metier lvl5 and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap = '**Figure 82**:  Proportion of countries landings of crustacean species by metier level 5 (top 20).'}
+#data prep
+sub_cl_2 <- cl%>%
+  filter(CatchGroup == 'crustaceans') %>%
+    mutate(CLmetier5 = substr(CLmetier6, 1, 7))%>%
+  group_by(CLyear, CLmetier5, CLlandingCountry) %>%
+  summarise(CLscientificWeight_1000ton_total = sum(CLscientificWeight_1000ton))
+
+sub_cl_top$Top <- "TOP"
+sub_cl_2_top <- left_join(sub_cl_2,sub_cl_top,by="CLmetier5")
+
+sub_cl_2_top <- sub_cl_2_top %>%
+  filter(Top=='TOP')
+
+barplot(data = sub_cl_2_top, 
+      x = "CLmetier5",
+      y = "CLscientificWeight_1000ton",
+      group = "CLlandingCountry",
+   # title = "Landings (1000 t) by Metier Lvl5 and Country",
+      ylab = "Proportion of Landings (%)",
+      asPct = T)
+
+```
+
+#### Metier lvl6
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 83**:  Crustacean species landings by metier level 6 (top 20).'}
+sub_cl_top <- cl%>%
+  filter(CatchGroup == 'crustaceans')%>%
+  group_by(CLyear, CLmetier6) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20, wt=CLscientificWeight_1000ton)
+
+barplot(data = sub_cl_top, 
+      x = "CLmetier6",
+      y = "CLscientificWeight_1000ton",
+  #   title = "Landings (1000 t) by Metier Lvl6",
+      ylab = "Landings (1000 t)")
+```
+
+#### Metier lvl6 and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 84**:  Proportion of countries landings of crustacean species by metier level 6 (top 20).'}
+
+sub_cl_2<- cl%>%
+  filter(CatchGroup == 'crustaceans') %>%
+  group_by(CLyear, CLmetier6, CLlandingCountry) %>%
+  summarise(CLscientificWeight_1000ton_total = sum(CLscientificWeight_1000ton))
+
+sub_cl_top$Top <- "TOP"
+sub_cl_2_top <- left_join(sub_cl_2,sub_cl_top, by = "CLmetier6")
+
+sub_cl_2_top <- sub_cl_2_top %>%
+  filter(Top=='TOP')
+
+barplot(data = sub_cl_2_top, 
+        x = "CLmetier6",
+        y = "CLscientificWeight_1000ton_total",
+ #     title = "Landings (1000 t) by Metier Lvl6 and Country",
+        group = "CLlandingCountry",
+        ylab = "Proportion of Landings (%)",
+        asPct = T)
+```
+
+
+### Landings by harbour, crustaceans {.tabset}
+#### Harbour
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 85**:  Crustacean species landings in the main harbours (top 20).'}
+
+sub_cl_top  <- cl %>%
+  filter(CatchGroup == 'crustaceans') %>%
+  group_by(CLyear, CLlandingLocation) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20, wt=CLscientificWeight_1000ton)
+
+barplot(data = sub_cl_top, 
+      x = "CLlandingLocation",
+      y = "CLscientificWeight_1000ton",
+ #     title = "Landings (1000 t) by Harbours",
+      ylab = "Landings (1000 t)")
+```
+
+#### Harbour and flag country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 86**:  Proportion of crustacean species landings by flag country and harbour.'}
+sub_cl_2<- cl%>%
+  filter(CatchGroup == 'crustaceans')%>%
+  group_by(CLyear, CLlandingLocation, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_1000ton_total = sum(CLscientificWeight_1000ton))
+
+sub_cl_top$Top <- "TOP"
+
+sub_cl_2_top <- left_join(sub_cl_2,sub_cl_top,by = "CLlandingLocation")
+
+sub_cl_2_top <- sub_cl_2_top %>%
+  filter(Top=='TOP')
+
+barplot(data = sub_cl_2_top, 
+        x = "CLlandingLocation",
+        y = "CLscientificWeight_1000ton_total",
+#       title = "Landings (1000 t) by Harbour and Flag Country",
+        group = "CLvesselFlagCountry",
+        ylab = "Proportion of Landings (%)",
+        asPct = T)
+```
+
+#### Map - harbour
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 87**: Map with the landing weight of crustacean species by main harbours (top 20).'}
+
+sub_cl_top %>%  mutate(
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA
+       )-> df
+
+result <- pointsMap_func2(df,
+                          title = '', #Landings (1000 t) by Harbour
+                          var_name = 'CLscientificWeight_1000ton',
+                          facet_name = 'CLyear',  # Poprawiono
+                          var_spatial_name = 'CLlandingLocation',
+                          spatial_dataset_name = 'Harbours',
+                          spatial_dataset_var_name = 'Harbour',
+                          plot_labels = TRUE,
+                          saveResults = FALSE,
+                          outputPath,
+                          Catch_group_name = NA,
+                          extraShp_name = 'StatRectshp',
+                          newVarName = NA,
+                          addToTitle = NA,
+                          RCGregion = 'BA'
+                         )
+
+  
+result
+
+```
+
+#### Map - harbour and flag country
+
+To be prepared for the next year.
+
+### Landings abroad, crustaceans
+
+The plot below shows the flow of the crustacean species landings between the vessel Flag Country (left), Harbour Country (center) and the Landing Country (right).
+```{r riverplot aboard crustaceans, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9, fig.cap = '**Figure 88**: River plot of crustacean species landings between vessel Flag Country (left), Harbour Country (center) and landing Country (right). Width of each line is proportional to landings proportion. Harbour Country is the country code obtained from the CLlandingLocation.'}
+
+    
+cl %>%
+  filter(CatchGroup == 'crustaceans')%>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
+
+result<-func_riverplot(df = cl_river,
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
+result
+```
+
+### Spatial distribution of landings, crustaceans
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 89**: Spatial distribution of the crustaceans landings by statistical rectangle.'}
+# do we need information on for how many rows(%) there was a missing CLscientificWeight_ton? <-------------------------- to do
+
+# data prep
+cl %>%
+  filter(CatchGroup == 'crustaceans') %>%
+  group_by(CLyear, CLstatisticalRectangle) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA)-> df
+
+# map
+result = choroplethMap_func2(
+  df,
+  var_name = 'CLscientificWeight_ton',
+  var_spatial_name = 'CLstatisticalRectangle',
+  facet_name = 'CLyear',
+  spatial_dataset_name = 'StatRectshp',
+  spatial_dataset_var_name = 'ICESNAME',
+  spatial_dataset_labels = FALSE,
+  saveResults = FALSE,
+  outputPath,
+  displayInR = TRUE,
+  extraShp_name = 'FAOshp',
+  var_name_new = NA,
+  addToTitle = NA,
+  RCGregion = 'BA'#<-why not regionselected
+)
+
+result[[1]]
+```
+
 # Effort (CE)
 
 ## Effort by country {.tabset}
 ### number of trips
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 90**: Total number of trips performed by country.'}
 
 barplot(data = ce, 
       x = "CEvesselFlagCountry",
       y = "CEnumberOfDominantTrips",
-      title = "Number of trips by Country",
-      ylab = "Sum of Number of trips")
+ #   title = "Number of trips by Country",
+      ylab = "Number of trips")
 
 
 ```
 
 ### days at sea
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 91**: Total number of days at sea performed by country.'}
 
 barplot(data = ce, 
       x = "CEvesselFlagCountry",
       y = "CEscientificDaysAtSea",
-      title = "Days at Sea by Country",
-      ylab = "Sum of days at Sea")
+#     title = "Days at Sea by Country",
+      ylab = "Days at Sea")
 
 
 ```
 
 ### KW-days
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 92**: Total number of KW-days performed by country.'}
 
 barplot(data = ce, 
       x = "CEvesselFlagCountry",
       y = "CEscientifickWDaysAtSea_1000x",
-      title = "KW-Days*1000 at Sea by Country",
-      ylab = "Sum of KW-Days*1000 at Sea")
+#     title = "KW-Days*1000 at Sea by Country",
+      ylab = "KW-Days*1000 at Sea")
 
 
 ```
 
 ### GT-days
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 93**: Total number of GT-days performed by country.'}
 
 barplot(data = ce, 
       x = "CEvesselFlagCountry",
       y = "CEgTDaysAtSea_1000x",
-      title = "GT-Days*1000 at Sea by Country",
-      ylab = "Sum of GT-Days*1000 at Sea")
+ #   title = "GT-Days*1000 at Sea by Country",
+      ylab = "GT-Days*1000 at Sea")
 
 
 ```
+
 ## Effort by fleet {.tabset}
-### number of trips
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+### Number of trips
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 94**: Total number of trips performed by vessel country fleet segment.'}
 sub_ce_top<- ce%>%
   group_by(CEyear, FlagCountry_Loa) %>%
   summarise(CEnumberOfDominantTrips = sum(CEnumberOfDominantTrips))%>%
@@ -1418,115 +1993,123 @@ sub_ce_top<- ce%>%
 barplot(data = sub_ce_top, 
       x = "FlagCountry_Loa",
       y = "CEnumberOfDominantTrips",
-      title = "Number of trips by Fleet",
-      ylab = "Sum of number of trips")
+ #   title = "Number of trips by Fleet",
+      ylab = "Number of trips")
 ```
 
-### number of trips by country and fleet
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+### Number of trips by country and fleet
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 95**: Distribution of the number of trips performed by countries in each vessel fleet segment of size category.'}
 
 barplot(data = ce,
       x = "CEvesselLengthCategory",
       y = "CEnumberOfDominantTrips",
       group = "CEvesselFlagCountry",
-      title = "Number of trips by Vessel Length Category and Country",
-      ylab = "Proportion of number of trips",
+#      title = "Number of trips by Vessel Length Category and Country",
+      ylab = "Number of trips (%)",
       asPct = T)
 ```
 
-### number of trips by fleet and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+### Number of trips by fleet and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 96**: Distribution of the number of trips performed by vessel fleet segment of size category, for each country.'}
 
 barplot(data = ce,
       x = "CEvesselFlagCountry",
       y = "CEnumberOfDominantTrips",
       group = "CEvesselLengthCategory",
-      title = "Number of trips by Country an Vessel Length Category",
-      ylab = "Proportion of number of trips",
+  #   title = "Number of trips by Country an Vessel Length Category",
+      ylab = "Number of trips (%)",
       asPct = T)
 ```
 
+
+In the following sections the information is displayed considering the separation of the vessel size categories in two groups: vessels with length overall (LOA) below 10 meters, and vessels having 10 meters or above. This option of presentation aims to contribute to a better perception of the particularities of each group. The number of trips presented refer to the 'Dominant trips' column of the CE table.
+
+
 ## Effort by area
+
 ### Below 10 meters {.tabset}
-#### area
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Area
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 97**: Number of trips performed by vessels with LOA below 10m, by area.'}
 
 barplot(data = ce%>%filter(CEvesselLengthCategory %in% c("VL0006", "VL0608", "VL0810")), 
       x = "CEarea",
       y = "CEnumberOfDominantTrips",
-      title = "Number of trips by Area",
-      ylab = "Sum of Number of trips")
+#     title = "Number of trips by Area",
+      ylab = "Number of trips")
 
 ```
 
-#### area and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
-
-barplot(data = ce%>%filter(CEvesselLengthCategory %in% c("VL0006", "VL0608", "VL0810")), 
-      x = "CEarea",
-      y = "CEnumberOfDominantTrips",
-      title = "Number of trips by Area",
-      ylab = "Sum of Number of trips")
-
-```
-
-#### area and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Area and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 98**: Distribution of the number of trips performed by country vessels with LOA below 10m, in each area.'}
 
 barplot(data = ce%>%filter(CEvesselLengthCategory %in% c("VL0006", "VL0608", "VL0810")),
       x = "CEarea",
       y = "CEnumberOfDominantTrips",
       group = "CEvesselFlagCountry",
-      title = "Number of trips by Area and Country",
-      ylab = "Proportion of Number of trips",
+#     title = "Number of trips by Area and Country",
+      ylab = "Number of trips (%)",
       asPct = T)
+
+```
+
+#### Country and area
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 99**: Distribution of trips performed by vessels with LOA below 10m in each area, by country.'}
+
+barplot(data = ce%>%filter(CEvesselLengthCategory %in% c("VL0006", "VL0608", "VL0810")),
+      x = "CEvesselFlagCountry",
+      y = "CEnumberOfDominantTrips",
+      group = "CEarea",
+#      title = "Number of trips by Country and Area",
+      ylab = "Number of trips (%)",
+      asPct = T)
+
 
 ```
 
 
 ### 10 meters and above {.tabset}
-#### area
+#### Area
 
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 100**: Number of trips performed by vessels with LOA of 10m and above, by area.'}
 
 barplot(data = ce%>%filter(CEvesselLengthCategory %in% c("VL1012", "VL1215", "VL1518","VL1824","VL2440","VL40XX")), 
       x = "CEarea",
       y = "CEnumberOfDominantTrips",
-      title = "Number of trips by Area",
-      ylab = "Sum of Number of trips")
+ #     title = "Number of trips by Area",
+      ylab = "Number of trips")
 
 ```
 
-#### area and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Area and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 101**: Distribution of the number of trips performed by country vessels with LOA of 10m and above, in each area.'}
 
 barplot(data = ce%>%filter(CEvesselLengthCategory %in% c("VL1012", "VL1215", "VL1518","VL1824","VL2440","VL40XX")),
       x = "CEarea",
       y = "CEnumberOfDominantTrips",
       group = "CEvesselFlagCountry",
       title = "Number of trips by Area and Country",
-      ylab = "Proportion of Number of trips",
+      ylab = "Number of trips (%)",
       asPct = T)
 
 ```
 
-#### country and area
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+#### Country and area
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 102**: Distribution of trips performed by vessels with LOA of 10m and above in each area, by country.'}
 
 barplot(data = ce%>%filter(CEvesselLengthCategory %in% c("VL1012", "VL1215", "VL1518","VL1824","VL2440","VL40XX")),
       x = "CEvesselFlagCountry",
       y = "CEnumberOfDominantTrips",
       group = "CEarea",
-      title = "Number of trips by Country and Area",
-      ylab = "Proportion of Number of trips",
+#      title = "Number of trips by Country and Area",
+      ylab = "Proportion of Number of trips (%)",
       asPct = T)
 
 ```
 
 ## Effort by metier
 ### Below 10 meters  {.tabset}
-#### metier lvl5
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#### Metier lvl5
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap='**Figure 103**: Number of trips performed by vessels with LOA below 10m, by metier level5.'}
 #data prep
 sub_ce_top <- ce%>%
   filter(CEvesselLengthCategory %in% c("VL0006", "VL0608", "VL0810"))%>%
@@ -1538,12 +2121,13 @@ sub_ce_top <- ce%>%
 barplot(data = sub_ce_top,
       x = "CEmetier5",
       y = "CEnumberOfDominantTrips",
-      title = "Number of trips by Metier Lvl5",
-      ylab = "Sum of Number of trips")
+#      title = "Number of trips by Metier Lvl5",
+      ylab = "Number of trips")
+
 ```
 
-#### metier lvl5 and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#### Metier lvl5 and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap='**Figure 104**: Distribution of the number of trips performed by country vessels with LOA below 10m, with metier level 5.'}
 #data prep
 sub_ce_2 <- ce%>%
   filter(CEvesselLengthCategory %in% c("VL0006", "VL0608", "VL0810"))%>%
@@ -1561,17 +2145,45 @@ barplot(data = sub_ce_2_top,
       x = "CEmetier5",
       y = "CEnumberOfDominantTrips",
       group = "CEvesselFlagCountry",
-      title = "Number of trips by Metier Lvl5 and Country",
-      ylab = "Proportion of Number of trips",
+ #     title = "Number of trips by Metier Lvl5 and Country",
+      ylab = "Number of trips (%)",
       asPct = T)
 
 ```
 
-#### statistical rectangle
 
-### 10 meteres and above  {.tabset}
-#### metier lvl5
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#### Country and Metier lvl5
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap='**Figure 105**: Distribution of trips performed by vessels with LOA below 10m with metier level 5, by country.'}
+#data prep
+sub_ce_2 <- ce%>%
+  filter(CEvesselLengthCategory %in% c("VL0006", "VL0608", "VL0810"))%>%
+    mutate(CEmetier5 = substr(CEmetier6, 1, 7))%>%
+  group_by(CEyear, CEmetier5, CEvesselFlagCountry) %>%
+  summarise(CEnumberOfDominantTrips_total = sum(CEnumberOfDominantTrips))
+
+sub_ce_top$Top <- "TOP"
+sub_ce_2_top <- left_join(sub_ce_2,sub_ce_top,by="CEmetier5")
+
+sub_ce_2_top <- sub_ce_2_top %>%
+  filter(Top=='TOP')
+
+barplot(data = sub_ce_2_top, 
+      x = "CEvesselFlagCountry",
+      y = "CEnumberOfDominantTrips",
+      group = "CEmetier5",
+#     title = "Number of trips by Metier Lvl5 and Country",
+      ylab = "Number of trips (%)",
+      asPct = T)
+
+```
+
+#### Statistical rectangle
+
+To be prepared for the next year.
+
+### 10 meters and above  {.tabset}
+#### Metier lvl5
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap='**Figure 106**: Number of trips performed by vessels with LOA of 10m and above, by metier level5.'}
 #data prep
 sub_ce_top <- ce%>%
   filter(CEvesselLengthCategory %in% c("VL1012", "VL1215", "VL1518","VL1824","VL2440","VL40XX"))%>%
@@ -1583,12 +2195,12 @@ sub_ce_top <- ce%>%
 barplot(data = sub_ce_top,
       x = "CEmetier5",
       y = "CEnumberOfDominantTrips",
-      title = "Number of trips by Metier Lvl5",
-      ylab = "Sum of Number of trips")
+#      title = "Number of trips by Metier Lvl5",
+      ylab = "Number of trips")
 ```
 
-#### metier lvl5 and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#### Metier lvl5 and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap='**Figure 107**: Distribution of the number of trips performed by country vessels with LOA of 10m and above, with metier level 5.'}
 #data prep
 sub_ce_2 <- ce%>%
   filter(CEvesselLengthCategory %in% c("VL1012", "VL1215", "VL1518","VL1824","VL2440","VL40XX"))%>%
@@ -1606,18 +2218,45 @@ barplot(data = sub_ce_2_top,
       x = "CEmetier5",
       y = "CEnumberOfDominantTrips",
       group = "CEvesselFlagCountry",
-      title = "Number of trips by Metier Lvl5 and Country",
-      ylab = "Proportion of Number of trips",
+#   title = "Number of trips by Metier Lvl5 and Country",
+      ylab = "Number of trips (%)",
       asPct = T)
 
 ```
 
-#### statistical rectangle
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap='**Figure 108**: Distribution of trips performed by vessels with LOA of 10m and above with metier level 5, by country.'}
+#data prep
+sub_ce_2 <- ce%>%
+  filter(CEvesselLengthCategory %in% c("VL1012", "VL1215", "VL1518","VL1824","VL2440","VL40XX"))%>%
+    mutate(CEmetier5 = substr(CEmetier6, 1, 7))%>%
+  group_by(CEyear, CEmetier5, CEvesselFlagCountry) %>%
+  summarise(CEnumberOfDominantTrips_total = sum(CEnumberOfDominantTrips))
+
+sub_ce_top$Top <- "TOP"
+sub_ce_2_top <- left_join(sub_ce_2,sub_ce_top,by="CEmetier5")
+
+sub_ce_2_top <- sub_ce_2_top %>%
+  filter(Top=='TOP')
+
+barplot(data = sub_ce_2_top, 
+      x = "CEvesselFlagCountry",
+      y = "CEnumberOfDominantTrips",
+      group = "CEmetier5",
+#   title = "Number of trips by Metier Lvl5 and Country",
+      ylab = "Number of trips (%)",
+      asPct = T)
+
+```
+
+#### Statistical rectangle
+
+To be prepared for the next year.
+
 
 ## Effort by harbour
 ### Below 10 meters {.tabset}
-#### harbour
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#### Harbour
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7,fig.height=7, fig.cap='**Figure 109**: Number of trips performed by vessels with LOA below 10m, from the main harbours (top 20).'}
 #data prep
 sub_ce_top <- ce%>%
   filter(CEvesselLengthCategory %in% c("VL0006", "VL0608", "VL0810"))%>%
@@ -1628,12 +2267,12 @@ sub_ce_top <- ce%>%
 barplot(data = sub_ce_top,
       x = "CElandingLocation",
       y = "CEnumberOfDominantTrips",
-      title = "Number of trips by Harbours",
-      ylab = "Sum of Number of trips")
+#      title = "Number of trips by Harbours",
+      ylab = "Number of trips")
 ```
 
-#### harbour and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#### Harbour and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap='**Figure 110**: Distribution of the number of trips performed by country vessels with LOA below 10m, from the main harbours (top 20).'}
 #data prep
 sub_ce_2 <- ce%>%
   filter(CEvesselLengthCategory %in% c("VL0006", "VL0608", "VL0810"))%>%
@@ -1650,17 +2289,19 @@ barplot(data = sub_ce_2_top,
       x = "CElandingLocation",
       y = "CEnumberOfDominantTrips",
       group = "CEvesselFlagCountry",
-      title = "Number of trips by Harbours and Country",
-      ylab = "Proportion of Number of trips",
+#      title = "Number of trips by Harbours and Country",
+      ylab = "Number of trips (%)",
       asPct = T)
 
 ```
 
-#### map - harbour
+#### Map - harbour
+
+To be prepared for the next year.
 
 ### 10 meteres and above {.tabset}
-#### harbour
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#### Harbour
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap='**Figure 111**: Number of trips performed by vessels with LOA of 10m and above, from the main harbours (top 20).'}
 #data prep
 sub_ce_top <- ce%>%
   filter(CEvesselLengthCategory %in% c("VL1012", "VL1215", "VL1518","VL1824","VL2440","VL40XX"))%>%
@@ -1671,12 +2312,12 @@ sub_ce_top <- ce%>%
 barplot(data = sub_ce_top,
       x = "CElandingLocation",
       y = "CEnumberOfDominantTrips",
-      title = "Number of trips by Harbours",
-      ylab = "Sum of Number of trips")
+  #   title = "Number of trips by Harbours",
+      ylab = "Number of trips")
 ```
 
-#### harbour and country
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7}
+#### Harbour and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap='**Figure 112**: Distribution of the number of trips performed by country vessels with LOA of 10m and above, from the main harbours (top 20).'}
 #data prep
 sub_ce_2 <- ce%>%
   filter(CEvesselLengthCategory %in% c("VL1012", "VL1215", "VL1518","VL1824","VL2440","VL40XX"))%>%
@@ -1693,18 +2334,20 @@ barplot(data = sub_ce_2_top,
       x = "CElandingLocation",
       y = "CEnumberOfDominantTrips",
       group = "CEvesselFlagCountry",
-      title = "Number of trips by Harbours and Country",
-      ylab = "Proportion of Number of trips",
+#      title = "Number of trips by Harbours and Country",
+      ylab = "Number of trips (%)",
       asPct = T)
 
 ```
 
-#### map - harbour
+#### Map - harbour
 
-## Spatal distribution on effort {.tabset}
+To be prepared for the next year.
+
+## Spatal distribution of effort {.tabset}
 ### Below 10 meters
 
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 113**: Spatial distribution of the fishing effort (dominant trips) performed by vessels with LOA below 10m, by statistical rectangle.'}
 # data prep
 ce %>%
   filter(CEvesselLengthCategory %in% c("VL0006", "VL0608", "VL0810")) %>% 
@@ -1738,7 +2381,7 @@ result[[1]]
 
 ### 10 meters and above
 
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 114**: Spatial distribution of the fishing effort (dominant trips) performed by vessels with LOA of 10m and above, by statistical rectangle.'}
 # data prep
 ce %>%
   filter(CEvesselLengthCategory %in% c("VL1012", "VL1215", "VL1518","VL1824","VL2440","VL40XX")) %>% 
@@ -1771,6 +2414,9 @@ result[[1]]
 ```
 
 ## Appendix A. Dates of data extraction
+
+The data referring to the present year was collected under the RCG 2024 data call for the 2023 data for the Baltic Sea, North Sea, Eastern Arctic and the North Atlantic regions and the latest version used was downloaded from the system on the 29th of May 2024 with the exception of information detailed in section “2. Overall Fleet Evolution” which was extracted from the EU Fleet Register (https://webgate.ec.europa.eu/fleet-europa/index_en) on the March 2024.
+
 ## Appendix B. Species catch groups
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
 # data prep
@@ -1794,6 +2440,30 @@ cl%>%
 ```
 
 ## Appendix C. Mean Landings per stock, put years here
-## Appendix D. Summary information of the landings abroad (ton), by country and area
+
+To be prepared for the next year.
+
+## Appendix D. Summary information of the main species landings abroad (ton), by country and area
+
+To be prepared for the next year.
+
 ## Appendix E. Glossary for the country codes
 
+```{r echo=FALSE, message=FALSE, warning = FALSE, out.width="90%", out.height="90%"}
+
+# READ Countries data
+country_table <-  read.table(
+    "../../data/aux_countries.txt",
+    header = T,
+    sep = ",",
+    colClasses = "character",
+    na.strings = "",
+    comment.char = ""
+  )
+ 
+table_out <- droplevels(country_table[country_table$ISO2Code %in% cl$CLvesselFlagCountry  | country_table$ISO2Code %in% cl$CLlandingCountry,])
+table_out <- table_out[,c('Country','ISO2Code')]
+
+kable(table_out, row.names=F, col.names = c('Name','Code'),format = "html", table.attr = "style='width:30%;'")
+
+```
