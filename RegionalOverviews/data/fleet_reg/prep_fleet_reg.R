@@ -1,10 +1,11 @@
 #The script prepare files to be used in the overviews.
 
+library(data.table)
 #change the list of MS if needed
 MS_country<-c("BEL","DEU" ,"DNK","ESP","EST","FIN","FRA","IRL","LTU","LVA",
               "NLD","POL","PRT","SWE")
 #change year
-year<-2023
+year<-2024
 
 #check the separator used in input files (',' or ';')
 separator<-";"
@@ -14,7 +15,7 @@ format_start_date<-"%Y-%m-%d"
 format_end_date<-"%Y-%m-%d"
 
 #run the function which change the date format 
-source("../RCGs/RegionalOverviews/funs_RDBES/func_prep_fleet_register.R")
+source("../RCG-RDBES-Overviews/RegionalOverviews/funs_RDBES/func_prep_fleet_register.R")
 prep_fleet_register(MS_country,
                     year,
                     separator,
