@@ -1,0 +1,157 @@
+---
+title: "RDBES Catch and Effort Overview"
+date: "`r format(Sys.time(), '%d.%m.%Y')`"
+output:
+  html_document:
+    toc: true
+    fig_caption: yes
+    
+params:
+  set_subtitle: "Title"
+  region: 'BA'
+  year: 2023
+  logo_path: "../../data/logo/logo RCG BALTIC.PNG"
+  data_dir: '../../data_RDBES/002_prepared/20250212/RCG_BA'
+  RDBES_download_date: '01/01/2000'
+  CSfileName: 'RDBES_RCG_BA_CS_2023_2023_prepared_20250212'
+  
+---
+
+---
+subtitle: `r paste(dplyr::case_when(params$region=='BA'~'Baltic',params$region=='NA'~'North Atlantic',params$region=='NSEA'~'North Sea and Eastern Arctic'), params$year, sep = ", ")`
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+```
+
+```{r, echo=FALSE}
+  htmltools::img(src = knitr::image_uri(params$logo_path), 
+               alt = 'logo', 
+               style = 'position:absolute; top:0; right:0; padding:10px;',width="300px", height="100px")
+```
+
+```{r Define_eval, echo=FALSE, message=FALSE, warning=FALSE}
+# DEFINE EVAL_PARAMETERS
+
+ ## establish conditions  - can use it if for example some chunks should be run only for selected Regions, e.g. only Bal
+ eval_region_BA <- params$region=='BA' # when added to the chunk header, the chunk will be run only for BA report
+ eval_region_NA <- params$region=='NA' # when added to the chunk header, the chunk will be run only for NA report
+ eval_region_NSEA <- params$region=='NSEA' # when added to the chunk header, the chunk will be run only for NSEA report
+
+```
+
+```{r GlobalSettings, echo=FALSE}
+# DEFINE GLOBAL PARAMETERS/FUNCTIONS FOR DISPLAYING TABLES/PLOTS/MAPS/...
+
+```
+
+
+```{r mapData, echo=FALSE}
+# LOAD DATA NEEDED FOR MAPS (shp, rdata, ...) FOR ALL RCGs
+UNLOCODE %>%
+  mutate(Harbour = loCode) %>%
+  filter(!is.na(Harbour)) %>%
+  select(Harbour, lat, lon) -> Harbours
+```
+
+```{r mapDataBA, include = F, eval=eval_region_BA}
+# LOAD PREPARE DATA NEEDED FOR MAPS (shp, rdata, ...) ONLY FOR RCG BA
+StatRectshp  = sf::st_read("../../data/shapefiles/RCG_BA_ICESrect.shp")# for BA maps on DIVISIONS level -> WATCH OUT ...28.1/...28.2
+
+FAOshp  = sf::st_read("../../data/shapefiles/RCG_BA_FAOareas.shp") %>% filter(F_LEVEL == 'SUBDIVISION') # for BA maps on DIVISIONS level -> WATCH OUT ...28.1/...28.2
+```
+
+```{r mapDataNA,include = F, eval=eval_region_NA}
+# LOAD DATA NEEDED FOR MAPS (shp, rdata, ...) ONLY FOR RCG NA
+StatRectshp  = sf::st_read("../../data/shapefiles/RCG_NA_ICESrect.shp")
+
+FAOshp  = sf::st_read("../../data/shapefiles/RCG_NA_FAOareas.shp") %>% filter(F_LEVEL == 'DIVISION') # for NA maps on DIVISIONS level
+
+```
+
+```{r mapDataNSEA, include = F, eval=eval_region_NSEA}
+# LOAD DATA NEEDED FOR MAPS (shp, rdata, ...) ONLY FOR RCG NSEA
+StatRectshp  = sf::st_read("../../data/shapefiles/RCG_NSEA_ICESrect.shp")
+
+FAOshp  = sf::st_read("../../data/shapefiles/RCG_NSEA_FAOareas.shp") %>%  filter(F_LEVEL == 'DIVISION' |
+                                                                                   F_LEVEL == 'SUBAREA' |
+                                                                                   F_CODE == '27.3.a.20' | 
+                                                                                   F_CODE == '27.3.a.21')
+
+```
+
+```{r mapDataPrepare, echo=FALSE, warning = FALSE, message = FALSE}
+# PREPARE DATA NEEDED FOR MAPS (shp, rdata, ...)
+#StatRectshp %>% mutate(StatisticalRectangle = ICESNAME) -> StatRectshp
+StatRectshp = cbind(StatRectshp,  sf::st_coordinates(sf::st_centroid(StatRectshp$geometry))) %>% rename(lon = X, lat = Y)
+
+FAOshp = cbind(FAOshp,  sf::st_coordinates(sf::st_centroid(FAOshp$geometry))) %>% rename(lon = X, lat = Y)
+
+if(params$region=='BA'){ # fixed wrong calculation of centroid of 27.3.d.30
+  FAOshp = FAOshp %>%   
+    mutate(lon = ifelse(F_CODE=='27.3.d.30', 19.5 ,lon), lat =  ifelse(F_CODE=='27.3.d.30',62 ,lat))
+
+}
+
+```
+
+
+**Disclaimer**
+The tables and figures of the overviews presented in this document are made for the coordination of EU regional fisheries data collection purposes and are not designed for any other use. Data used for producing the outputs are extracted from the Regional Database and Estimating System (RDBES) and EU Fleet Register. Dates of data extractions are stated in Appendix A. Due to different aggregations and reporting authorities, data can differ from those used e.g. for assessments or technical reports. 
+
+Member States (MS) are responsible for uploading latest data and the latest year should be viewed as provisional. Data can be resubmitted by a MS for more than one previous year so there might be differences in earlier year reports, if countries update back in time. Responsibility for the quality of the data and comparability to other data sources lies with the MS that provided these data. The upload logs presented by MS regarding the data submitted to RDBES should be found in the SharePoint for Intersessional Work, under the folder "Data".
+
+The respective scripts and calculations used for data displaying are publicly available via the RCG GitHub (https://github.com/ices-eg/RCG-RDBES-Overviews) and subject to change as the work of the group progresses.
+
+# Introduction
+put some text
+
+## Reading the graphs
+### Barplots
+put some text here
+
+### Maps
+put some text here
+
+# Commercial fishery sampling overview
+
+## General information
+Following report base on `r params$year` sampling data uploaded to the RDBES data portal.
+
+```{r general_table, echo=FALSE}
+cs |>
+  group_by(DEhierarchy,SDctry)|>
+  count() -> temp_n_records
+
+cs |>
+  group_by(DEhierarchy,SDctry, FTsampType)|>
+  count() -> temp_n_rec
+
+kable(temp_n_records)
+kable(temp_n_rec)
+
+```
+
+Some results from summaryBiologicalVar function ->
+
+```{r, echo=FALSE}
+# result <- summaryBiologicalVar(
+#   cs_rcg,
+#   var = 'Age',
+#   year = yearSelected,
+#   outputType = 'plot',
+#   statistics = TRUE
+# )
+# result
+# result1 <- summaryBiologicalVar(
+#   cs_rcg,
+#   var = 'Age',
+#   year = yearSelected,
+#   outputType = 'table',
+#   statistics = TRUE
+# )
+# result1
+```
+
+## Appendix A
