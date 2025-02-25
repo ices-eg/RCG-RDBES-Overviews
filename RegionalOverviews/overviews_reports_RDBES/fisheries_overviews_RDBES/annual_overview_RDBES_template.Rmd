@@ -66,7 +66,7 @@ library(networkD3)
 # LOAD FUNCTIONS GENERATING PLOTS/MAPS
 source("../../funs_RDBES/choroplethMap_func2.R", local = knitr::knit_global())
 
-source("../../funs_RDBES/pointsMap_func2.R", local = knitr::knit_global())
+source("../../funs_RDBES/pointsMap_func2.R", local = knitr::knit_global()
 
 #load barplot fuction
 source("../../funs_RDBES/func_barplot.R", local = knitr::knit_global())
@@ -155,7 +155,7 @@ The preparation of these reports, using the new RDBES data format, is still in d
 ## Reading the graphs
 
 ### Maps
-The maps are generated based on complete and available data from the RDBES. The subtitles of the header refer to the sub-selection that is displayed (e.g. “all Data”, “pelagics”, etc.).  If the data cannot be shown on a map (e.g. due to missing information on the area or harbour code), the missing values are given in the figure text below. 
+The maps are based on complete and available data from the RDBES. The subtitles of the header refer to the sub-selection that is displayed (e.g. “all Data”, “pelagics”, etc.).  If the data cannot be shown on a map (e.g. due to missing information on the area or harbour code), the missing values are given in the figure text below. 
 
 # Overall fleet evolution (All RCGs){.tabset}
 The tables included in this section present a summary of the information on licensed vessels from the European Union Fleet Register.
@@ -204,8 +204,10 @@ In this section it is presented the summary information of the overall landings,
 ## Overall landings
 
 ### Landings by species {.tabset}
+
 #### Species
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 1**: Landings of the 20 main species present in the region.'}
+
 
 sub_cl<- cl%>%
   group_by(CLyear,SpeciesLaName) %>%
@@ -221,6 +223,7 @@ barplot(data = sub_cl,
 
 #### Species and country
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 2**: Proportion of countries landings per main species landed (top 20).'}
+
 
 sub_cl_2<- cl%>%
   group_by(CLyear, SpeciesLaName, CLlandingCountry) %>%
@@ -391,7 +394,7 @@ barplot(data = sub_cl_2_top,
         y = "CLscientificWeight_1000ton_total",
      #   title = "Landings (1000 t) by Metier Lvl6 and Country",
         group = "CLlandingCountry",
-        ylab = "Proportion of Landings (%))",
+        ylab = "Proportion of Landings (%)",
         asPct = T)
 ```
 
@@ -431,8 +434,10 @@ barplot(data = sub_cl_2_top,
         asPct = T)
 ```
 
+
 #### Map - harbour
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 15**: Map with the landing weight by main harbours (top 20).'}
+
 
 sub_cl_top %>%  mutate(
          analysis_type = 'sum',
@@ -443,6 +448,7 @@ sub_cl_top %>%  mutate(
 
 result <- pointsMap_func2(df,
                           title = '', #Landings (1000 t) by Harbour
+
                           var_name = 'CLscientificWeight_1000ton',
                           facet_name = 'CLyear',  # Poprawiono
                           var_spatial_name = 'CLlandingLocation',
@@ -461,6 +467,7 @@ result <- pointsMap_func2(df,
   
 result
 
+
 ```
 #### Map - harbour and flag country
 
@@ -469,7 +476,8 @@ To be prepared for the next year.
 ### Landings abroad
 The plot below shows the flow of the landings between the vessel Flag Country (left), Harbour Country (center) and the Landing Country (right).
 
-```{r riverplot aboard, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9, fig.cap = '**Figure 16**: River plot of total landings between vessel Flag Country (left), Harbour Country (center) and landing Country (right). Width of each line is proportional to landings proportion. Harbour Country is the country code obtained from the CLlandingLocation.'}
+```{r riverplot aboard, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9, fig.cap = '**Figure 16**: River plot of total landings between vessel Flag Country (left), Harbour Country (center) and landing Country (right). Width of each line is proportional to landings. Harbour Country is the country code obtained from the CLlandingLocation.'}
+
     
 cl %>%
   group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
@@ -828,6 +836,8 @@ To be prepared for the next year.
 The plot below shows the flow of the small pelagics landings between the vessel Flag Country (left), Harbour Country (center) and the Landing Country (right).
 
 ```{r riverplot aborad sp, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9, fig.cap = '**Figure 34**: River plot of small pelagics landings between vessel Flag Country (left), Harbour Country (center) and landing Country (right). Width of each line is proportional to landings proportion. Harbour Country is the country code obtained from the CLlandingLocation. '}
+
+
     
 cl %>%
   filter(CatchGroup == 'small pelagic')%>%
@@ -1179,6 +1189,7 @@ The plot below shows the flow of the demersal species landings between the vesse
 
 ```{r riverplot aborad demersal, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9, fig.cap = '**Figure 52**: River plot of demersal species landings between vessel Flag Country (left), Harbour Country (center) and landing Country (right). Width of each line is proportional to landings proportion. Harbour Country is the country code obtained from the CLlandingLocation. '}
 
+
 cl %>%
   filter(CatchGroup == 'demersal')%>%
   group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
@@ -1529,6 +1540,7 @@ To be prepared for the next year.
 
 The plot below shows the flow of the flatfish species landings between the vessel Flag Country (left), Harbour Country (center) and the Landing Country (right).
 ```{r riverplot aborad flatfish, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9, fig.cap = '**Figure 70**: River plot of flatfish species landings between vessel Flag Country (left), Harbour Country (center) and landing Country (right). Width of each line is proportional to landings proportion. Harbour Country is the country code obtained from the CLlandingLocation.'}
+
 
     
 cl %>%

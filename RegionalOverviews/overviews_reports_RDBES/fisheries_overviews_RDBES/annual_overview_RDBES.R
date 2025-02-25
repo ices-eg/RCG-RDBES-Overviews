@@ -30,9 +30,9 @@
 ## Custom the overview
 # Make your selection 
 yearSelected = 2023
-regionSelected = 'BA'# One of: 'BA', 'NA', 'NSEA'
+regionSelected = 'NA'# One of: 'BA', 'NA', 'NSEA'
 downloadDataFromSP = 0 # One of: 1 (download from Share Point prepared data) or 0 (do not download and use data prepared locally - using "001_read_and_prepare_data_RDBES_CL_CE.R")
-dataprepDate = 20240412 # Date on which data where prepared. If prepared data are downloaded from ICES SP, then this is the date used for the data folder name on the ICES SP. 
+dataprepDate = 20240515 # Date on which data where prepared. If prepared data are downloaded from ICES SP, then this is the date used for the data folder name on the ICES SP. 
 
 ## Set wd 
 # setwd("//storage-lk.slu.se/home$/erqu0001/Desktop/HLab_GH/Public_Eros/RCGs") # eros machine
@@ -57,6 +57,7 @@ source("RegionalOverviews/overviews_reports_RDBES/fisheries_overviews_RDBES/scri
 ## Load prepared data
 source("RegionalOverviews/overviews_reports_RDBES/fisheries_overviews_RDBES/scripts/loadData.R")
 source("RegionalOverviews/overviews_reports_RDBES/fisheries_overviews_RDBES/scripts/loadFleetRegister.R")
+load("RegionalOverviews/data/UNLOCODE.rData")
 ## Source the .rmd file producing the overview
 rmdReport <- file.path("RegionalOverviews/overviews_reports_RDBES/fisheries_overviews_RDBES/annual_overview_RDBES_template.Rmd")
 rmarkdown::render(
