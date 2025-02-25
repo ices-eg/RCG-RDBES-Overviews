@@ -66,7 +66,7 @@ library(networkD3)
 # LOAD FUNCTIONS GENERATING PLOTS/MAPS
 source("../../funs_RDBES/choroplethMap_func2.R", local = knitr::knit_global())
 
-source("../../funs_RDBES/pointsMap_func2.R", local = knitr::knit_global()
+source("../../funs_RDBES/pointsMap_func2.R", local = knitr::knit_global())
 
 #load barplot fuction
 source("../../funs_RDBES/func_barplot.R", local = knitr::knit_global())
