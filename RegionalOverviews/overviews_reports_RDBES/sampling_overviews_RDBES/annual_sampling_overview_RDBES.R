@@ -37,7 +37,7 @@ setwd("D:/RCG-RDBES-Overviews/") # Kasia machine
 source("RegionalOverviews/overviews_reports_RDBES/sampling_overviews_RDBES/scripts/loadLibraries.R")
 
 ## Load functions 
-#source("RegionalOverviews/overviews_reports_RDBES/sampling_overviews_RDBES/scripts/loadFunctions.R")
+source("RegionalOverviews/overviews_reports_RDBES/sampling_overviews_RDBES/scripts/loadFunctions.R")
 
 # Parameters are defined based on user selection
 source("RegionalOverviews/overviews_reports_RDBES/sampling_overviews_RDBES/scripts/parametersDefinition.R")
