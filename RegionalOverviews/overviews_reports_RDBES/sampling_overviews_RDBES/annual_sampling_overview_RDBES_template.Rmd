@@ -123,71 +123,7 @@ Following report base on `r params$year` sampling data uploaded to the RDBES dat
 **Table 1.** The total number of records in Sample Details (SD) by hierarchies including national and regional routines. The number of records related to regional sampling schames is presented in brackets.
 ```{r sample_information, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
 
-#prepare subset of data
-cs |>
-  select(DEhierarchy, SDctry, SDid) |>
-  distinct() |>
-  group_by(SDctry, DEhierarchy) |>
-  count() |>
-  arrange(DEhierarchy) |>
-  pivot_wider(names_from = DEhierarchy, values_from = n) |>
-  rename(`Country/Hierarchy` = SDctry) |>
-  rowwise() |>
-  mutate(Total = sum(c_across(where(is.numeric)), na.rm = TRUE)) -> SDsummary
-
-summarizedRow <- SDsummary |>
-  ungroup() |>
-  summarise(`Country/Hierarchy` = "Total",
-            across(-`Country/Hierarchy`, sum, na.rm = TRUE))
-
-SDsummary <- bind_rows(SDsummary, summarizedRow)
-
-SDsummary <- SDsummary |>
-  mutate(across(everything(), ~ replace_na(as.character(.), "")))
-
-#kable(SDsummary)
-
-cs |>
-  select(DEhierarchy, SDctry, SDid,DEsampSchemeType) |>
-  filter(DEsampSchemeType %in% c('RegPilCF','RegPilIB','RegRouCF')) |>
-  distinct() |>
-  group_by(SDctry, DEhierarchy) |>
-  count() |>
-  arrange(DEhierarchy) |>
-  pivot_wider(names_from = DEhierarchy, values_from = n) |>
-  rename(`Country/Hierarchy` = SDctry) |>
-  rowwise() |>
-  mutate(Total = sum(c_across(where(is.numeric)), na.rm = TRUE)) -> SDsummaryType
-
-summarizedRow <- SDsummaryType |>
-  ungroup() |>
-  summarise(`Country/Hierarchy` = "Total",
-            across(-`Country/Hierarchy`, sum, na.rm = TRUE))
-
-SDsummaryType <- bind_rows(SDsummaryType, summarizedRow)
-
-SDsummaryType <- SDsummaryType |>
-  mutate(across(everything(), ~ replace_na(as.character(.), "")))
-
-#kable(SDsummaryType)
-
-# merge tables with prefix. I want numbers of regional routine in brackets
-combined <- SDsummary |>
-  left_join(SDsummaryType, by = "Country/Hierarchy", suffix = c("", ".y"))
-
-combined <- combined |>
-  mutate(across(ends_with(".y"), ~ paste0("(", replace_na(as.character(.), "0"), ")")))
-
-# merge cells from both tables
-for(col in colnames(SDsummary)[-1]) {
-  combined[[col]] <- paste0(combined[[col]], combined[[paste0(col, ".y")]])
-}
-
-# delete columns with ".y"
-combined <- combined |>
-  select(-ends_with(".y"))|>
-  mutate(across(everything(), ~ gsub("\\(NA\\)", "", .)),
-         across(everything(), ~ gsub("\\(0\\)", "", .)))
+source("scripts/SD.R")
 
 #print result
 kable(combined, align = "c")|>
@@ -202,46 +138,8 @@ kable(combined, align = "c")|>
 **Table 2** Number of unique species in Sample (SA) by hierarchies. In the Total column and row, there are unique species counts depending on the aggregation specified in the table.
 
 ```{r sample_data, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6}
-cs |>
-  select(DEhierarchy, SDctry, SAspeCode) |>
-  distinct() |>
-  group_by(SDctry, DEhierarchy) |>
-  count() |>
-  arrange(DEhierarchy) |>
-  pivot_wider(names_from = DEhierarchy, values_from = n) |>
-  rename(`Country/Hierarchy` = SDctry) -> SAsummary
 
-cs |>
-  select(SDctry, SAspeCode) |>
-  distinct() |>
-  group_by(SDctry) |>
-  count() |>
-  rename(`Country/Hierarchy` = SDctry,
-         Total = n) -> summarizedCol
-
-SAsummary <- SAsummary |>
-  left_join(summarizedCol, by = "Country/Hierarchy")
-
-summarizedRow <- cs |>
-  select(DEhierarchy, SAspeCode) |>
-  distinct() |>
-  group_by(DEhierarchy) |>
-  count() |>
-  arrange(DEhierarchy) |>
-  pivot_wider(names_from = DEhierarchy, values_from = n)|>
-  mutate(`Country/Hierarchy` = "Total")
-
-summarizedRowTotal <- cs |>
-  select(SAspeCode) |>
-  distinct() |>
-  count() |>
-  rename(Total = n)
-
-cbind(summarizedRow,summarizedRowTotal) -> summarizedRow
-SAsummary <- bind_rows(SAsummary, summarizedRow)
-
-SAsummary <- SAsummary |>
-  mutate(across(everything(), ~ replace_na(as.character(.), "")))
+source("scripts/SAspecies.R")
 
 kable(SAsummary, align = "c")|>
   kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) |>
@@ -252,69 +150,8 @@ kable(SAsummary, align = "c")|>
 #### Number of records in Frequency Measure (FM) and Biological Measurement (BV) 
 **Table 3** Number of records in Frequency Measure (FM) by hierarchies. The table shows the number of records in FM for hierarchies A and B. Hierarchy B is shown in brackets.
 ```{r FM, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6}
-cs |>
-  select(DEhierarchy, SDctry, FMid) |>
-  filter(FMid != "" & !is.na(FMid)) |>
-  distinct() |>
-  group_by(SDctry, DEhierarchy) |>
-  count() |>
-  arrange(DEhierarchy) |>
-  pivot_wider(names_from = DEhierarchy, values_from = n) |>
-  rename(`Country/Hierarchy` = SDctry) |>
-  rowwise() |>
-  mutate(Total = sum(c_across(where(is.numeric)), na.rm = TRUE)) -> FMsummary
 
-summarizedRow <- FMsummary |>
-  ungroup() |>
-  summarise(`Country/Hierarchy` = "Total",
-            across(-`Country/Hierarchy`, sum, na.rm = TRUE))
-
-FMsummary <- bind_rows(FMsummary, summarizedRow)
-
-FMsummary <- FMsummary |>
-  mutate(across(everything(), ~ replace_na(as.character(.), "")))
-
-#only lower hierarchy B
-cs |>
-  select(DEhierarchy, SDctry, FMid, SAlowHierarchy) |>
-  filter(SAlowHierarchy == 'B', FMid != "", !is.na(FMid)) |>
-  distinct() |>
-  group_by(SDctry, DEhierarchy) |>
-  count() |>
-  arrange(DEhierarchy) |>
-  pivot_wider(names_from = DEhierarchy, values_from = n) |>
-  rename(`Country/Hierarchy` = SDctry) |>
-  rowwise() |>
-  mutate(Total = sum(c_across(where(is.numeric)), na.rm = TRUE)) -> FMsummaryB
-
-summarizedRow <- FMsummaryB |>
-  ungroup() |>
-  summarise(`Country/Hierarchy` = "Total",
-            across(-`Country/Hierarchy`, sum, na.rm = TRUE))
-
-FMsummaryB <- bind_rows(FMsummaryB, summarizedRow)
-
-FMsummaryB <- FMsummaryB |>
-  mutate(across(everything(), ~ replace_na(as.character(.), "")))
-
-# merge tables with prefix. I want numbers of regional routine in brackets
-combined <- FMsummary |>
-  left_join(FMsummaryB, by = "Country/Hierarchy", suffix = c("", ".y"))
-
-combined <- combined |>
-  mutate(across(ends_with(".y"), ~ paste0("(", replace_na(as.character(.), "0"), ")")))
-
-# merge cells from both tables
-for(col in colnames(FMsummary)[-1]) {
-  combined[[col]] <- paste0(combined[[col]], combined[[paste0(col, ".y")]])
-}
-
-# delete columns with ".y"
-combined <- combined |>
-  select(-ends_with(".y"))|>
-  mutate(across(everything(), ~ gsub("\\(NA\\)", "", .)),
-         across(everything(), ~ gsub("\\(0\\)", "", .)),
-         across(everything(), ~ gsub("\\(\\)", "", .)))
+source("scripts/FMBVrecords.R")
 
 #print result
 kable(combined, align = "c")|>
@@ -325,53 +162,8 @@ kable(combined, align = "c")|>
 
 **Table 4** Number of records in Biological Measurement (BV) under Frequency Measure(lower hierarchy A) and Sample (SA)(lower hierarchy C). Number of records under Sample (SA)(hierarchy C) is shown in brackets.
 ```{r BV, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6}
-cs |>
-  select(DEhierarchy, SDctry, BVid) |>
-  filter(BVid != "", !is.na(BVid)) |>
-  distinct() |>
-  group_by(SDctry, DEhierarchy) |>
-  count() |>
-  arrange(DEhierarchy) |>
-  pivot_wider(names_from = DEhierarchy, values_from = n) |>
-  rename(`Country/Hierarchy` = SDctry) |>
-  rowwise() |>
-  mutate(Total = sum(c_across(where(is.numeric)), na.rm = TRUE)) -> BVsummary
 
-summarizedRow <- BVsummary |>
-  ungroup() |>
-  summarise(`Country/Hierarchy` = "Total",
-            across(-`Country/Hierarchy`, sum, na.rm = TRUE))
-
-BVsummary <- bind_rows(BVsummary, summarizedRow)
-
-BVsummary <- BVsummary |>
-  mutate(across(everything(), ~ replace_na(as.character(.), "")))
-
-cs |>
-  select(DEhierarchy, SDctry, BVid, SAlowHierarchy) |>
-  filter(SAlowHierarchy == 'C',
-         BVid != "",
-         !is.na(BVid)) |>
-  distinct() |>
-  group_by(SDctry, DEhierarchy) |>
-  count() |>
-  arrange(DEhierarchy) |>
-  pivot_wider(names_from = DEhierarchy, values_from = n) |>
-  rename(`Country/Hierarchy` = SDctry) |>
-  rowwise() |>
-  mutate(Total = sum(c_across(where(is.numeric)), na.rm = TRUE)) -> BVsummaryC
-
-# merge tables with prefix. I want numbers of regional routine in brackets
-combined <- BVsummary |>
-  left_join(BVsummaryC, by = "Country/Hierarchy", suffix = c("", ".y"))
-
-combined <- combined |>
-  mutate(across(ends_with(".y"), ~ paste0("(", replace_na(as.character(.), "0"), ")")))
-
-# merge cells from both tables
-for(col in colnames(BVsummary)[-1]) {
-  combined[[col]] <- paste0(combined[[col]], combined[[paste0(col, ".y")]])
-}
+source("scripts/BVrecords.R")
 
 # delete columns with ".y"
 combined <- combined |>
@@ -390,21 +182,10 @@ kable(combined, align = "c")|>
 **Table 5** Types of biological measurement measured in Biological Measurement (BV) with number of records.
  
 ```{r BVtypeMeas, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6}
-cs|> 
-  select(BVtypeMeas, BVid) |>
-  filter(!is.na(BVid),
-         BVid != "")|>
-  distinct() |>
-  group_by(BVtypeMeas) |>
-  count() |>
-  arrange(desc(n)) |>
-  pivot_wider(names_from = BVtypeMeas, values_from = n) |>
-  rowwise() |>
-  mutate(Total = sum(c_across(where(is.numeric)), na.rm = TRUE)) -> BVtypeMeasSummary
+
+source("scripts/BVtypeMeasSummary.R")
 
 kable(BVtypeMeasSummary,format.args = list( big.mark = " "))
-
-
 
 ```
 
@@ -528,6 +309,7 @@ barplot(data = sub_cs,
 ### Number of fish analyzed in all types of biological measurements
 
 ```{r BVfishid, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6}
+# testowo do wyrzucenia jak wyjaśni się kwestia z długością
 sub_cs<- cs |>
     filter(!is.na(BVid) & BVid!="",
          !is.na(SAid) & SAid!="",
@@ -541,6 +323,38 @@ sub_cs<- cs |>
   count() |>
   rename(NumFish = n) |>
   top_n(20, wt=NumFish)
+#od tego
+# sub_cs<- cs |>
+#     filter(!is.na(BVid) & BVid!="",
+#          !is.na(SAid) & SAid!="",
+#          !is.na(BVfishId) & BVfishId!="",
+#          BVvalueMeas !="") |>
+#     mutate(FishId = paste0(SAid,"_",BVfishId)) |>
+#   select(FishId,BVtypeMeas,SAlowHierarchy) |>
+#   distinct()|>
+#   group_by(FishId,SAlowHierarchy) |>
+#   arrange(BVtypeMeas) |>
+#   mutate(temp = BVtypeMeas) |>
+#   pivot_wider(names_from = BVtypeMeas, values_from = temp)|>
+#   mutate(across(everything(), ~ replace_na(as.character(.), "_")))
+# 
+# # do tego
+# a <- colnames(sub_cs[,3:ncol(sub_cs)])
+# sub_csa <- sub_cs |>
+#   distinct()|>
+#   rowwise() %>%
+#   mutate(temp1 = paste(c_across(all_of(a)), collapse = "_")) |> #colnames(sub_cs[,3:ncol(sub_cs)])
+#   group_by(temp1,SAlowHierarchy) |>
+#   count() |>
+#   arrange(desc(n)) |>
+#   arrange(SAlowHierarchy) |>
+#   pivot_wider(names_from = SAlowHierarchy, values_from = n) |>
+#   mutate(across(everything(), ~ replace_na(as.character(.), "")))
+# #liczby muszą się zgadzać ale nadal coś tam jest namieszane liczba rekordów jest inna niż w tabelach wyżej
+
+#print result
+kable(sub_cs, align = "c")|>
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) 
 ```
 ## Biological information per species
 BVfishid number of fish analyzed in top 3/4 types of biological measurements
