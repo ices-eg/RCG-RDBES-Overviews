@@ -1,5 +1,5 @@
 ---
-title: "RDBES Catch and Effort Overview"
+title: "Sampling Overview"
 date: "`r format(Sys.time(), '%d.%m.%Y')`"
 output:
   html_document:
@@ -105,7 +105,21 @@ Member States (MS) are responsible for uploading latest data and the latest year
 The respective scripts and calculations used for data displaying are publicly available via the RCG GitHub (https://github.com/ices-eg/RCG-RDBES-Overviews) and subject to change as the work of the group progresses.
 
 # Introduction
-put some text
+The present Sampling Overview displays summary information on the statistics for EU sampling of commercial landings included in the [Regional Data Base and Estimation System (RDBES)](https://www.ices.dk/data/data-portals/Pages/rdbes.aspx), which is used to store detailed commercial fisheries and sampling data.
+
+The RDBES is hosted at the International Council for Exploration of the Sea (ICES) and its data is property of EU Member States with usage governed by the Data use license for the Regional Database (RDB). It is a regionally coordinated database platform covering fisheries by region (e.g. North Atlantic Ocean, North Sea, Baltic Sea) and is a main resource used by the Regional Coordination Groups [(RCG)](https://www.fisheries-rcg.eu/rcg-nansea/) to coordinate data collection of EU fisheries. 
+
+The RDBES should be seen as part of the movements towards statistically Sound Sampling Schemes (4S), greater regional coordination, transparent Assessment Framework (TAF) and improved estimates to ICES assessments. In that context, the RDBES aims also: 
+
+1. To ensure that data can be made available for the coordination of regional fisheries data sampling plans, in particular for the EU DC-MAP Regional Coordination Groups (RCGs),
+2. To provide a regional estimation system such that statistical estimates of quantities of interest can be produced from sample data,
+3. To increase the data quality, documentation of data and ensuring of approved estimation methods are used,
+4. To serve and facilitate the production of fisheries management advice and status reports,
+5. To increase the awareness of fisheries data collected by the users of the RDBES and the overall usage of these data.
+
+The RDBES data model is an evolution of the work already done in defining and using the current Regional Database (RDB) and the COST data models and functions.  The current RDB data model provides a common data structure to describe commercial sampling data at a disaggregated level, and commercial landings and effort data at an aggregated level.  The significant difference in the new RDBES model is that it provides a common structure to describe both the disaggregated sampling data and, most importantly, how it was sampled.
+
+To allow for the variety of sampling designs used in different institutes and countries the RDBES identifies a number of different sampling hierarchies, which represent the different hierarchical sampling techniques that are used in practice.  Two types of hierarchy are used in the model. The upper hierarchies describe how a sample is selected, and they are numbered from 1 to 13. The lower hierarchies describe what type of length-frequency or biological variables are measured for that sample, and they are named with the letters from A to D.  All hierarchies are defined in terms of the tables they consist of and the relationships between them. 
 
 ## Reading the graphs
 ### Barplots
