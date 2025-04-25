@@ -18,6 +18,9 @@ rm(list = ls())
 
 setwd("D:/RCG-RDBES-Overviews")#("Path to RCGs local repo")
 
+# library(remotes)
+# install_github("ices-tools-dev/RDBEScore@dev") # KK: in dev are my changes
+
 library(data.table)
 library(RDBEScore)
 library(dplyr)
@@ -40,7 +43,7 @@ getwd()
 year_start <- 2022
 year_end <- 2024
 time_tag <- format(Sys.time(), "%Y%m%d")
-target_region <- 'RCG_BA'
+target_region <- 'RCG_NA'
 ## ===========================
 ## Create directory structure
 ## ===========================
@@ -86,12 +89,12 @@ setwd('RegionalOverviews/data_RDBES/001_raw')
 for (H in c('H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H13')) {
   temp <- createRDBESDataObject(
     input = paste0(
-      'D:/RCG-RDBES-Overviews/RegionalOverviews/data_RDBES/001_raw/RDBES CS/15042025/HCS_',
+      'D:/RCG-RDBES-Overviews/RegionalOverviews/data_RDBES/001_raw/RDBES CS/22042025/NANSEA/HCS_',
       H,
-      '_BS_2025_04_15.zip'
+      '_NANSEA_2025_04_22.zip'
     )
   )
-  validateRDBESDataObject(temp, verbose = FALSE)
+  validateRDBESDataObject(temp, verbose = FALSE) 
   if (H != 'H13') {
     VD <- temp$VD
   }
