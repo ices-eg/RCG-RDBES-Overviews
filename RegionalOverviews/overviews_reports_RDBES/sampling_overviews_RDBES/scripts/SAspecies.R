@@ -1,5 +1,6 @@
 cs |>
   select(DEhierarchy, SDctry, SAspeCode) |>
+  filter(!is.na(SAspeCode))|>
   distinct() |>
   group_by(SDctry, DEhierarchy) |>
   count() |>
@@ -9,6 +10,7 @@ cs |>
 
 cs |>
   select(SDctry, SAspeCode) |>
+  filter(!is.na(SAspeCode))|>
   distinct() |>
   group_by(SDctry) |>
   count() |>
