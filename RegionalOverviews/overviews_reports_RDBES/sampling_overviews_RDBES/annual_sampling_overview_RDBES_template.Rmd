@@ -230,8 +230,6 @@ cs|>
 
 kable(BVtypeMeasSummarytest,format.args = list( big.mark = " "))
 
-
-
 ```
 <br>
 
@@ -264,7 +262,6 @@ ggplot(sub_cs, aes(x = SDctry, y = NumLengthFish, fill = SDctry)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 0, hjust = 1),
         legend.position = "none")
-
 
 ```
 <br>
@@ -299,7 +296,6 @@ ggplot(sub_cs, aes(x = SDctry, y = NumAgeFish, fill = SDctry)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 0, hjust = 1),
         legend.position = "none")
-
      
 ```
 <br>
@@ -455,6 +451,7 @@ sub_cs<- cs |>
 #print result
 kable(sub_cs, align = "c")|>
   kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) 
+
 ```
 
 <br>
