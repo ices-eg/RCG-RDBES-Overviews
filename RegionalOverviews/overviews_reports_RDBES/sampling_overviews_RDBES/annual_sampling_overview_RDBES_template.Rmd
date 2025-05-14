@@ -1,5 +1,5 @@
 ---
-title: "RDBES Catch and Effort Overview"
+title: "RDBES Sampling Overview"
 date: "`r format(Sys.time(), '%d.%m.%Y')`"
 output:
   html_document:
@@ -9,11 +9,11 @@ output:
 params:
   set_subtitle: "Title"
   region: 'BA'
-  year: 2023
+  year: 2024
   logo_path: "../../data/logo/logo RCG BALTIC.PNG"
-  data_dir: '../../data_RDBES/002_prepared/20250212/RCG_BA'
+  data_dir: '../../data_RDBES/002_prepared/20250425/RCG_BA'
   RDBES_download_date: '01/01/2000'
-  CSfileName: 'RDBES_RCG_BA_CS_2023_2023_prepared_20250212'
+  CSfileName: 'RDBES_RCG_BA_CS_2024_2024_prepared_20250425'
   
 ---
 
@@ -98,60 +98,382 @@ if(params$region=='BA'){ # fixed wrong calculation of centroid of 27.3.d.30
 
 
 **Disclaimer**
-The tables and figures of the overviews presented in this document are made for the coordination of EU regional fisheries data collection purposes and are not designed for any other use. Data used for producing the outputs are extracted from the Regional Database and Estimating System (RDBES) and EU Fleet Register. Dates of data extractions are stated in Appendix A. Due to different aggregations and reporting authorities, data can differ from those used e.g. for assessments or technical reports. 
+The tables and figures of the overviews presented in this document are made for the coordination of EU regional fisheries data collection purposes and are not designed for any other use. Data used for producing the outputs are extracted from the Regional Database and Estimating System (RDBES). Dates of data extractions are stated in Appendix A. Due to different aggregations and reporting authorities, data can differ from those used e.g. for assessments or technical reports. 
 
 Member States (MS) are responsible for uploading latest data and the latest year should be viewed as provisional. Data can be resubmitted by a MS for more than one previous year so there might be differences in earlier year reports, if countries update back in time. Responsibility for the quality of the data and comparability to other data sources lies with the MS that provided these data. The upload logs presented by MS regarding the data submitted to RDBES should be found in the SharePoint for Intersessional Work, under the folder "Data".
 
 The respective scripts and calculations used for data displaying are publicly available via the RCG GitHub (https://github.com/ices-eg/RCG-RDBES-Overviews) and subject to change as the work of the group progresses.
 
 # Introduction
-put some text
+The present Sampling Overview displays summary information on the statistics for EU sampling of commercial landings included in the [Regional Data Base and Estimation System (RDBES)](https://www.ices.dk/data/data-portals/Pages/rdbes.aspx), which is used to store detailed commercial fisheries and sampling data.
+
+The RDBES is hosted at the International Council for Exploration of the Sea (ICES) and its data is property of EU Member States with usage governed by the Data use license for the Regional Database (RDB). It is a regionally coordinated database platform covering fisheries by region (e.g. North Atlantic Ocean, North Sea, Baltic Sea) and is a main resource used by the Regional Coordination Groups [(RCG)](https://www.fisheries-rcg.eu/rcg-nansea/) to coordinate data collection of EU fisheries. 
+
+The RDBES should be seen as part of the movements towards statistically Sound Sampling Schemes (4S), greater regional coordination, transparent Assessment Framework (TAF) and improved estimates to ICES assessments. In that context, the RDBES aims also: 
+
+1. To ensure that data can be made available for the coordination of regional fisheries data sampling plans, in particular for the EU DC-MAP Regional Coordination Groups (RCGs),
+2. To provide a regional estimation system such that statistical estimates of quantities of interest can be produced from sample data,
+3. To increase the data quality, documentation of data and ensuring of approved estimation methods are used,
+4. To serve and facilitate the production of fisheries management advice and status reports,
+5. To increase the awareness of fisheries data collected by the users of the RDBES and the overall usage of these data.
+
+The RDBES data model is an evolution of the work already done in defining and using the Regional Database (RDB) and the COST data models and functions.  The RDB data model provided a common data structure to describe commercial sampling data at a disaggregated level, and commercial landings and effort data at an aggregated level.  The significant difference in the new RDBES model is that it provides a common structure to describe both the disaggregated sampling data and, most importantly, how it was sampled.
+
+To allow for the variety of sampling designs used in different institutes and countries the RDBES identifies a number of different sampling hierarchies, which represent the different hierarchical sampling techniques that are used in practice.  Two types of hierarchy are used in the model. The upper hierarchies describe how a sample is selected, and they are numbered from 1 to 13. The lower hierarchies describe what type of length-frequency or biological variables are measured for that sample, and they are named with the letters from A to D.  All hierarchies are defined in terms of the tables they consist of and the relationships between them. 
 
 ## Reading the graphs
 ### Barplots
-put some text here
+Inventory data are displayed using barplots where it's presented the desired quantitative sampling variable by a certain categorical variable on the X-axis (e.g. country).
 
 ### Maps
-put some text here
+No spatial information is available yet. 
 
 # Commercial fishery sampling overview
 
 ## General information
-Following report base on `r params$year` sampling data uploaded to the RDBES data portal.
+This report is based on `r params$year` sampling data uploaded to the RDBES data portal.
 
-```{r general_table, echo=FALSE}
-cs |>
-  group_by(DEhierarchy,SDctry)|>
-  count() -> temp_n_records
+### Sample information
 
-cs |>
-  group_by(DEhierarchy,SDctry, FTsampType)|>
-  count() -> temp_n_rec
+**Table 1.** The total number of records in Sample Details (SD) by hierarchy, including national and regional routines. The number of records related to regional sampling schemes is presented in brackets.
 
-kable(temp_n_records)
-kable(temp_n_rec)
+```{r sample_information, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
+
+source("scripts/SD.R")
+
+#print result
+kable(combined, align = "c")|>
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) |>
+  column_spec(1, width = "4cm")|>
+  column_spec(2:ncol(combined), width = "3cm")
+
+```
+<br>
+
+### Samples data 
+#### Number of species in Sample (SA)
+**Table 2** Number of unique species in Sample table (SA) by hierarchy. The 'Total' column refers to unique species counts by country (some species may be present in more than one hierarchy).
+
+```{r sample_data, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6}
+
+source("scripts/SAspecies.R")
+
+kable(SAsummary, align = "c")|>
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) |>
+  column_spec(1, width = "4cm")|>
+  column_spec(2:ncol(combined), width = "3cm")
+```
+<br>
+
+#### Number of records in Frequency Measure (FM) and Biological Variables (BV) 
+**Table 3** Number of records in Frequency Measure (FM) by hierarchy. The table shows the number of records in FM for hierarchies A and B. Hierarchy B (only length frequency data) is shown in brackets.
+```{r FM, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6}
+
+source("scripts/FMBVrecords.R")
+
+#print result
+kable(combined, align = "c")|>
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) |>
+  column_spec(1, width = "4cm")|>
+  column_spec(2:ncol(combined), width = "3cm")
+```
+<br>
+
+**Table 4** Number of records in Biological Variable (BV) under Frequency Measure (FM) (lower hierarchy A) and Sample (SA) (lower hierarchy C). The number of records under Sample (SA) is shown in brackets.
+```{r BV, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6}
+
+source("scripts/BVrecords.R")
+
+# delete columns with ".y"
+combined <- combined |>
+  select(-ends_with(".y"))|>
+  mutate(across(everything(), ~ gsub("\\(NA\\)", "", .)),
+         across(everything(), ~ gsub("\\(0\\)", "", .)),
+         across(everything(), ~ gsub("\\(\\)", "", .)))
+
+#print result
+kable(combined, align = "c")|>
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) |>
+  column_spec(1, width = "4cm")|>
+  column_spec(2:ncol(combined), width = "3cm")
+```
+
+<br>
+
+**Table 5** Total number of records by biological variable, present in table BV. a) includes NA reported values; b) without NA's.
+
+##### a)
+ 
+```{r BVtypeMeas, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6}
+
+source("scripts/BVtypeMeasSummary.R")
+
+kable(BVtypeMeasSummary,format.args = list( big.mark = " "))
 
 ```
 
+
+##### b) 
+
+```{r BVtypeMeaTest, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6}
+
+cs|> 
+  select(BVtypeMeas, BVid,BVvalueMeas) |>
+  filter(!is.na(BVid) & BVid !="" & !is.na(BVvalueMeas) & BVvalueMeas != "") |>
+  distinct() |>
+  group_by(BVtypeMeas) |>
+  count() |>
+  arrange(desc(n)) |>
+  pivot_wider(names_from = BVtypeMeas, values_from = n) |>
+  rowwise() |>
+  mutate(Total = sum(c_across(where(is.numeric)), na.rm = TRUE)) -> BVtypeMeasSummarytest
+
+kable(BVtypeMeasSummarytest,format.args = list( big.mark = " "))
+
+
+
+```
+<br>
+
+### Frequency Measure data 
+
+####	Number of measured individuals
+
+```{r FMnumberAtUnit, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 1** Number of individuals measured by country. The top 20 countries in numbers are presented. (source data: FM)"}
+sub_cs<- cs |>
+  select(SDctry,FMnumAtUnit,FMid,FMtypeMeas) |>
+  filter(!is.na(FMid) & FMid!="",
+         grepl("Length", FMtypeMeas)) |>
+  distinct() |>
+  group_by(SDctry,FMnumAtUnit) |>
+  summarise(NumLengthFish = sum(FMnumAtUnit)) |>
+  top_n(20, wt=NumLengthFish)
+
+## Option 1: this one orders the x-axis from the higher to the lower bars
+
+# barplot(data = sub_cs,
+#       x = "SDctry",
+#       y = "NumLengthFish",
+#       ylab = "Number of individuals measured") 
+
+## Option 2: this one keeps the x-axis ordered alphabetically
+ggplot(sub_cs, aes(x = SDctry, y = NumLengthFish, fill = SDctry)) +
+  geom_col() +
+  ylab("Number of individuals measured") +
+  xlab("Country") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 0, hjust = 1),
+        legend.position = "none")
+
+
+```
+<br>
+
+### Biological data 
+
+#### Number of aged individuals 
+```{r age, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 2** Number of individuals aged by country. The top 20 countries in numbers are presented.  (source data: BV)"}
+
+sub_cs<- cs |>
+  select(SDctry,BVvalueMeas,BVid,BVtypeMeas) |>
+  filter(!is.na(BVid) & BVid!="",
+         grepl("Age", BVtypeMeas),
+         BVvalueMeas != "") |>
+  distinct() |>
+  group_by(SDctry) |>
+  count() |>
+  rename(NumAgeFish = n) |>
+  top_n(20, wt=NumAgeFish)
+
+## Option 1:
+# barplot(data = sub_cs, 
+#       x = "SDctry",
+#       y = "NumAgeFish",
+#       ylab = "Number of individuals with age") 
+
+## Option 2:
+ggplot(sub_cs, aes(x = SDctry, y = NumAgeFish, fill = SDctry)) +
+  geom_col() +
+  ylab("Number of individuals with age") +
+  xlab("Country") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 0, hjust = 1),
+        legend.position = "none")
+
+     
+```
+<br>
+
+#### Number of weighted individuals 
+```{r weight, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 3** Number of records with weight. If individuals have different types of weight, it will be counted as one.(source data: BV)"}
+
+sub_cs<- cs |>
+  select(SDctry,BVvalueMeas,BVfishId,BVid,BVtypeMeas) |>
+  filter(!is.na(BVfishId) & BVfishId!="",
+         grepl("Weight", BVtypeMeas),
+         BVvalueMeas != "") |>
+  mutate(BVtypeMeas = substr(BVtypeMeas,1,6)) |>
+  distinct() |>
+  group_by(SDctry) |>
+  count() |>
+  rename(NumWeightFish = n) |>
+  top_n(20, wt=NumWeightFish)
+
+## Option 1:
+# barplot(data = sub_cs, 
+#       x = "SDctry",
+#       y = "NumWeightFish",
+#       ylab = "Number of individuals with weight")
+
+## Option 2:
+ggplot(sub_cs, aes(x = SDctry, y = NumWeightFish, fill = SDctry)) +
+  geom_col() +
+  ylab("Number of individuals with weight") +
+  xlab("Country") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 0, hjust = 1),
+        legend.position = "none")
+
+```
+<br>
+
+#### Number of individuals with maturity 
+
+```{r maturity, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 4** Number of individuals with maturity by country. The top 20 countries in numbers are presented. (source data: BV)."}
+sub_cs<- cs |>
+  select(SDctry,BVvalueMeas,BVid,BVtypeMeas) |>
+  filter(!is.na(BVid) & BVid!="",
+         grepl("Maturity", BVtypeMeas),
+         BVvalueMeas != "") |>
+  distinct() |>
+  group_by(SDctry) |>
+  count() |>
+  rename(NumMaturityFish = n) |>
+  top_n(20, wt=NumMaturityFish)
+
+## Option 1: 
+# barplot(data = sub_cs, 
+#       x = "SDctry",
+#       y = "NumMaturityFish",
+#       ylab = "Number of individuals with maturity")
+
+## Option 2:
+ggplot(sub_cs, aes(x = SDctry, y = NumMaturityFish, fill = SDctry)) +
+  geom_col() +
+  ylab("Number of individuals with maturity") +
+  xlab("Country") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 0, hjust = 1),
+        legend.position = "none")
+
+```
+<br>
+
+#### Number of sexed individuals
+
+```{r sex, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 5** Number of sexed individuals. The top 20 countries in numbers are presented. (source data: BV)."}
+
+sub_cs<- cs |>
+  select(SDctry,BVvalueMeas,BVid,BVtypeMeas) |>
+  filter(!is.na(BVid) & BVid!="",
+         grepl("Sex", BVtypeMeas),
+         BVvalueMeas != "") |>
+  distinct() |>
+  group_by(SDctry) |>
+  count() |>
+  rename(NumSexFish = n) |>
+  top_n(20, wt=NumSexFish)
+
+## Option 1: 
+# barplot(data = sub_cs, 
+#       x = "SDctry",
+#       y = "NumSexFish",
+#       ylab = "Number of individuals with sex")
+
+## Option 2:
+ggplot(sub_cs, aes(x = SDctry, y = NumSexFish, fill = SDctry)) +
+  geom_col() +
+  ylab("Number of individuals with sex") +
+  xlab("Country") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 0, hjust = 1),
+        legend.position = "none")
+
+```
+
+<br>
+
+### Number of individuals in all types of biological variables
+
+The table below summarises all the information (number of individuals) reported by biological variable.
+
+```{r BVfishid, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6}
+# testowo do wyrzucenia jak wyjaśni się kwestia z długością
+sub_cs<- cs |>
+    filter(!is.na(BVid) & BVid!="",
+         !is.na(SAid) & SAid!="",
+         !is.na(BVfishId) & BVfishId!="",
+         BVvalueMeas !="") |>
+  select(BVfishId,BVtypeMeas,SAid,BVid,SDctry,BVvalueMeas) |>
+  mutate(FishId = paste0(SAid,"_",BVfishId),
+         BVFishidlen=nchar(as.character(BVfishId))) |>
+  distinct() |>
+  group_by(BVtypeMeas) |>
+  count() |>
+  rename(NumFish = n) |>
+  top_n(20, wt=NumFish)
+
+#od tego
+# sub_cs<- cs |>
+#     filter(!is.na(BVid) & BVid!="",
+#          !is.na(SAid) & SAid!="",
+#          !is.na(BVfishId) & BVfishId!="",
+#          BVvalueMeas !="") |>
+#     mutate(FishId = paste0(SAid,"_",BVfishId)) |>
+#   select(FishId,BVtypeMeas,SAlowHierarchy) |>
+#   distinct()|>
+#   group_by(FishId,SAlowHierarchy) |>
+#   arrange(BVtypeMeas) |>
+#   mutate(temp = BVtypeMeas) |>
+#   pivot_wider(names_from = BVtypeMeas, values_from = temp)|>
+#   mutate(across(everything(), ~ replace_na(as.character(.), "_")))
+# 
+# # do tego
+# a <- colnames(sub_cs[,3:ncol(sub_cs)])
+# sub_csa <- sub_cs |>
+#   distinct()|>
+#   rowwise() %>%
+#   mutate(temp1 = paste(c_across(all_of(a)), collapse = "_")) |> #colnames(sub_cs[,3:ncol(sub_cs)])
+#   group_by(temp1,SAlowHierarchy) |>
+#   count() |>
+#   arrange(desc(n)) |>
+#   arrange(SAlowHierarchy) |>
+#   pivot_wider(names_from = SAlowHierarchy, values_from = n) |>
+#   mutate(across(everything(), ~ replace_na(as.character(.), "")))
+# #liczby muszą się zgadzać ale nadal coś tam jest namieszane liczba rekordów jest inna niż w tabelach wyżej
+
+#print result
+kable(sub_cs, align = "c")|>
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) 
+```
+
+<br>
+## Biological information per species
+BVfishid number of fish analyzed in top 3/4 types of biological measurements
+
+<!-- cs |> -->
+<!--   group_by(DEhierarchy,SDctry)|> -->
+<!--   count() -> temp_n_records -->
+
+<!-- cs |> -->
+<!--   group_by(DEhierarchy,SDctry, FTsampType)|> -->
+<!--   count() -> temp_n_rec -->
+
+<!-- kable(temp_n_records) -->
+<!-- kable(temp_n_rec) -->
 Some results from summaryBiologicalVar function ->
+<br>
 
-```{r, echo=FALSE}
-# result <- summaryBiologicalVar(
-#   cs_rcg,
-#   var = 'Age',
-#   year = yearSelected,
-#   outputType = 'plot',
-#   statistics = TRUE
-# )
-# result
-# result1 <- summaryBiologicalVar(
-#   cs_rcg,
-#   var = 'Age',
-#   year = yearSelected,
-#   outputType = 'table',
-#   statistics = TRUE
-# )
-# result1
-```
-
+## Biological information by species
+<br>
 ## Appendix A
