@@ -1953,7 +1953,8 @@ barplot(data = ce,
       x = "CEvesselFlagCountry",
       y = "CEnumberOfDominantTrips",
  #   title = "Number of trips by Country",
-      ylab = "Number of trips")
+      ylab = "Number of trips", 
+      col_cou = T)
 
 
 ```
@@ -1965,7 +1966,8 @@ barplot(data = ce,
       x = "CEvesselFlagCountry",
       y = "CEscientificDaysAtSea",
 #     title = "Days at Sea by Country",
-      ylab = "Days at Sea")
+      ylab = "Days at Sea", 
+      col_cou = T)
 
 
 ```
@@ -1977,7 +1979,8 @@ barplot(data = ce,
       x = "CEvesselFlagCountry",
       y = "CEscientifickWDaysAtSea_1000x",
 #     title = "KW-Days*1000 at Sea by Country",
-      ylab = "KW-Days*1000 at Sea")
+      ylab = "KW-Days*1000 at Sea", 
+      col_cou = T)
 
 
 ```
@@ -1989,7 +1992,8 @@ barplot(data = ce,
       x = "CEvesselFlagCountry",
       y = "CEgTDaysAtSea_1000x",
  #   title = "GT-Days*1000 at Sea by Country",
-      ylab = "GT-Days*1000 at Sea")
+      ylab = "GT-Days*1000 at Sea", 
+      col_cou = T)
 
 
 ```
@@ -2006,7 +2010,8 @@ barplot(data = sub_ce_top,
       x = "FlagCountry_Loa",
       y = "CEnumberOfDominantTrips",
  #   title = "Number of trips by Fleet",
-      ylab = "Number of trips")
+      ylab = "Number of trips", 
+      col_cou = T)
 ```
 
 ### Number of trips by country and fleet
@@ -2030,7 +2035,8 @@ barplot(data = ce,
       group = "CEvesselLengthCategory",
   #   title = "Number of trips by Country an Vessel Length Category",
       ylab = "Number of trips (%)",
-      asPct = T)
+      asPct = T, 
+      col_cou = T)
 ```
 
 
