@@ -9,11 +9,11 @@ output:
 params:
   set_subtitle: "Title"
   region: 'BA'
-  year: 2023
+  year: 2024
   logo_path: "../../data/logo/logo RCG BALTIC.PNG"
   data_dir: '../../data_RDBES/002_prepared/20250212/RCG_BA'
   RDBES_download_date: '01/01/2000'
-  CSfileName: 'RDBES_RCG_BA_CS_2023_2023_prepared_20250212'
+  CSfileName: 'RDBES_RCG_NA_CS_2024_2024_prepared_20250425'
   
 ---
 
@@ -255,14 +255,16 @@ sub_cs <- cs |>
   pivot_wider(names_from = FMtypeMeas, values_from = NumLengthFish) |>
   select(-NMeas) 
 
-# I group all species having pinched length and total length. They are all spanish
-sub_cs_Pinched <- sub_cs |> 
+# I group all species having pinched length and total length. They are all spanish 
+# For NA and NSEA
+  sub_cs_Pinched <- sub_cs |>
   filter(!is.na(LengthTotal) & !is.na(LengthPinchedTail)) |>
-  mutate(SpeciesLaName = paste(nrow(sub_cs), " species"))|> 
+  mutate(SpeciesLaName = paste(nrow(sub_cs), " species (may include stock assesed sp"))|>
   summarise_all(sum)
 
-sub_cs_Rest <- sub_cs |> 
-  filter(!(!is.na(LengthTotal) & !is.na(LengthPinchedTail))) 
+
+sub_cs_Rest <- sub_cs |>
+  filter(!(!is.na(LengthTotal) & !is.na(LengthPinchedTail)))
 
 sub_cs <- rbind(sub_cs_Pinched, sub_cs_Rest)
 
