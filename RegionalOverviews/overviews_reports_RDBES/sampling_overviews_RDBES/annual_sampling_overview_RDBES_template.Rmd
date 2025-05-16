@@ -223,10 +223,8 @@ kable(BVtypeMeasSummarytest,format.args = list( big.mark = " "))
 
 
 ```
-### Frequancy Measured data 
-### Biological data 
+### Frequency Measured data 
 ####	Number of measured individuals
-
 ```{r FMnumberAtUnit, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 1** add caption."}
 sub_cs<- cs |>
   select(SDctry,FMnumAtUnit,FMid,FMtypeMeas) |>
@@ -242,6 +240,45 @@ barplot(data = sub_cs,
       y = "NumLengthFish",
       ylab = "Number of fish measured")
 ```
+
+####	Type of Length Measured
+```{r TypeLength, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 1** add caption."}
+sub_cs <- cs |>
+  select(SpeciesLaName, FMnumAtUnit,FMid,FMtypeMeas) |>
+  filter(!is.na(FMid) & FMid!="") |>
+  distinct() |>
+  group_by(SpeciesLaName, FMtypeMeas) |>
+  summarise(NumLengthFish = sum(FMnumAtUnit, na.rm=T)) |>
+  group_by(SpeciesLaName) |>
+  mutate(NMeas = length(FMtypeMeas)) |>
+  filter(NMeas>1) |>
+  pivot_wider(names_from = FMtypeMeas, values_from = NumLengthFish) |>
+  select(-NMeas) 
+
+# I group all species having pinched length and total length. They are all spanish
+sub_cs_Pinched <- sub_cs |> 
+  filter(!is.na(LengthTotal) & !is.na(LengthPinchedTail)) |>
+  mutate(SpeciesLaName = paste(nrow(sub_cs), " species"))|> 
+  summarise_all(sum)
+
+sub_cs_Rest <- sub_cs |> 
+  filter(!(!is.na(LengthTotal) & !is.na(LengthPinchedTail))) 
+
+sub_cs <- rbind(sub_cs_Pinched, sub_cs_Rest)
+
+#print result
+kable(sub_cs, align = "c")|>
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) 
+
+
+
+```
+
+
+
+
+
+### Biological data 
 #### Number of aged individuals 
 ```{r age, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 2** add caption."}
 sub_cs<- cs |>
