@@ -20,14 +20,17 @@
 # Dev. notes: 
 #
 # - 12.02.2025 first draft based on annual_overview_RDBES
+# - 05.05.2025 CL added
 #
 ###################################################################
 
 ## Custom the overview
 # Make your selection 
-yearSelected = 2023
+yearSelected = 2024
 regionSelected = 'BA'# One of: 'BA', 'NA', 'NSEA'
-dataprepDate = 20250217 # Date on which data where prepared.
+dataprepDate = 20250425 # Date on which data where prepared.
+dataprepDateCL = 20250429
+dataprepDateCE = 20250429
 
 ## Set wd 
 setwd("D:/RCG-RDBES-Overviews/") # Kasia machine

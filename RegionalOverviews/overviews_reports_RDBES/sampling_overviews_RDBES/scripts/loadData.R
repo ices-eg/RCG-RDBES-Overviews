@@ -34,10 +34,18 @@ load(
   paste(params$data_dir, '/', params$CSfileName,'.Rdata', sep = "")
 ); cs = cs_rcg # shorter name 
 
+# Load CL data
+load(
+  paste(params$data_dir, '/', params$CLfileName,'.Rdata', sep = "")
+); cl = cl_rcg # shorter name 
+
+
 # put some necessary data prep part below
 ######################
 # FILTER the data out
 ######################
+cl <- cl[CLyear %in% params$year]
+
 cs <- cs[DEyear %in% params$year]
 
 # Print end message
