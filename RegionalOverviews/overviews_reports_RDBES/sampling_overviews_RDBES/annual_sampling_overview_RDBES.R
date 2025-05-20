@@ -32,8 +32,10 @@ dataprepDate = 20250425 # Date on which data where prepared.
 dataprepDateCL = 20250429
 dataprepDateCE = 20250429
 
+
 ## Set wd 
-setwd("D:/RCG-RDBES-Overviews/") # Kasia machine
+ setwd("C:/Use/0_GitHub/RCG-RDBES-Overviews") # Lucia's machine
+# setwd("D:/RCG-RDBES-Overviews/") # Kasia machine
 #setwd("Path to RCGs local repo")
 
 ## Load libraries

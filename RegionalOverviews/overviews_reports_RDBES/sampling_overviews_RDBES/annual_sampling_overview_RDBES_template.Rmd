@@ -16,7 +16,6 @@ params:
   CSfileName: 'RDBES_RCG_BA_CS_2024_2024_prepared_20250425'
   CLfileName: 'RDBES_RCG_BA_CL_2023_2023_prepared_20250212'
   CEfileName: 'RDBES_RCG_BA_CE_2023_2023_prepared_20250212'
-
 ---
 
 ---
@@ -225,10 +224,8 @@ kable(BVtypeMeasSummarytest,format.args = list( big.mark = " "))
 
 
 ```
-### Frequancy Measured data 
-### Biological data 
+### Frequency Measured data 
 ####	Number of measured individuals
-
 ```{r FMnumberAtUnit, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 1** add caption."}
 sub_cs<- cs |>
   select(SDctry,FMnumAtUnit,FMid,FMtypeMeas) |>
@@ -244,6 +241,30 @@ barplot(data = sub_cs,
       y = "NumLengthFish",
       ylab = "Number of fish measured")
 ```
+
+####	Type of Length Measured
+```{r TypeLength, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 1** add caption."}
+sub_cs <- cs |>
+  select(SpeciesLaName, FMnumAtUnit, FMid, FMtypeMeas) |>
+  filter(!is.na(FMid) & FMid!="") |>
+  distinct() |>
+  group_by(SpeciesLaName, FMtypeMeas) |>
+  summarise(NumLengthFish = sum(FMnumAtUnit, na.rm=T)) |>
+  group_by(SpeciesLaName) |>
+  mutate(NMeas = length(FMtypeMeas)) |>
+  filter(NMeas>1) |>
+  pivot_wider(names_from = FMtypeMeas, values_from = NumLengthFish) |>
+  select(-NMeas) 
+
+datatable(sub_cs)
+
+```
+
+
+
+
+
+### Biological data 
 #### Number of aged individuals 
 ```{r age, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 2** add caption."}
 sub_cs<- cs |>

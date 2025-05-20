@@ -26,7 +26,7 @@ suppressPackageStartupMessages(library(ggrepel))
 suppressPackageStartupMessages(library(knitr))
 suppressPackageStartupMessages(library(kableExtra))
 suppressPackageStartupMessages(library(crayon))
-
+suppressPackageStartupMessages(library(DT))
 
 # Print end message
 if(is_empty(warnings())){
