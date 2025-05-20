@@ -20,14 +20,18 @@
 # Dev. notes: 
 #
 # - 12.02.2025 first draft based on annual_overview_RDBES
+# - 05.05.2025 CL added
 #
 ###################################################################
 
 ## Custom the overview
 # Make your selection 
 yearSelected = 2024
-regionSelected = 'NA'# One of: 'BA', 'NA', 'NSEA'
+regionSelected = 'BA'# One of: 'BA', 'NA', 'NSEA'
 dataprepDate = 20250425 # Date on which data where prepared.
+dataprepDateCL = 20250429
+dataprepDateCE = 20250429
+
 
 ## Set wd 
  setwd("C:/Use/0_GitHub/RCG-RDBES-Overviews") # Lucia's machine

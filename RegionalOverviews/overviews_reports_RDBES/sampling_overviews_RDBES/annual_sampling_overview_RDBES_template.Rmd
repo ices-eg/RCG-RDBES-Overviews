@@ -6,15 +6,16 @@ output:
     toc: true
     fig_caption: yes
     
-# params:
-#   set_subtitle: "Title"
-#   region: 'BA'
-#   year: 2024
-#   logo_path: "../../data/logo/logo RCG BALTIC.PNG"
-#   data_dir: '../../data_RDBES/002_prepared/20250212/RCG_BA'
-#   RDBES_download_date: '01/01/2000'
-#   CSfileName: 'RDBES_RCG_NA_CS_2024_2024_prepared_20250425'
-#   
+params:
+  set_subtitle: "Title"
+  region: 'BA'
+  year: 2023
+  logo_path: "../../data/logo/logo RCG BALTIC.PNG"
+  data_dir: '../../data_RDBES/002_prepared/20250425/RCG_BA'
+  RDBES_download_date: '01/01/2000'
+  CSfileName: 'RDBES_RCG_BA_CS_2024_2024_prepared_20250425'
+  CLfileName: 'RDBES_RCG_BA_CL_2023_2023_prepared_20250212'
+  CEfileName: 'RDBES_RCG_BA_CE_2023_2023_prepared_20250212'
 ---
 
 ---
@@ -405,8 +406,198 @@ BVfishid number of fish analyzed in top 3/4 types of biological measurements
 
 <!-- kable(temp_n_records) -->
 <!-- kable(temp_n_rec) -->
-Some results from summaryBiologicalVar function ->
+
+## Total landings and number of trips sampled
+
+### Area vs Gear
+
+```{r , echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6}
+cl_data <- cl_rcg
+cl_data$Region <- ifelse(cl_data$Region=="NA"|is.na(cl_data$Region),'NATL',cl_data$Region)
+
+cs |>
+  filter(SAcatchCat %in% c('Lan', 'Catch'),!is.na(SAid) &
+           SAid != "",
+         DEhierarchy != 13) |>
+  select(FTid,FOid,LEid,DEhierarchy,metier6,DEyear,SDctry,VDlenCat,SAsampWtLive,Area,SpeciesLaName)|>
+  mutate(Trip_id = ifelse((!is.na(FTid) &
+                             FTid != "") &
+                            (is.na(LEid) | LEid == ""), FTid, LEid)) |>
+  mutate(Trip_id = as.character(ifelse(
+    Trip_id == "" & DEhierarchy == 13, FOid, Trip_id
+  ))) |>
+  rename(
+    MetierLvl6 = metier6,
+    Year = DEyear,
+    FlagCountry = SDctry,
+    VesselLengthCategory = VDlenCat
+  ) |>
+  distinct()|>
+  group_by(Year,
+           FlagCountry,
+           Area,
+           SpeciesLaName,
+           MetierLvl6,
+           VesselLengthCategory) |>
+  summarise(NoTrips = n_distinct(Trip_id, na.rm = TRUE),
+            WeigthKg = sum(SAsampWtLive/1000, na.rm =  TRUE)) -> samplingPart
+
+cl_data |>
+  rename(MetierLvl6=CLmetier6,
+         Year = CLyear,
+         FlagCountry = CLvesselFlagCountry,
+         VesselLengthCategory = CLvesselLengthCategory,
+         Area = CLarea) |>
+  filter(Year %in% unique(samplingPart$Year)) |>
+  group_by(Year, FlagCountry, Area, 
+            SpeciesLaName, 
+           MetierLvl6, VesselLengthCategory )|>
+  summarise(LandingsT = sum(CLscientificWeight_ton, na.rm=TRUE))-> LandingsPart
+# 
+# 
+samplingPart %>%
+  full_join(LandingsPart)-> samplingVSlandings
+
+samplingVSlandings |>
+  mutate(Gear = str_sub(MetierLvl6, end = 3)) %>%
+  group_by(Area, Gear
+           # ,SpeciesLaName, 
+           # FlagCountry
+           ) %>%
+  summarise(
+    NoTrips = sum(NoTrips, na.rm = TRUE),
+    LandingsT = sum(LandingsT, na.rm = TRUE)
+  ) |>
+  mutate(NoTrips = ifelse(NoTrips == 0, NA, NoTrips)) ->
+  samplingVSlandingsF
 
 
+ggplot(samplingVSlandingsF, aes(y = factor(Area),#FlagCountry),
+                                x = factor(Gear))) +        ## global aes
+  geom_tile(aes(fill = LandingsT), na.rm = TRUE) +         ## to get the rect filled
+  geom_point(aes(
+    size =NoTrips),
+    shape =1,
+    stroke = 1)  +    ## geom_point for circle illusion
+  scale_fill_distiller(palette = "Spectral", direction = -1, trans = 'log10', na.value="transparent") +
+ 
+  theme_bw()
+
+```
+
+### Total landings and number of trips sampled - Regional routine 
+
+```{r eval=eval_region_BA, echo=FALSE, fig.height=6, fig.width=6, message=FALSE, warning=FALSE, dpi=100, results="asis"}
+
+cl_data <- cl_rcg
+
+cs |>
+  filter(
+    SAcatchCat %in% c('Lan', 'Catch'),
+    !is.na(SAid) &
+      SAid != "",
+    DEhierarchy != 13,
+    DEsampScheme == 'Baltic SPF regional',
+    SpeciesLaName %in% c('Clupea harengus', 'Sprattus sprattus')
+  ) |>
+  select(
+    FTid,
+    FOid,
+    LEid,
+    DEhierarchy,
+    metier6,
+    DEyear,
+    SDctry,
+    VDlenCat,
+    SAsampWtLive,
+    Area,
+    SpeciesLaName
+  ) |>
+  mutate(Trip_id = ifelse((!is.na(FTid) &
+                             FTid != "") &
+                            (is.na(LEid) |
+                               LEid == ""), FTid, LEid)) |>
+  mutate(Trip_id = as.character(ifelse(
+    Trip_id == "" & DEhierarchy == 13, FOid, Trip_id
+  ))) |>
+  rename(
+    MetierLvl6 = metier6,
+    Year = DEyear,
+    FlagCountry = SDctry,
+    VesselLengthCategory = VDlenCat
+  ) |>
+  distinct() |>
+  group_by(Year,
+           FlagCountry,
+           Area,
+           SpeciesLaName,
+           MetierLvl6,
+           VesselLengthCategory) |>
+  summarise(
+    NoTrips = n_distinct(Trip_id, na.rm = TRUE),
+    WeigthKg = sum(SAsampWtLive / 1000, na.rm =  TRUE)
+  ) -> samplingPart
+
+cl_data |>
+  rename(
+    MetierLvl6 = CLmetier6,
+    Year = CLyear,
+    FlagCountry = CLvesselFlagCountry,
+    VesselLengthCategory = CLvesselLengthCategory,
+    Area = CLarea
+  ) |>
+  filter(
+    Year %in% unique(samplingPart$Year),
+    SpeciesLaName %in% unique(samplingPart$SpeciesLaName)
+  ) |>
+  group_by(Year,
+           FlagCountry,
+           Area,
+           SpeciesLaName,
+           MetierLvl6,
+           VesselLengthCategory) |>
+  summarise(LandingsT = sum(CLscientificWeight_ton, na.rm = TRUE)) -> LandingsPart
+
+samplingPart %>%
+  full_join(LandingsPart) -> samplingVSlandings
+
+samplingVSlandings |>
+  mutate(Gear = str_sub(MetierLvl6, end = 3)) %>%
+  group_by(
+    #Area,
+    Gear,
+    SpeciesLaName,
+    FlagCountry
+  ) %>%
+  summarise(
+    NoTrips = sum(NoTrips, na.rm = TRUE),
+    LandingsT = sum(LandingsT, na.rm = TRUE)
+  ) |>
+  mutate(NoTrips = ifelse(NoTrips == 0, NA, NoTrips)) ->
+  samplingVSlandingsF
+
+
+ggplot(samplingVSlandingsF, aes(y = factor(FlagCountry), x = factor(Gear))) +  ## global aes
+  facet_wrap( ~ SpeciesLaName, ncol = 1) +
+  geom_tile(aes(fill = LandingsT), na.rm = TRUE) +         ## to get the rect filled
+  geom_point(aes(size = NoTrips), shape = 1, stroke = 1)  +    ## geom_point for circle illusion
+  scale_fill_distiller(
+    palette = "Spectral",
+    direction = -1,
+    trans = 'log10',
+    na.value = "transparent"
+  ) +
+  labs(title="Baltic SPF regional")+
+  theme_bw()
+
+```
+  
+```{r eval=eval_region_NA, echo=FALSE, fig.height=6, fig.width=6, message=FALSE, warning=FALSE, dpi=100, results="asis"}
+cat('Regional routine is not yet performed in the North Atlantic.')
+```
+
+```{r eval=eval_region_NA, echo=FALSE, fig.height=6, fig.width=6, message=FALSE, warning=FALSE, dpi=100, results="asis"}
+cat('Regional routine is not yet performed in the North Sea & Eastern Arctic.')
+```
 ## Biological information by species
 ## Appendix A
