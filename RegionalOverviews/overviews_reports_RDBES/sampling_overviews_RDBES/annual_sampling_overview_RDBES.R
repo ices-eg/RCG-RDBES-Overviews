@@ -16,6 +16,7 @@
 ###################################################################
 # Authors: 
 # - Kasia Krakówka [first draft]
+# -  Ana Cláudia Fernandes
 # 
 # Dev. notes: 
 #
@@ -25,25 +26,29 @@
 
 ## Custom the overview
 # Make your selection 
-yearSelected = 2023
+yearSelected = 2024
 regionSelected = 'BA'# One of: 'BA', 'NA', 'NSEA'
-dataprepDate = 20250217 # Date on which data where prepared.
+dataprepDate = 20250521 # Date on which data where prepared.
+dataprepDateCL = 20250527
+dataprepDateCE = 20250527
 
 ## Set wd 
-setwd("D:/RCG-RDBES-Overviews/") # Kasia machine
+#setwd("D:/RCG-RDBES-Overviews/") # Kasia machine
+setwd("F:/Documentos/PNAB/2025/000_RCG_IntersessionalWork/Fisheries_Overviews/RCG-RDBES-Overviews-master/")
 #setwd("Path to RCGs local repo")
 
 ## Load libraries
 source("RegionalOverviews/overviews_reports_RDBES/sampling_overviews_RDBES/scripts/loadLibraries.R")
 
 ## Load functions 
-#source("RegionalOverviews/overviews_reports_RDBES/sampling_overviews_RDBES/scripts/loadFunctions.R")
+source("RegionalOverviews/overviews_reports_RDBES/sampling_overviews_RDBES/scripts/loadFunctions.R")
 
 # Parameters are defined based on user selection
 source("RegionalOverviews/overviews_reports_RDBES/sampling_overviews_RDBES/scripts/parametersDefinition.R")
 
 ## Load prepared data
 source("RegionalOverviews/overviews_reports_RDBES/sampling_overviews_RDBES/scripts/loadData.R")
+
 load("RegionalOverviews/data/UNLOCODE.rData")
 
 ## Source the .rmd file producing the overview
@@ -55,3 +60,4 @@ rmarkdown::render(
   envir = new.env(parent = globalenv()),
   encoding = 'UTF-8'
 )
+
