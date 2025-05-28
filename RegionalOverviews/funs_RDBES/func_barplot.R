@@ -1,6 +1,7 @@
 # Authors: 
 # - Jonathan Stounberg
 # - Kasia Krakówka
+# - Ana Cláudia Fernandes
 # 
 # Dev. notes: 
 #
@@ -127,3 +128,45 @@ barplot <- function(data = data,
   print(p)
 }
 
+## Function to use when ploting countries in the x-axis
+
+	barplot1 <- function(data,
+						 x = "",
+						 y = "",
+						 xlab = "",
+						 ylab = "",
+						 title = "",
+						 country_col_file = "../../data/colours2.csv",
+						 country_code_file = "../../data/aux_countries.txt") {
+	  
+	# Load color mapping
+	  colours <- read.csv2(country_col_file)
+	  country <- read.table(country_code_file, sep = ",", header = TRUE)
+	  names(country)[1] <- "CountryName"
+	  
+	  col <- merge(colours, country, by = "CountryName", all.x = TRUE)
+	  col <- col[, c("ISO2Code", "colour5")]
+	  col <- setNames(col$colour5, col$ISO2Code)
+
+	  # Prepare data
+	  data <- data.frame(data)
+	  
+	  # Ensure x is a factor with alphabetical levels
+	  data[[x]] <- factor(data[[x]], levels = sort(as.character(unique(data[[x]]))))
+	  
+	  data$x <- data[[x]]
+	  data$y <- data[[y]]
+	  
+	  # Now use x as the axis and fill
+	  p <- ggplot(data, aes(x = x, y = y, fill = x)) +
+		geom_col() +
+		xlab(xlab) +
+		ylab(ylab) +
+		ggtitle(title) +
+		theme_minimal() +
+		theme(axis.text.x = element_text(angle = 0, hjust = 1),
+			  legend.position = "none") +
+		scale_fill_manual(values = col)
+
+	  print(p)
+	}
