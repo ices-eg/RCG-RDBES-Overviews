@@ -10,10 +10,15 @@ params:
   set_subtitle: "Title"
   region: 'BA'
   year: 2024
-  logo_path: "../../data/logo/logo RCG BALTIC.PNG"
-  data_dir: '../../data_RDBES/002_prepared/20250425/RCG_BA'
-  RDBES_download_date: '01/01/2000'
-  CSfileName: 'RDBES_RCG_BA_CS_2024_2024_prepared_20250425'
+  logo_path: "../../data/logo/logo RCG BALTIC.PNG" # logo RCG NA NS_EA.PNG OR logo RCG BALTIC.PNG
+  data_dir_CS: '../../data_RDBES/002_prepared/20250521/RCG_BA'
+  data_dir_CL: '../../data_RDBES/002_prepared/20250527/RCG_BA'
+  data_dir_CE: '../../data_RDBES/002_prepared/20250527/RCG_BA'
+  RDBES_download_date: '20/05/2025'
+  CSfileName: 'RDBES_RCG_BA_CS_2024_2024_prepared_20250521'
+  CLfileName: 'RDBES_RCG_BA_CL_2024_2024_prepared_20250527'
+  CEfileName: 'RDBES_RCG_BA_CE_2024_2024_prepared_20250527'
+
   
 ---
 
@@ -117,9 +122,9 @@ The RDBES should be seen as part of the movements towards statistically Sound Sa
 4. To serve and facilitate the production of fisheries management advice and status reports,
 5. To increase the awareness of fisheries data collected by the users of the RDBES and the overall usage of these data.
 
-The RDBES data model is an evolution of the work already done in defining and using the Regional Database (RDB) and the COST data models and functions.  The RDB data model provided a common data structure to describe commercial sampling data at a disaggregated level, and commercial landings and effort data at an aggregated level.  The significant difference in the new RDBES model is that it provides a common structure to describe both the disaggregated sampling data and, most importantly, how it was sampled.
+The RDBES data model is an evolution of the work already done in defining and using the Regional Database (RDB) and the COST data models and functions.  The RDB data model provided a common data structure to describe commercial sampling data at a disaggregated level, and commercial landings and effort data at an aggregated level.  The significant difference for the new RDBES model is that this provides a common structure to describe both the disaggregated sampling data and, most importantly, how it was sampled.
 
-To allow for the variety of sampling designs used in different institutes and countries the RDBES identifies a number of different sampling hierarchies, which represent the different hierarchical sampling techniques that are used in practice.  Two types of hierarchy are used in the model. The upper hierarchies describe how a sample is selected, and they are numbered from 1 to 13. The lower hierarchies describe what type of length-frequency or biological variables are measured for that sample, and they are named with the letters from A to D.  All hierarchies are defined in terms of the tables they consist of and the relationships between them. 
+To allow for the variety of sampling designs used in different institutes and countries the RDBES identifies a number of different sampling hierarchies, which represent the different hierarchical sampling techniques that are used in practice.  Two types of hierarchies are used in the model. The upper hierarchies describe how a sample is selected, and they are numbered from 1 to 13. The lower hierarchies describe what type of length-frequency or biological variables are measured for that sample, and they are named with the letters from A to D.  All hierarchies are defined in terms of the tables they consist of and the relationships between them. 
 
 ## Reading the graphs
 ### Barplots
@@ -152,7 +157,7 @@ kable(combined, align = "c")|>
 
 ### Samples data 
 #### Number of species in Sample (SA)
-**Table 2** Number of unique species in Sample table (SA) by hierarchy. The 'Total' column refers to unique species counts by country (some species may be present in more than one hierarchy).
+**Table 2** Number of unique species in Sample table (SA) by hierarchy. The 'Total' column and row refer to unique species counts by country and hierarchy, respectively.
 
 ```{r sample_data, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6}
 
@@ -166,7 +171,7 @@ kable(SAsummary, align = "c")|>
 <br>
 
 #### Number of records in Frequency Measure (FM) and Biological Variables (BV) 
-**Table 3** Number of records in Frequency Measure (FM) by hierarchy. The table shows the number of records in FM for hierarchies A and B. Hierarchy B (only length frequency data) is shown in brackets.
+**Table 3** Number of records in Frequency Measure (FM) by hierarchy. The table shows the number of records in FM for hierarchies A and B. Hierarchy B is shown in brackets.
 ```{r FM, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6}
 
 source("scripts/FMBVrecords.R")
@@ -179,7 +184,7 @@ kable(combined, align = "c")|>
 ```
 <br>
 
-**Table 4** Number of records in Biological Variable (BV) under Frequency Measure (FM) (lower hierarchy A) and Sample (SA) (lower hierarchy C). The number of records under Sample (SA) is shown in brackets.
+**Table 4** Number of records in Biological Variable (BV) under Frequency Measure (FM) (lower hierarchy A) and Sample (SA). The number of records under Sample (SA) is shown in brackets.
 ```{r BV, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6}
 
 source("scripts/BVrecords.R")
@@ -230,14 +235,18 @@ cs|>
 
 kable(BVtypeMeasSummarytest,format.args = list( big.mark = " "))
 
+
+
 ```
 <br>
 
 ### Frequency Measure data 
 
+<br>
+
 ####	Number of measured individuals
 
-```{r FMnumberAtUnit, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 1** Number of individuals measured by country. The top 20 countries in numbers are presented. (source data: FM)"}
+```{r FMnumberAtUnit, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 1** Number of individuals measured by country. (source data: FM)"}
 sub_cs<- cs |>
   select(SDctry,FMnumAtUnit,FMid,FMtypeMeas) |>
   filter(!is.na(FMid) & FMid!="",
@@ -255,19 +264,22 @@ sub_cs<- cs |>
 #       ylab = "Number of individuals measured") 
 
 ## Option 2: this one keeps the x-axis ordered alphabetically
-ggplot(sub_cs, aes(x = SDctry, y = NumLengthFish, fill = SDctry)) +
-  geom_col() +
-  ylab("Number of individuals measured") +
-  xlab("Country") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 0, hjust = 1),
-        legend.position = "none")
-
+barplot1(data = sub_cs,
+						 x = "SDctry",
+						 y = "NumLengthFish",
+						 xlab = "Country",
+						 ylab = "Number of individuals measured",
+						 title = ""
+						 )
 ```
 <br>
 
 ####	Type of Length Measured
-```{r TypeLength, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 1** add caption."}
+<br>
+
+**Table 6** Species that have more than one type of length measurement in the Frequency Measure table.
+
+```{r TypeLength, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap=""}
 sub_cs <- cs |>
   select(SpeciesLaName, FMnumAtUnit, FMid, FMtypeMeas) |>
   filter(!is.na(FMid) & FMid!="") |>
@@ -280,15 +292,18 @@ sub_cs <- cs |>
   pivot_wider(names_from = FMtypeMeas, values_from = NumLengthFish) |>
   select(-NMeas) 
 
-datatable(sub_cs)
+# data.table(sub_cs)
+kable(sub_cs)
 
 ```
 <br>
 
+
 ### Biological data 
+<br>
 
 #### Number of aged individuals 
-```{r age, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 2** Number of individuals aged by country. The top 20 countries in numbers are presented.  (source data: BV)"}
+```{r age, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 2** Number of individuals aged by country. (source data: BV)"}
 
 sub_cs<- cs |>
   select(SDctry,BVvalueMeas,BVid,BVtypeMeas) |>
@@ -308,13 +323,14 @@ sub_cs<- cs |>
 #       ylab = "Number of individuals with age") 
 
 ## Option 2:
-ggplot(sub_cs, aes(x = SDctry, y = NumAgeFish, fill = SDctry)) +
-  geom_col() +
-  ylab("Number of individuals with age") +
-  xlab("Country") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 0, hjust = 1),
-        legend.position = "none")
+barplot1(data = sub_cs,
+						 x = "SDctry",
+						 y = "NumAgeFish",
+						 xlab = "Country",
+						 ylab = "Number of individuals with age",
+						 title = ""
+						 )
+
      
 ```
 <br>
@@ -340,21 +356,23 @@ sub_cs<- cs |>
 #       y = "NumWeightFish",
 #       ylab = "Number of individuals with weight")
 
-## Option 2:
-ggplot(sub_cs, aes(x = SDctry, y = NumWeightFish, fill = SDctry)) +
-  geom_col() +
-  ylab("Number of individuals with weight") +
-  xlab("Country") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 0, hjust = 1),
-        legend.position = "none")
+
+## Option 2: country-specific
+barplot1(data = sub_cs,
+						 x = "SDctry",
+						 y = "NumWeightFish",
+						 xlab = "Country",
+						 ylab = "Number of individuals with weight",
+						 title = ""
+						 )
+
 
 ```
 <br>
 
 #### Number of individuals with maturity 
 
-```{r maturity, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 4** Number of individuals with maturity by country. The top 20 countries in numbers are presented. (source data: BV)."}
+```{r maturity, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 4** Number of individuals with maturity by country. (source data: BV)."}
 sub_cs<- cs |>
   select(SDctry,BVvalueMeas,BVid,BVtypeMeas) |>
   filter(!is.na(BVid) & BVid!="",
@@ -373,20 +391,21 @@ sub_cs<- cs |>
 #       ylab = "Number of individuals with maturity")
 
 ## Option 2:
-ggplot(sub_cs, aes(x = SDctry, y = NumMaturityFish, fill = SDctry)) +
-  geom_col() +
-  ylab("Number of individuals with maturity") +
-  xlab("Country") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 0, hjust = 1),
-        legend.position = "none")
+barplot1(data = sub_cs,
+						 x = "SDctry",
+						 y = "NumMaturityFish",
+						 xlab = "Country",
+						 ylab = "Number of individuals with maturity",
+						 title = ""
+						 )
+
 
 ```
 <br>
 
 #### Number of sexed individuals
 
-```{r sex, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 5** Number of sexed individuals. The top 20 countries in numbers are presented. (source data: BV)."}
+```{r sex, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 5** Number of sexed individuals. (source data: BV)."}
 
 sub_cs<- cs |>
   select(SDctry,BVvalueMeas,BVid,BVtypeMeas) |>
@@ -406,13 +425,14 @@ sub_cs<- cs |>
 #       ylab = "Number of individuals with sex")
 
 ## Option 2:
-ggplot(sub_cs, aes(x = SDctry, y = NumSexFish, fill = SDctry)) +
-  geom_col() +
-  ylab("Number of individuals with sex") +
-  xlab("Country") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 0, hjust = 1),
-        legend.position = "none")
+barplot1(data = sub_cs,
+						 x = "SDctry",
+						 y = "NumSexFish",
+						 xlab = "Country",
+						 ylab = "Number of individuals with sex",
+						 title = ""
+						 )
+
 
 ```
 
@@ -420,7 +440,7 @@ ggplot(sub_cs, aes(x = SDctry, y = NumSexFish, fill = SDctry)) +
 
 ### Number of individuals in all types of biological variables
 
-The table below summarises all the information (number of individuals) reported by biological variable.
+The table below summarises all the information (number of individuals) reported by biological variable. (source data: BV)
 
 ```{r BVfishid, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6}
 # testowo do wyrzucenia jak wyjaśni się kwestia z długością
@@ -470,27 +490,9 @@ sub_cs<- cs |>
 #print result
 kable(sub_cs, align = "c")|>
   kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) 
-
 ```
 
 <br>
-## Biological information per species
-BVfishid number of fish analyzed in top 3/4 types of biological measurements
-
-<!-- cs |> -->
-<!--   group_by(DEhierarchy,SDctry)|> -->
-<!--   count() -> temp_n_records -->
-
-<!-- cs |> -->
-<!--   group_by(DEhierarchy,SDctry, FTsampType)|> -->
-<!--   count() -> temp_n_rec -->
-
-<!-- kable(temp_n_records) -->
-<!-- kable(temp_n_rec) -->
-Some results from summaryBiologicalVar function ->
-<br>
-
-
 ## Biological information per species
 BVfishid number of fish analyzed in top 3/4 types of biological measurements
 
@@ -509,201 +511,223 @@ BVfishid number of fish analyzed in top 3/4 types of biological measurements
 
 ## Sampling coverage
 
-The figures below present the total landings and the number of samples collected (trips (FT) or landing events (LE)).
+The figures below present the total landings and the number of samples collected (trips (FT), fishing operation (FO) or landing events (LE), depending on the hierarchy used).
 
 ### Area vs Gear
 
 ```{r , echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6}
-cl_data <- cl_rcg
-cl_data$Region <- ifelse(cl_data$Region=="NA"|is.na(cl_data$Region),'NATL',cl_data$Region)
-
-cs |>
-  filter(SAcatchCat %in% c('Lan', 'Catch'),!is.na(SAid) &
-           SAid != "",
-         DEhierarchy != 13) |>
-  select(FTid,FOid,LEid,DEhierarchy,metier6,DEyear,SDctry,VDlenCat,SAsampWtLive,Area,SpeciesLaName)|>
-  mutate(Trip_id = ifelse((!is.na(FTid) &
-                             FTid != "") &
-                            (is.na(LEid) | LEid == ""), FTid, LEid)) |>
-  mutate(Trip_id = as.character(ifelse(
-    Trip_id == "" & DEhierarchy == 13, FOid, Trip_id
-  ))) |>
-  rename(
-    MetierLvl6 = metier6,
-    Year = DEyear,
-    FlagCountry = SDctry,
-    VesselLengthCategory = VDlenCat
-  ) |>
-  distinct()|>
-  group_by(Year,
-           FlagCountry,
-           Area,
-           SpeciesLaName,
-           MetierLvl6,
-           VesselLengthCategory) |>
-  summarise(NoTrips = n_distinct(Trip_id, na.rm = TRUE),  ## suggest to use NoSamples because they can come from different sources (FT, FO and LE) (ACFernandes)
-            WeigthKg = sum(SAsampWtLive/1000, na.rm =  TRUE)) -> samplingPart
-
-cl_data |>
-  rename(MetierLvl6=CLmetier6,
-         Year = CLyear,
-         FlagCountry = CLvesselFlagCountry,
-         VesselLengthCategory = CLvesselLengthCategory,
-         Area = CLarea) |>
-  filter(Year %in% unique(samplingPart$Year)) |>
-  group_by(Year, FlagCountry, Area, 
-            SpeciesLaName, 
-           MetierLvl6, VesselLengthCategory )|>
-  summarise(LandingsT = sum(CLscientificWeight_ton, na.rm=TRUE))-> LandingsPart
-# 
-# 
-samplingPart %>%
-  full_join(LandingsPart)-> samplingVSlandings
-
-samplingVSlandings |>
-  mutate(Gear = str_sub(MetierLvl6, end = 3)) %>%
-  group_by(Area, Gear
-           # ,SpeciesLaName, 
-           # FlagCountry
-           ) %>%
-  summarise(
-    NoTrips = sum(NoTrips, na.rm = TRUE), ## suggest to use NoSamples because they can come from different sources (FT, FO and LE) (ACFernandes)
-    LandingsT = sum(LandingsT, na.rm = TRUE)
-  ) |>
-  mutate(NoTrips = ifelse(NoTrips == 0, NA, NoTrips)) ->
-  samplingVSlandingsF
-
-
-ggplot(samplingVSlandingsF, aes(y = factor(Area),#FlagCountry),
-                                x = factor(Gear))) +        ## global aes
-  geom_tile(aes(fill = LandingsT), na.rm = TRUE) +         ## to get the rect filled
-  geom_point(aes(
-    size =NoTrips),
-    shape =1,
-    stroke = 1)  +    ## geom_point for circle illusion
-  scale_fill_distiller(palette = "Spectral", direction = -1, trans = 'log10', na.value="transparent") +
- 
-  theme_bw()
-
-```
-
-### Total landings and number of samples collected - Regional routine 
-
-```{r eval=eval_region_BA, echo=FALSE, fig.height=6, fig.width=6, message=FALSE, warning=FALSE, dpi=100, results="asis"}
-
-cl_data <- cl_rcg
-
-cs |>
-  filter(
-    SAcatchCat %in% c('Lan', 'Catch'),
-    !is.na(SAid) &
-      SAid != "",
-    DEhierarchy != 13,
-    DEsampScheme == 'Baltic SPF regional',
-    SpeciesLaName %in% c('Clupea harengus', 'Sprattus sprattus')
-  ) |>
-  select(
-    FTid,
-    FOid,
-    LEid,
-    DEhierarchy,
-    metier6,
-    DEyear,
-    SDctry,
-    VDlenCat,
-    SAsampWtLive,
-    Area,
-    SpeciesLaName
-  ) |>
-  mutate(Trip_id = ifelse((!is.na(FTid) &
-                             FTid != "") &
-                            (is.na(LEid) |
-                               LEid == ""), FTid, LEid)) |>
-  mutate(Trip_id = as.character(ifelse(
-    Trip_id == "" & DEhierarchy == 13, FOid, Trip_id
-  ))) |>
-  rename(
-    MetierLvl6 = metier6,
-    Year = DEyear,
-    FlagCountry = SDctry,
-    VesselLengthCategory = VDlenCat
-  ) |>
-  distinct() |>
-  group_by(Year,
-           FlagCountry,
-           Area,
-           SpeciesLaName,
-           MetierLvl6,
-           VesselLengthCategory) |>
-  summarise(
-    NoTrips = n_distinct(Trip_id, na.rm = TRUE),
-    WeigthKg = sum(SAsampWtLive / 1000, na.rm =  TRUE)
-  ) -> samplingPart
-
-cl_data |>
-  rename(
-    MetierLvl6 = CLmetier6,
-    Year = CLyear,
-    FlagCountry = CLvesselFlagCountry,
-    VesselLengthCategory = CLvesselLengthCategory,
-    Area = CLarea
-  ) |>
-  filter(
-    Year %in% unique(samplingPart$Year),
-    SpeciesLaName %in% unique(samplingPart$SpeciesLaName)
-  ) |>
-  group_by(Year,
-           FlagCountry,
-           Area,
-           SpeciesLaName,
-           MetierLvl6,
-           VesselLengthCategory) |>
-  summarise(LandingsT = sum(CLscientificWeight_ton, na.rm = TRUE)) -> LandingsPart
-
-samplingPart %>%
-  full_join(LandingsPart) -> samplingVSlandings
-
-samplingVSlandings |>
-  mutate(Gear = str_sub(MetierLvl6, end = 3)) %>%
-  group_by(
-    #Area,
-    Gear,
-    SpeciesLaName,
-    FlagCountry
-  ) %>%
-  summarise(
-    NoTrips = sum(NoTrips, na.rm = TRUE),
-    LandingsT = sum(LandingsT, na.rm = TRUE)
-  ) |>
-  mutate(NoTrips = ifelse(NoTrips == 0, NA, NoTrips)) ->
-  samplingVSlandingsF
-
-
-ggplot(samplingVSlandingsF, aes(y = factor(FlagCountry), x = factor(Gear))) +  ## global aes
-  facet_wrap( ~ SpeciesLaName, ncol = 1) +
-  geom_tile(aes(fill = LandingsT), na.rm = TRUE) +         ## to get the rect filled
-  geom_point(aes(size = NoTrips), shape = 1, stroke = 1)  +    ## geom_point for circle illusion
-  scale_fill_distiller(
-    palette = "Spectral",
-    direction = -1,
-    trans = 'log10',
-    na.value = "transparent"
-  ) +
-  labs(title="Baltic SPF regional")+
-  theme_bw()
-
-```
   
-```{r eval=eval_region_NA, echo=FALSE, fig.height=6, fig.width=6, message=FALSE, warning=FALSE, dpi=100, results="asis"}
-cat('Regional routine is not yet performed in the North Atlantic.')
+  cl_data <- cl_rcg
+  cl_data$Region <- ifelse(cl_data$Region=="NA"|is.na(cl_data$Region),'NATL',cl_data$Region)
+  
+  cs |>
+    filter(SAcatchCat %in% c('Lan', 'Catch'),!is.na(SAid) &
+             SAid != "",
+           DEhierarchy != 13) |>
+    select(FTid,FOid,LEid,DEhierarchy,metier6,DEyear,SDctry,VDlenCat,SAsampWtLive,Area,SpeciesLaName)|>
+    mutate(Trip_id = ifelse((!is.na(FTid) &
+                               FTid != "") &
+                              (is.na(LEid) | LEid == ""), FTid, LEid)) |>
+    mutate(Trip_id = as.character(ifelse(
+      Trip_id == "" & DEhierarchy == 13, FOid, Trip_id
+    ))) |>
+    rename(
+      MetierLvl6 = metier6,
+      Year = DEyear,
+      FlagCountry = SDctry,
+      VesselLengthCategory = VDlenCat
+    ) |>
+    distinct()|>
+    group_by(Year,
+             FlagCountry,
+             Area,
+             SpeciesLaName,
+             MetierLvl6,
+             VesselLengthCategory) |>
+    summarise(NoSamples = n_distinct(Trip_id, na.rm = TRUE),  ## suggest to use NoSamples because they can come from different sources (FT, FO and LE) (ACFernandes)
+              WeigthKg = sum(SAsampWtLive/1000, na.rm =  TRUE)) -> samplingPart
+  
+  cl_data |>
+    rename(MetierLvl6=CLmetier6,
+           Year = CLyear,
+           FlagCountry = CLvesselFlagCountry,
+           VesselLengthCategory = CLvesselLengthCategory,
+           Area = CLarea) |>
+    filter(Year %in% unique(samplingPart$Year)) |>
+    group_by(Year, FlagCountry, Area, 
+              SpeciesLaName, 
+             MetierLvl6, VesselLengthCategory )|>
+    summarise(LandingsT = sum(CLscientificWeight_ton, na.rm=TRUE))-> LandingsPart
+  # 
+  # 
+  samplingPart %>%
+    full_join(LandingsPart)-> samplingVSlandings
+  
+  samplingVSlandings |>
+    mutate(Gear = str_sub(MetierLvl6, end = 3)) %>%
+    group_by(Area, Gear
+             # ,SpeciesLaName, 
+             # FlagCountry
+             ) %>%
+    summarise(
+      NoSamples = sum(NoSamples, na.rm = TRUE), ## suggest to use NoSamples because they can come from different sources (FT, FO and LE) (ACFernandes)
+      LandingsT = sum(LandingsT, na.rm = TRUE)
+    ) |>
+    mutate(NoSamples = ifelse(NoSamples == 0, NA, NoSamples)) ->
+    samplingVSlandingsF
+  
+  
+  ggplot(samplingVSlandingsF, aes(y = factor(Area),#FlagCountry),
+                                  x = factor(Gear))) +        ## global aes
+    geom_tile(aes(fill = LandingsT), na.rm = TRUE) +         ## to get the rect filled
+    geom_point(aes(
+      size =NoSamples),
+      shape =1,
+      stroke = 1, na.rm=T)  +    ## geom_point for circle illusion (ACF added na.rm=T)
+    scale_fill_distiller(palette = "Spectral", direction = -1, trans = 'log10', na.value="transparent") +
+    theme_bw() +
+    theme(
+     axis.text.x = element_text(angle = 45, hjust = 1),
+     legend.position = "right"
+    ) +
+    labs(
+     x ='Gear',
+     y = 'Area',
+     fill = "Landings (t)",
+     size = "No. of Samples",
+     title = "Sampling vs Landings by Area and Gear"
+    )
+     
 ```
-
-```{r eval=eval_region_NA, echo=FALSE, fig.height=6, fig.width=6, message=FALSE, warning=FALSE, dpi=100, results="asis"}
-cat('Regional routine is not yet performed in the North Sea & Eastern Arctic.')
-```
-## Biological information by species
-## Appendix A
-
-## Biological information by species
+ 
 <br>
-## Appendix A
+  
+  
+### Total landings and number of samples collected - Regional routine
+  
+```{r eval=eval_region_BA, echo=FALSE, fig.height=6, fig.width=6, message=FALSE, warning=FALSE, dpi=100, results="asis"}
+  
+  cl_data <- cl_rcg
+  
+  cs |>
+    filter(
+      SAcatchCat %in% c('Lan', 'Catch'),
+      !is.na(SAid) &
+        SAid != "",
+      DEhierarchy != 13,
+      DEsampScheme == 'Baltic SPF regional',
+      SpeciesLaName %in% c('Clupea harengus', 'Sprattus sprattus')
+    ) |>
+    select(
+      FTid,
+      FOid,
+      LEid,
+      DEhierarchy,
+      metier6,
+      DEyear,
+      SDctry,
+      VDlenCat,
+      SAsampWtLive,
+      Area,
+      SpeciesLaName
+    ) |>
+    mutate(Trip_id = ifelse((!is.na(FTid) &
+                               FTid != "") &
+                              (is.na(LEid) |
+                                 LEid == ""), FTid, LEid)) |>
+    mutate(Trip_id = as.character(ifelse(
+      Trip_id == "" & DEhierarchy == 13, FOid, Trip_id
+    ))) |>
+    rename(
+      MetierLvl6 = metier6,
+      Year = DEyear,
+      FlagCountry = SDctry,
+      VesselLengthCategory = VDlenCat
+    ) |>
+    distinct() |>
+    group_by(Year,
+             FlagCountry,
+             Area,
+             SpeciesLaName,
+             MetierLvl6,
+             VesselLengthCategory) |>
+    summarise(
+      NoSamples = n_distinct(Trip_id, na.rm = TRUE),
+      WeigthKg = sum(SAsampWtLive / 1000, na.rm =  TRUE)
+    ) -> samplingPart
+  
+  cl_data |>
+    rename(
+      MetierLvl6 = CLmetier6,
+      Year = CLyear,
+      FlagCountry = CLvesselFlagCountry,
+      VesselLengthCategory = CLvesselLengthCategory,
+      Area = CLarea
+    ) |>
+    filter(
+      Year %in% unique(samplingPart$Year),
+      SpeciesLaName %in% unique(samplingPart$SpeciesLaName)
+    ) |>
+    group_by(Year,
+             FlagCountry,
+             Area,
+             SpeciesLaName,
+             MetierLvl6,
+             VesselLengthCategory) |>
+    summarise(LandingsT = sum(CLscientificWeight_ton, na.rm = TRUE)) -> LandingsPart
+  
+  samplingPart %>%
+    full_join(LandingsPart) -> samplingVSlandings
+  
+  samplingVSlandings |>
+    mutate(Gear = str_sub(MetierLvl6, end = 3)) %>%
+    group_by(
+      #Area,
+      Gear,
+      SpeciesLaName,
+      FlagCountry
+    ) %>%
+    summarise(
+      NoSamples = sum(NoSamples, na.rm = TRUE),
+      LandingsT = sum(LandingsT, na.rm = TRUE)
+    ) |>
+    mutate(NoSamples = ifelse(NoSamples == 0, NA, NoSamples)) ->
+    samplingVSlandingsF
+  
+  
+  ggplot(samplingVSlandingsF, aes(y = factor(FlagCountry), x = factor(Gear))) +  ## global aes
+    facet_wrap( ~ SpeciesLaName, ncol = 1) +
+    geom_tile(aes(fill = LandingsT), na.rm = TRUE) +         ## to get the rect filled
+    geom_point(aes(size = NoSamples), shape = 1, stroke = 1)  +    ## geom_point for circle illusion
+    scale_fill_distiller(
+      palette = "Spectral",
+      direction = -1,
+      trans = 'log10',
+      na.value = "transparent"
+    ) +
+    labs(
+       x ='Gear',
+       y = 'Country',
+       fill = "Landings (t)",
+       size = "No. of Samples",
+       title = "Baltic SPF regional",
+     ) +
+    theme_bw()
+
+```
+ 
+```{r eval=eval_region_NA, echo=FALSE, fig.height=6, fig.width=6, message=FALSE, warning=FALSE, dpi=100, results="asis"}
+cat('Regional routine is not yet performed in the North Atlantic, North Sea & Eastern Arctic.')
+```
+
+## Biological information by species
+
+Not performed this year.
+
+<br>
+
+
+## Appendix A. Dates of data extraction
+
+The data referring to the present year was collected under the RCG 2025 data call for the 2024 data for the Baltic Sea, North Sea, Eastern Arctic and the North Atlantic regions and the last downloaded from the system was performed on the 20th of May 2025 with the exception of information detailed in section “Overall fleet evolution” which was extracted from the EU Fleet Register (https://webgate.ec.europa.eu/fleet-europa/index_en) on the 4th of February 2025.
+
