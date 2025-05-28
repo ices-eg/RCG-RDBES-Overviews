@@ -12,8 +12,7 @@
 ###################################################################
 # Authors: 
 # - Kasia Krakówka [first draft]
-# - Ana Cláudia Fernandes
-# 
+# - Ana Cláudia Fernandes# 
 # 
 # Dev. notes: 
 #
