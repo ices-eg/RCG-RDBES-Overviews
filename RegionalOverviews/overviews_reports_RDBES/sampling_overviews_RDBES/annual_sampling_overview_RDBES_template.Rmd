@@ -292,8 +292,7 @@ sub_cs <- cs |>
   pivot_wider(names_from = FMtypeMeas, values_from = NumLengthFish) |>
   select(-NMeas) 
 
-# data.table(sub_cs)
-kable(sub_cs)
+data.table(sub_cs)
 
 ```
 <br>
