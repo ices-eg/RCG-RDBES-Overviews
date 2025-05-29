@@ -58,4 +58,5 @@ for(col in colnames(SDsummary)[-1]) {
 combined <- combined |>
   select(-ends_with(".y"))|>
   mutate(across(everything(), ~ gsub("\\(NA\\)", "", .)),
-         across(everything(), ~ gsub("\\(0\\)", "", .)))
+         across(everything(), ~ gsub("\\(0\\)", "", .)),
+         across(everything(), ~ gsub("\\(\\)", "", .)))
