@@ -201,6 +201,7 @@ kable(combined, align = "c")|>
   kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) |>
   column_spec(1, width = "4cm")|>
   column_spec(2:ncol(combined), width = "3cm")
+
 ```
 
 <br>
@@ -510,7 +511,7 @@ BVfishid number of fish analyzed in top 3/4 types of biological measurements
 
 ## Sampling coverage
 
-The figures below present the total landings and the number of samples collected (trips (FT), fishing operation (FO) or landing events (LE), depending on the hierarchy used).
+The figures below present the total landings and the number of Primary Sampling Units (PSU) collected (trips (FT), fishing operation (FO) or landing events (LE), depending on the hierarchy used).
 
 ### Area vs Gear
 
@@ -543,7 +544,7 @@ The figures below present the total landings and the number of samples collected
              SpeciesLaName,
              MetierLvl6,
              VesselLengthCategory) |>
-    summarise(NoSamples = n_distinct(Trip_id, na.rm = TRUE),  ## suggest to use NoSamples because they can come from different sources (FT, FO and LE) (ACFernandes)
+    summarise(NoPSU = n_distinct(Trip_id, na.rm = TRUE),  ## suggest to use NoSamples because they can come from different sources (FT, FO and LE) (ACFernandes)
               WeigthKg = sum(SAsampWtLive/1000, na.rm =  TRUE)) -> samplingPart
   
   cl_data |>
@@ -569,10 +570,10 @@ The figures below present the total landings and the number of samples collected
              # FlagCountry
              ) %>%
     summarise(
-      NoSamples = sum(NoSamples, na.rm = TRUE), ## suggest to use NoSamples because they can come from different sources (FT, FO and LE) (ACFernandes)
+      NoPSU = sum(NoPSU, na.rm = TRUE), ## suggest to use NoSamples because they can come from different sources (FT, FO and LE) (ACFernandes)
       LandingsT = sum(LandingsT, na.rm = TRUE)
     ) |>
-    mutate(NoSamples = ifelse(NoSamples == 0, NA, NoSamples)) ->
+    mutate(NoPSU = ifelse(NoPSU == 0, NA, NoPSU)) ->
     samplingVSlandingsF
   
   
@@ -580,7 +581,7 @@ The figures below present the total landings and the number of samples collected
                                   x = factor(Gear))) +        ## global aes
     geom_tile(aes(fill = LandingsT), na.rm = TRUE) +         ## to get the rect filled
     geom_point(aes(
-      size =NoSamples),
+      size = NoPSU),
       shape =1,
       stroke = 1, na.rm=T)  +    ## geom_point for circle illusion (ACF added na.rm=T)
     scale_fill_distiller(palette = "Spectral", direction = -1, trans = 'log10', na.value="transparent") +
@@ -593,7 +594,7 @@ The figures below present the total landings and the number of samples collected
      x ='Gear',
      y = 'Area',
      fill = "Landings (t)",
-     size = "No. of Samples",
+     size = "No. of PSU",
      title = "Sampling vs Landings by Area and Gear"
     )
      
@@ -651,7 +652,7 @@ The figures below present the total landings and the number of samples collected
              MetierLvl6,
              VesselLengthCategory) |>
     summarise(
-      NoSamples = n_distinct(Trip_id, na.rm = TRUE),
+      NoPSU = n_distinct(Trip_id, na.rm = TRUE),
       WeigthKg = sum(SAsampWtLive / 1000, na.rm =  TRUE)
     ) -> samplingPart
   
@@ -687,17 +688,17 @@ The figures below present the total landings and the number of samples collected
       FlagCountry
     ) %>%
     summarise(
-      NoSamples = sum(NoSamples, na.rm = TRUE),
+      NoPSU = sum(NoPSU, na.rm = TRUE),
       LandingsT = sum(LandingsT, na.rm = TRUE)
     ) |>
-    mutate(NoSamples = ifelse(NoSamples == 0, NA, NoSamples)) ->
+    mutate(NoPSU = ifelse(NoPSU == 0, NA, NoPSU)) ->
     samplingVSlandingsF
   
   
   ggplot(samplingVSlandingsF, aes(y = factor(FlagCountry), x = factor(Gear))) +  ## global aes
     facet_wrap( ~ SpeciesLaName, ncol = 1) +
     geom_tile(aes(fill = LandingsT), na.rm = TRUE) +         ## to get the rect filled
-    geom_point(aes(size = NoSamples), shape = 1, stroke = 1)  +    ## geom_point for circle illusion
+    geom_point(aes(size = NoPSU), shape = 1, stroke = 1)  +    ## geom_point for circle illusion
     scale_fill_distiller(
       palette = "Spectral",
       direction = -1,
@@ -708,7 +709,7 @@ The figures below present the total landings and the number of samples collected
        x ='Gear',
        y = 'Country',
        fill = "Landings (t)",
-       size = "No. of Samples",
+       size = "No. of PSU",
        title = "Baltic SPF regional",
      ) +
     theme_bw()
