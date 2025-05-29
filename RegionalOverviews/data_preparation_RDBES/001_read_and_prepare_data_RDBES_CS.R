@@ -41,7 +41,7 @@ getwd()
 ## ========================
 
 year_start <- 2022
-year_end <- 2024
+year_end <- 2022
 time_tag <- format(Sys.time(), "%Y%m%d")
 target_region <- 'RCG_NA'
 ## ===========================
@@ -89,9 +89,9 @@ setwd('RegionalOverviews/data_RDBES/001_raw')
 for (H in c('H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H13')) {
   temp <- createRDBESDataObject(
     input = paste0(
-      'D:/RCG-RDBES-Overviews/RegionalOverviews/data_RDBES/001_raw/RDBES CS/22042025/NANSEA/HCS_',
+      'D:/RCG-RDBES-Overviews/RegionalOverviews/data_RDBES/001_raw/RDBES CS/21052025/NANSEA/HCS_',
       H,
-      '_NANSEA_2025_04_22.zip'
+      '_NANSEA_2025_05_21.zip'
     )
   )
   validateRDBESDataObject(temp, verbose = FALSE) 
@@ -190,14 +190,19 @@ for (H in c('H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H13')) {
   # ======================
   
   if ("FOarea" %in% colnames(cs)) {
+    cs$FOarea <- as.character(cs$FOarea)
+    cs$FOmetier6 <- as.character(cs$FOmetier6)
     cs$Area[cs$DEhierarchy %in% c(1, 2, 3, 6, 10, 13)] <- cs[cs$DEhierarchy %in% c(1, 2, 3, 6, 10, 13), FOarea]
     cs$metier6[cs$DEhierarchy %in% c(1, 2, 3, 6, 10, 13)] <- cs[cs$DEhierarchy %in% c(1, 2, 3, 6, 10, 13), FOmetier6]
   }
   if ("LEarea" %in% colnames(cs)) {
+    cs$LEarea <- as.character(cs$LEarea)
+    cs$LEmetier6 <- as.character(cs$LEmetier6)
     cs$Area[!cs$DEhierarchy %in% c(1, 2, 3, 6, 10, 13)] <- cs[!cs$DEhierarchy %in% c(1, 2, 3, 6, 10, 13), LEarea]
     cs$metier6[!cs$DEhierarchy %in% c(1, 2, 3, 6, 10, 13)] <- cs[!cs$DEhierarchy %in% c(1, 2, 3, 6, 10, 13), LEmetier6]
   }
   
+  gc()
   ################################################################################################################################################################
   ################################################################################################################################################################
   #
@@ -256,6 +261,7 @@ for (H in c('H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H13')) {
     
   }
   
+  gc()
   ################################################################################################################################################################
   ################################################################################################################################################################
   #
@@ -413,4 +419,5 @@ for (H in c('H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H13')) {
     ".Rdata",
     sep = ""
   ))
+  
   
