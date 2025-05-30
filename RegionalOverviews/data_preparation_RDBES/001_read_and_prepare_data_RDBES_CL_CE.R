@@ -17,12 +17,12 @@
 # 22.04.2024 included the AreaMap in the data (ACFernandes)
 # 06.05.2024 included some basic data checks
 # 15.05.2024 included part for subseting SSF data
-#
+# 29.04.2025 included correction of aphia and species name of 'Scomber japonicus' in the data (changed to 'Scomber colias')
 ###############################################################################################################################################################
 
 rm(list=ls())
 
-setwd("C:/Users/acfernandes/Documents/2024/000_RCG_InterssessionalWork/ISSG_Overviews/RCG-RDBES-Overviews")#("Path to RCGs local repo")
+setwd("Path to RCGs local repo")
 
 library(data.table)
 gc()
@@ -43,8 +43,8 @@ getwd()
 
 restrict_to_SSF_data <- FALSE
 target_region <- "RCG_BA" # RCG_BA, RCG_NA, RCG_NSEA
-year_start <- 2023
-year_end <- 2023
+year_start <- 2021
+year_end <- 2024
 time_tag<-format(Sys.time(), "%Y%m%d")
 
 ## =========================== 
@@ -425,6 +425,12 @@ dim(cl_rcg[is.na(SpeciesLaName),])
 
 ## Evaluate the need to put all "Trachurus" as "Trachurus spp", except "Trachurus trachurus"
 
+## Correction of the 'incorrect' assignement to Somber japonicus - not an european species.  
+
+## SpeciesLaName: 'Scomber japonicus' corrected to 'Scomber colias'
+## CLspeciesCode: '127022' corrected to '151174'
+cl_rcg[SpeciesLaName %in% c("Scomber japonicus"), AreaMap := "Scomber colias"]
+cl_rcg[CLspeciesCode %in% c("127022"), AreaMap := "151174"]
 
 ################################################################################################################################################################
 ################################################################################################################################################################

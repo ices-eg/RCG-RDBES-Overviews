@@ -21,6 +21,7 @@
 # Dev. notes: 
 #
 # - 12.02.2025 first draft based on annual_overview_RDBES
+# - 05.05.2025 CL added
 #
 ###################################################################
 
@@ -33,9 +34,10 @@ dataprepDateCL = 20250527
 dataprepDateCE = 20250527
 
 ## Set wd 
-#setwd("D:/RCG-RDBES-Overviews/") # Kasia machine
-setwd("F:/Documentos/PNAB/2025/000_RCG_IntersessionalWork/Fisheries_Overviews/RCG-RDBES-Overviews-master/")
 #setwd("Path to RCGs local repo")
+setwd("F:/Documentos/PNAB/2025/000_RCG_IntersessionalWork/Fisheries_Overviews/RCG-RDBES-Overviews-master/")
+#setwd("C:/Use/0_GitHub/RCG-RDBES-Overviews") # Lucia's machine
+#setwd("D:/RCG-RDBES-Overviews/") # Kasia machine
 
 ## Load libraries
 source("RegionalOverviews/overviews_reports_RDBES/sampling_overviews_RDBES/scripts/loadLibraries.R")

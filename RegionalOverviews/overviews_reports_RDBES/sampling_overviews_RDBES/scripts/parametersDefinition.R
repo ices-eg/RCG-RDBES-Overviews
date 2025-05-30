@@ -30,13 +30,12 @@ params <- list(
   logo_path = ifelse(regionSelected=='BA',file.path("../../data/logo/logo RCG BALTIC.PNG"),file.path("../../data/logo/logo RCG NA NS_EA.PNG")),
   data_dir_CS = paste0(getwd(), '/RegionalOverviews/data_RDBES/002_prepared/', dataprepDate, '/RCG_', regionSelected),
   CSfileName = paste0('RDBES_RCG_', regionSelected, '_CS_',yearSelected,'_',yearSelected,'_prepared_', dataprepDate),
-  
   data_dir_CL = paste0(getwd(), '/RegionalOverviews/data_RDBES/002_prepared/', dataprepDateCL, '/RCG_', regionSelected),
   CLfileName = paste0('RDBES_RCG_', regionSelected, '_CL_',yearSelected,'_',yearSelected,'_prepared_', dataprepDateCL),
-  
   data_dir_CE = paste0(getwd(), '/RegionalOverviews/data_RDBES/002_prepared/', dataprepDateCE, '/RCG_', regionSelected),
   CEfileName = paste0('RDBES_RCG_', regionSelected, '_CE_',yearSelected,'_',yearSelected,'_prepared_', dataprepDateCE),
-  
+  CLfileName = paste0('RDBES_RCG_', regionSelected, '_CL_',yearSelected,'_',yearSelected,'_prepared_', dataprepDateCL),
+  CEfileName = paste0('RDBES_RCG_', regionSelected, '_CE_',yearSelected,'_',yearSelected,'_prepared_', dataprepDateCE),
   RDBES_download_date = '01/01/2000'
 )
 
