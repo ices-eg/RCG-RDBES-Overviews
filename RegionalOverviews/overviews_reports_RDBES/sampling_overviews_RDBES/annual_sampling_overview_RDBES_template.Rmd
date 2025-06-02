@@ -100,7 +100,6 @@ if(params$region=='BA'){ # fixed wrong calculation of centroid of 27.3.d.30
 
 ```
 
-
 **Disclaimer**
 The tables and figures of the overviews presented in this document are made for the coordination of EU regional fisheries data collection purposes and are not designed for any other use. Data used for producing the outputs are extracted from the Regional Database and Estimating System (RDBES). Dates of data extractions are stated in Appendix A. Due to different aggregations and reporting authorities, data can differ from those used e.g. for assessments or technical reports. 
 
@@ -302,7 +301,7 @@ sub_cs <- cs |>
   pivot_wider(names_from = FMtypeMeas, values_from = NumLengthFish) |>
   select(-NMeas) 
 
-data.table(sub_cs)
+datatable(sub_cs)
 
 ```
 <br>
@@ -314,6 +313,13 @@ data.table(sub_cs)
 #### Number of aged individuals 
 ```{r age, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 2** Number of individuals aged by country. (source data: BV)"}
 
+## Create the base country list from your full dataset - to have all countries in the plots
+
+all_countries <- cs |> 
+  distinct(SDctry) |> 
+  filter(!is.na(SDctry))
+
+## Prepare sub_cs
 sub_cs<- cs |>
   select(SDctry,BVvalueMeas,BVid,BVtypeMeas) |>
   filter(!is.na(BVid) & BVid!="",
@@ -325,6 +331,11 @@ sub_cs<- cs |>
   rename(NumAgeFish = n) |>
   top_n(20, wt=NumAgeFish)
 
+## Join with full country list to include zero counts
+sub_cs <- all_countries |>
+  left_join(sub_cs, by = "SDctry") |>
+  mutate(NumAgeFish = replace_na(NumAgeFish, 0))
+
 ## Option 1:
 # barplot(data = sub_cs, 
 #       x = "SDctry",
@@ -333,13 +344,13 @@ sub_cs<- cs |>
 
 ## Option 2:
 barplot1(data = sub_cs,
-						 x = "SDctry",
-						 y = "NumAgeFish",
-						 xlab = "Country",
-						 ylab = "Number of individuals with age",
-						 title = ""
-						 )
-
+		x = "SDctry",
+		y = "NumAgeFish",
+		xlab = "Country",
+		ylab = "Number of individuals with age",
+		title = "",
+		col_cou=T
+		)
      
 ```
 <br>
@@ -347,6 +358,9 @@ barplot1(data = sub_cs,
 #### Number of weighted individuals 
 ```{r weight, echo=FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width = 6, fig.height = 6, fig.cap="**Figure 3** Number of records with weight. If individuals have different types of weight, it will be counted as one.(source data: BV)"}
 
+## Create the base country list from your full dataset - to have all countries in the plots
+
+## Prepare sub_cs
 sub_cs<- cs |>
   select(SDctry,BVvalueMeas,BVfishId,BVid,BVtypeMeas) |>
   filter(!is.na(BVfishId) & BVfishId!="",
@@ -359,12 +373,21 @@ sub_cs<- cs |>
   rename(NumWeightFish = n) |>
   top_n(20, wt=NumWeightFish)
 
+## Join with full country list to include zero counts
+sub_cs <- all_countries |>
+  left_join(sub_cs, by = "SDctry") |>
+  mutate(NumWeightFish = replace_na(NumWeightFish, 0))
+
 ## Option 1:
 # barplot(data = sub_cs, 
 #       x = "SDctry",
 #       y = "NumWeightFish",
 #       ylab = "Number of individuals with weight")
 
+## Join with full country list to include zero counts
+sub_cs <- all_countries |>
+  left_join(sub_cs, by = "SDctry") |>
+  mutate(NumWeightFish = replace_na(NumWeightFish, 0))
 
 ## Option 2: country-specific
 barplot1(data = sub_cs,
@@ -372,7 +395,8 @@ barplot1(data = sub_cs,
 						 y = "NumWeightFish",
 						 xlab = "Country",
 						 ylab = "Number of individuals with weight",
-						 title = ""
+						 title = "",
+						 col_cou=T
 						 )
 
 
@@ -393,6 +417,11 @@ sub_cs<- cs |>
   rename(NumMaturityFish = n) |>
   top_n(20, wt=NumMaturityFish)
 
+## Join with full country list to include zero counts
+sub_cs <- all_countries |>
+  left_join(sub_cs, by = "SDctry") |>
+  mutate(NumMaturityFish = replace_na(NumMaturityFish, 0))
+
 ## Option 1: 
 # barplot(data = sub_cs, 
 #       x = "SDctry",
@@ -405,9 +434,9 @@ barplot1(data = sub_cs,
 						 y = "NumMaturityFish",
 						 xlab = "Country",
 						 ylab = "Number of individuals with maturity",
-						 title = ""
+						 title = "",
+						 col_cou=T
 						 )
-
 
 ```
 <br>
@@ -427,6 +456,11 @@ sub_cs<- cs |>
   rename(NumSexFish = n) |>
   top_n(20, wt=NumSexFish)
 
+## Join with full country list to include zero counts
+sub_cs <- all_countries |>
+  left_join(sub_cs, by = "SDctry") |>
+  mutate(NumSexFish = replace_na(NumSexFish, 0))
+
 ## Option 1: 
 # barplot(data = sub_cs, 
 #       x = "SDctry",
@@ -439,9 +473,9 @@ barplot1(data = sub_cs,
 						 y = "NumSexFish",
 						 xlab = "Country",
 						 ylab = "Number of individuals with sex",
-						 title = ""
+						 title = "",
+						 col_cou=T
 						 )
-
 
 ```
 
@@ -738,4 +772,4 @@ Not performed this year.
 
 ## Appendix A. Dates of data extraction
 
-The data referring to the present year was collected under the RCG 2025 data call for the 2024 data for the Baltic Sea, North Sea, Eastern Arctic and the North Atlantic regions and the last downloaded from the system was performed on the 20th of May 2025 with the exception of information detailed in section “Overall fleet evolution” which was extracted from the EU Fleet Register (https://webgate.ec.europa.eu/fleet-europa/index_en) on the 4th of February 2025.
+The data referring to the present year was collected under the RCG 2025 data call for the 2024 data for the Baltic Sea, North Sea, Eastern Arctic and the North Atlantic regions and the last download from the system was performed on the 28th of May 2025 with the exception of information detailed in section “Overall fleet evolution” which was extracted from the EU Fleet Register (https://webgate.ec.europa.eu/fleet-europa/index_en) on the 4th of February 2025.
