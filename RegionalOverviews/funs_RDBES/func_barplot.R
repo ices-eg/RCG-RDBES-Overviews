@@ -131,42 +131,89 @@ barplot <- function(data = data,
 ## Function to use when ploting countries in the x-axis
 
 	barplot1 <- function(data,
-						 x = "",
-						 y = "",
-						 xlab = "",
-						 ylab = "",
-						 title = "",
-						 country_col_file = "../../data/colours2.csv",
-						 country_code_file = "../../data/aux_countries.txt") {
-	  
-	# Load color mapping
-	  colours <- read.csv2(country_col_file)
-	  country <- read.table(country_code_file, sep = ",", header = TRUE)
-	  names(country)[1] <- "CountryName"
-	  
-	  col <- merge(colours, country, by = "CountryName", all.x = TRUE)
-	  col <- col[, c("ISO2Code", "colour5")]
-	  col <- setNames(col$colour5, col$ISO2Code)
+                     x = "",
+                     y = "",
+                     group = "",
+                     asPct = FALSE,
+                     title = "",
+                     xlab = "Country",
+                     ylab = "",
+                     col_cou = FALSE,
+                     all_countries = NULL) {
 
-	  # Prepare data
-	  data <- data.frame(data)
-	  
-	  # Ensure x is a factor with alphabetical levels
-	  data[[x]] <- factor(data[[x]], levels = sort(as.character(unique(data[[x]]))))
-	  
-	  data$x <- data[[x]]
-	  data$y <- data[[y]]
-	  
-	  # Now use x as the axis and fill
-	  p <- ggplot(data, aes(x = x, y = y, fill = x)) +
-		geom_col() +
-		xlab(xlab) +
-		ylab(ylab) +
-		ggtitle(title) +
-		theme_minimal() +
-		theme(axis.text.x = element_text(angle = 0, hjust = 1),
-			  legend.position = "none") +
-		scale_fill_manual(values = col)
+  	  # Read country colours if requested
+  if (col_cou || grepl("Country", group)) {
+    colours <- read.csv2("../../data/colours2.csv")
+    country <- read.table("../../data/aux_countries.txt", sep = ",", header = TRUE)
+    names(country)[1] <- "CountryName"
+    col <- merge(colours, country, by = "CountryName", all.x = TRUE)
+    col <- col[, c("ISO2Code", "colour5")]
+    col <- setNames(col$colour5, col$ISO2Code)
+  }
 
-	  print(p)
-	}
+  data <- as.data.frame(data)
+
+  # Get all countries (even those missing y data)
+  all_countries <- sort(unique(as.character(data[[x]])))
+
+  if (group != "") {
+    data$grp <- as.factor(data[[group]])
+
+    full_grid <- expand.grid(
+      xval = all_countries,
+      grp = unique(data$grp)
+    )
+    names(full_grid) <- c(x, "grp")
+
+    df <- data %>%
+      mutate(grp = as.factor(.data[[group]])) %>%
+      group_by(.data[[x]], grp) %>%
+      summarise(yval = sum(.data[[y]], na.rm = TRUE), .groups = "drop") %>%
+      right_join(full_grid, by = c(x, "grp")) %>%
+      mutate(yval = replace_na(yval, 0))
+  } else {
+    df <- data %>%
+      group_by(.data[[x]]) %>%
+      summarise(yval = sum(.data[[y]], na.rm = TRUE), .groups = "drop")
+
+    # Ensure all countries are represented
+    df <- df %>%
+      right_join(data.frame(temp_x = all_countries), by = setNames("temp_x", x)) %>%
+      mutate(yval = replace_na(yval, 0)) %>%
+      mutate(grp = .data[[x]])
+  }
+
+  # Set factor levels to ensure full country inclusion and order
+  df[[x]] <- factor(df[[x]], levels = all_countries)
+
+  # Convert to percent if needed
+  if (asPct) {
+    df <- df %>%
+      group_by(.data[[x]]) %>%
+      mutate(yval = (yval / sum(yval)) * 100) %>%
+      ungroup()
+  }
+
+  # Build plot
+  p <- ggplot(df, aes(x = .data[[x]], y = yval, fill = grp)) +
+    geom_col() +
+    theme_minimal() +
+    xlab(xlab) +
+    ylab(ifelse(asPct, "Percentage (%)", ylab)) +
+    ggtitle(title) +
+    theme(axis.text.x = element_text(angle = 0, hjust = 1))
+
+  # Apply colours
+  if (col_cou || grepl("Country", group)) {
+    p <- p + scale_fill_manual(values = col)
+  }
+
+  # Hide legend if no grouping
+  if (group == "") {
+    p <- p + theme(legend.position = "none")
+  } else {
+    p <- p + labs(fill = group)
+  }
+
+  print(p)
+}
