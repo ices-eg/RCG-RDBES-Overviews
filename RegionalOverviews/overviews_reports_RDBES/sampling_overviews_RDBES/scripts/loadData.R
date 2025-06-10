@@ -12,7 +12,7 @@
 ###################################################################
 # Authors: 
 # - Kasia Krakówka [first draft]
-# 
+# - Ana Cláudia Fernandes# 
 # 
 # Dev. notes: 
 #
@@ -21,8 +21,8 @@
 ###################################################################
 
 # Print start message 
-  cat("[1]    Loading data")
-  cat("\n")
+cat("[1]    Loading data")
+cat("\n")
 
 
 # Empty warnings from previous code
@@ -31,13 +31,18 @@
 ## Load data 
 # Load CS data
 load(
-  paste(params$data_dir, '/', params$CSfileName,'.Rdata', sep = "")
+  paste(params$data_dir_CS, '/', params$CSfileName,'.Rdata', sep = "")
 ); cs = cs_rcg # shorter name 
 
 # Load CL data
 load(
-  paste(params$data_dir, '/', params$CLfileName,'.Rdata', sep = "")
+  paste(params$data_dir_CL, '/', params$CLfileName,'.Rdata', sep = "")
 ); cl = cl_rcg # shorter name 
+
+# Load CE data
+load(
+  paste(params$data_dir_CE, '/', params$CEfileName,'.Rdata', sep = "")
+); ce = ce_rcg # shorter name 
 
 
 # put some necessary data prep part below
@@ -46,7 +51,11 @@ load(
 ######################
 cl <- cl[CLyear %in% params$year]
 
+ce <- ce[CEyear %in% params$year]
+
 cs <- cs[DEyear %in% params$year]
+
+
 
 # Print end message
 if(is_empty(warnings())){
