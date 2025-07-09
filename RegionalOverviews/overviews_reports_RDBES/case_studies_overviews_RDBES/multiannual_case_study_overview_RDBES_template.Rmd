@@ -1,0 +1,982 @@
+---
+title: "Multiannual Case Study Overview"
+date: "`r format(Sys.time(), '%d.%m.%Y')`"
+output:
+  html_document:
+    toc: true
+    fig_caption: yes
+    
+params:
+  eval: TRUE
+  set_subtitle: "Title"
+  region: 'BA'
+  year: 2024
+  logo_path: "../../data/logo/logo RCG BALTIC.PNG"
+  data_dir_CS: '../../data_RDBES/002_prepared/20250425/RCG_BA'
+  data_dir_CL: '../../data_RDBES/002_prepared/20250425/RCG_BA'
+  CSfileName: 'RDBES_RCG_BA_CS_2022_2024_prepared_20250521'
+  CLfileName: 'RDBES_RCG_BA_CL_2021_2024_prepared_20250527'
+
+---
+
+---
+subtitle: `r paste(dplyr::case_when(params$region=='BA'~'Baltic,',params$region=='NA'~'North Atlantic',params$region=='NSEA'~'North Sea and Eastern Arctic'), params$year-2,'-',params$year, sep = " ")`
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+options(scipen = 999)
+```
+
+```{r, echo=FALSE}
+  htmltools::img(src = knitr::image_uri(params$logo_path), 
+               alt = 'logo', 
+               style = 'position:absolute; top:0; right:0; padding:10px;',width="300px", height="100px")
+```
+
+**Disclaimer**
+The tables and figures of the overviews presented in this document are made for the coordination of EU regional fisheries data collection purposes and are not designed for any other use. Data used for producing the outputs are extracted from the Regional Database and Estimating System (RDBES). The data 2022,2023,2024 was collected under the RCG 2025 data call for the Baltic Sea, North Sea, Eastern Arctic and the North Atlantic regions and the latest version used was downloaded from the system on the 27th of May 2025. Due to different aggregations and reporting authorities, data can differ from those used e.g. for assessments or technical reports. 
+
+The respective scripts and calculations used for data displaying are publicly available via the RCG GitHub (https://github.com/ices-eg/RCG-RDBES-Overviews) and subject to change as the work of the group progresses.
+
+# Introduction
+The present Case Study Overview displays summary information on the statistics for EU sampling of commercial landings included in the [Regional Data Base and Estimation System (RDBES)](https://www.ices.dk/data/data-portals/Pages/rdbes.aspx), which is used to store detailed commercial fisheries and sampling data.
+
+The RDBES is hosted at the International Council for Exploration of the Sea (ICES) and its data is property of EU Member States with usage governed by the Data use license for the Regional Database (RDB). It is a regionally coordinated database platform covering fisheries by region (e.g. North Atlantic Ocean, North Sea, Baltic Sea) and is a main resource used by the Regional Coordination Groups [(RCG)](https://www.fisheries-rcg.eu/rcg-nansea/) to coordinate data collection of EU fisheries. 
+
+To allow for the variety of sampling designs used in different institutes and countries the RDBES identifies a number of different sampling hierarchies, which represent the different hierarchical sampling techniques that are used in practice.  Two types of hierarchy are used in the model. The upper hierarchies describe how a sample is selected, and they are numbered from 1 to 13. The lower hierarchies describe what type of length-frequency or biological variables are measured for that sample, and they are named with the letters from A to D.  All hierarchies are defined in terms of the tables they consist of and the relationships between them. 
+
+# Total landings and number of samples collected - Regional routine {.tabset}
+The matrices below show the total landing in tons and the number of samples collected in the Baltic SPF Regional in the years `r params$year - 2` - `r params$year` for the two main small pelagic species: Clupea harengus and Sprattus sprattus. For each species, two plots have been prepared: one group by area and gear, and the other group by country and gear.
+
+## Clupea harengus - Area/Gear
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+  
+  cl_data <- cl_rcg
+  
+  cs_rcg |>
+    filter(
+      SAcatchCat %in% c('Lan', 'Catch'),
+      !is.na(SAid) &
+        SAid != "",
+      DEhierarchy != 13,
+      DEsampScheme == 'Baltic SPF regional',
+      SpeciesLaName %in% c('Clupea harengus')
+    ) |>
+    select(
+      FTid,
+      FOid,
+      LEid,
+      DEhierarchy,
+      metier6,
+      DEyear,
+      SDctry,
+      VDlenCat,
+      SAsampWtLive,
+      Area,
+      SpeciesLaName
+    ) |>
+    mutate(Trip_id = ifelse((!is.na(FTid) &
+                               FTid != "") &
+                              (is.na(LEid) |
+                                 LEid == ""), FTid, LEid)) |>
+    mutate(Trip_id = as.character(ifelse(
+      Trip_id == "" & DEhierarchy == 13, FOid, Trip_id
+    ))) |>
+    rename(
+      MetierLvl6 = metier6,
+      Year = DEyear,
+      FlagCountry = SDctry,
+      VesselLengthCategory = VDlenCat
+    ) |>
+    distinct() |>
+    group_by(Year,
+             FlagCountry,
+             Area,
+             SpeciesLaName,
+             MetierLvl6,
+             VesselLengthCategory) |>
+    summarise(
+      NoPSU = n_distinct(Trip_id, na.rm = TRUE),
+      WeigthKg = sum(SAsampWtLive / 1000, na.rm =  TRUE)
+    ) -> samplingPart
+  
+  cl_data |>
+    rename(
+      MetierLvl6 = CLmetier6,
+      Year = CLyear,
+      FlagCountry = CLvesselFlagCountry,
+      VesselLengthCategory = CLvesselLengthCategory,
+      Area = CLarea
+    ) |>
+    filter(
+      Year %in% unique(samplingPart$Year),
+      SpeciesLaName %in% unique(samplingPart$SpeciesLaName)
+    ) |>
+    group_by(Year,
+             FlagCountry,
+             Area,
+             SpeciesLaName,
+             MetierLvl6,
+             VesselLengthCategory) |>
+    summarise(LandingsT = sum(CLscientificWeight_ton, na.rm = TRUE)) -> LandingsPart
+  
+  samplingPart %>%
+    full_join(LandingsPart) -> samplingVSlandings
+  
+  samplingVSlandings |>
+    mutate(Gear = str_sub(MetierLvl6, end = 3)) %>%
+    group_by(
+      Area,
+      Gear,
+      Year#,
+     # FlagCountry
+    ) %>%
+    summarise(
+      NoPSU = sum(NoPSU, na.rm = TRUE),
+      LandingsT = sum(LandingsT, na.rm = TRUE)
+    ) |>
+    mutate(NoPSU = ifelse(NoPSU == 0, NA, NoPSU)) ->
+    samplingVSlandingsF_HER
+  
+  
+  ggplot(samplingVSlandingsF_HER, aes(y = factor(Area), x = factor(Gear))) +  ## global aes
+    facet_wrap( ~ Year, ncol = 3) +
+    geom_tile(aes(fill = LandingsT), na.rm = TRUE) +         ## to get the rect filled
+    geom_point(aes(size = NoPSU), shape = 1, stroke = 1)  +    ## geom_point for circle illusion
+    scale_fill_distiller(
+      palette = "Spectral",
+      direction = -1,
+      trans = 'log10',
+      na.value = "transparent"
+    ) +
+    labs(
+       x ='Gear',
+       y = 'Area',
+       fill = "Landings (t)",
+       size = "No. of PSU",
+       title = "Baltic SPF regional - Clupea harengus",
+     ) +
+    theme_bw()+
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+## Clupea harengus - Country/Gear
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+  
+  cl_data <- cl_rcg
+  
+  cs_rcg |>
+    filter(
+      SAcatchCat %in% c('Lan', 'Catch'),
+      !is.na(SAid) &
+        SAid != "",
+      DEhierarchy != 13,
+      DEsampScheme == 'Baltic SPF regional',
+      SpeciesLaName %in% c('Clupea harengus')
+    ) |>
+    select(
+      FTid,
+      FOid,
+      LEid,
+      DEhierarchy,
+      metier6,
+      DEyear,
+      SDctry,
+      VDlenCat,
+      SAsampWtLive,
+      Area,
+      SpeciesLaName
+    ) |>
+    mutate(Trip_id = ifelse((!is.na(FTid) &
+                               FTid != "") &
+                              (is.na(LEid) |
+                                 LEid == ""), FTid, LEid)) |>
+    mutate(Trip_id = as.character(ifelse(
+      Trip_id == "" & DEhierarchy == 13, FOid, Trip_id
+    ))) |>
+    rename(
+      MetierLvl6 = metier6,
+      Year = DEyear,
+      FlagCountry = SDctry,
+      VesselLengthCategory = VDlenCat
+    ) |>
+    distinct() |>
+    group_by(Year,
+             FlagCountry,
+             Area,
+             SpeciesLaName,
+             MetierLvl6,
+             VesselLengthCategory) |>
+    summarise(
+      NoPSU = n_distinct(Trip_id, na.rm = TRUE),
+      WeigthKg = sum(SAsampWtLive / 1000, na.rm =  TRUE)
+    ) -> samplingPart
+  
+  cl_data |>
+    rename(
+      MetierLvl6 = CLmetier6,
+      Year = CLyear,
+      FlagCountry = CLvesselFlagCountry,
+      VesselLengthCategory = CLvesselLengthCategory,
+      Area = CLarea
+    ) |>
+    filter(
+      Year %in% unique(samplingPart$Year),
+      SpeciesLaName %in% unique(samplingPart$SpeciesLaName)
+    ) |>
+    group_by(Year,
+             FlagCountry,
+             Area,
+             SpeciesLaName,
+             MetierLvl6,
+             VesselLengthCategory) |>
+    summarise(LandingsT = sum(CLscientificWeight_ton, na.rm = TRUE)) -> LandingsPart
+  
+  samplingPart %>%
+    full_join(LandingsPart) -> samplingVSlandings
+  
+  samplingVSlandings |>
+    mutate(Gear = str_sub(MetierLvl6, end = 3)) %>%
+    group_by(
+      #Area,
+      Gear,
+      Year,
+      FlagCountry
+    ) %>%
+    summarise(
+      NoPSU = sum(NoPSU, na.rm = TRUE),
+      LandingsT = sum(LandingsT, na.rm = TRUE)
+    ) |>
+    mutate(NoPSU = ifelse(NoPSU == 0, NA, NoPSU)) ->
+    samplingVSlandingsF_HER
+  
+  
+  ggplot(samplingVSlandingsF_HER, aes(y = factor(FlagCountry), x = factor(Gear))) +  ## global aes
+    facet_wrap( ~ Year, ncol = 3) +
+    geom_tile(aes(fill = LandingsT), na.rm = TRUE) +         ## to get the rect filled
+    geom_point(aes(size = NoPSU), shape = 1, stroke = 1)  +    ## geom_point for circle illusion
+    scale_fill_distiller(
+      palette = "Spectral",
+      direction = -1,
+      trans = 'log10',
+      na.value = "transparent"
+    ) +
+    labs(
+       x ='Gear',
+       y = 'Country',
+       fill = "Landings (t)",
+       size = "No. of PSU",
+       title = "Baltic SPF regional - Clupea harengus",
+     ) +
+    theme_bw()+
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+## Sprattus sprattus - Area/Gear
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+  
+  cl_data <- cl_rcg
+  
+  cs_rcg |>
+    filter(
+      SAcatchCat %in% c('Lan', 'Catch'),
+      !is.na(SAid) &
+        SAid != "",
+      DEhierarchy != 13,
+      DEsampScheme == 'Baltic SPF regional',
+      SpeciesLaName %in% c('Sprattus sprattus')
+    ) |>
+    select(
+      FTid,
+      FOid,
+      LEid,
+      DEhierarchy,
+      metier6,
+      DEyear,
+      SDctry,
+      VDlenCat,
+      SAsampWtLive,
+      Area,
+      SpeciesLaName
+    ) |>
+    mutate(Trip_id = ifelse((!is.na(FTid) &
+                               FTid != "") &
+                              (is.na(LEid) |
+                                 LEid == ""), FTid, LEid)) |>
+    mutate(Trip_id = as.character(ifelse(
+      Trip_id == "" & DEhierarchy == 13, FOid, Trip_id
+    ))) |>
+    rename(
+      MetierLvl6 = metier6,
+      Year = DEyear,
+      FlagCountry = SDctry,
+      VesselLengthCategory = VDlenCat
+    ) |>
+    distinct() |>
+    group_by(Year,
+             FlagCountry,
+             Area,
+             SpeciesLaName,
+             MetierLvl6,
+             VesselLengthCategory) |>
+    summarise(
+      NoPSU = n_distinct(Trip_id, na.rm = TRUE),
+      WeigthKg = sum(SAsampWtLive / 1000, na.rm =  TRUE)
+    ) -> samplingPart
+  
+  cl_data |>
+    rename(
+      MetierLvl6 = CLmetier6,
+      Year = CLyear,
+      FlagCountry = CLvesselFlagCountry,
+      VesselLengthCategory = CLvesselLengthCategory,
+      Area = CLarea
+    ) |>
+    filter(
+      Year %in% unique(samplingPart$Year),
+      SpeciesLaName %in% unique(samplingPart$SpeciesLaName)
+    ) |>
+    group_by(Year,
+             FlagCountry,
+             Area,
+             SpeciesLaName,
+             MetierLvl6,
+             VesselLengthCategory) |>
+    summarise(LandingsT = sum(CLscientificWeight_ton, na.rm = TRUE)) -> LandingsPart
+  
+  samplingPart %>%
+    full_join(LandingsPart) -> samplingVSlandings
+  
+  samplingVSlandings |>
+    mutate(Gear = str_sub(MetierLvl6, end = 3)) %>%
+    group_by(
+      Area,
+      Gear,
+      Year#,
+      #FlagCountry
+    ) %>%
+    summarise(
+      NoPSU = sum(NoPSU, na.rm = TRUE),
+      LandingsT = sum(LandingsT, na.rm = TRUE)
+    ) |>
+    mutate(NoPSU = ifelse(NoPSU == 0, NA, NoPSU)) ->
+    samplingVSlandingsF_SPR
+  
+  
+  ggplot(samplingVSlandingsF_SPR, aes(y = factor(Area), x = factor(Gear))) +  ## global aes
+    facet_wrap( ~ Year, ncol = 3) +
+    geom_tile(aes(fill = LandingsT), na.rm = TRUE) +         ## to get the rect filled
+    geom_point(aes(size = NoPSU), shape = 1, stroke = 1)  +    ## geom_point for circle illusion
+    scale_fill_distiller(
+      palette = "Spectral",
+      direction = -1,
+      trans = 'log10',
+      na.value = "transparent"
+    ) +
+    labs(
+       x ='Gear',
+       y = 'Area',
+       fill = "Landings (t)",
+       size = "No. of PSU",
+       title = "Baltic SPF regional - Sprattus sprattus",
+     ) +
+    theme_bw()
+
+```
+
+## Sprattus sprattus - Country/Gear
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+  
+  cl_data <- cl_rcg
+  
+  cs_rcg |>
+    filter(
+      SAcatchCat %in% c('Lan', 'Catch'),
+      !is.na(SAid) &
+        SAid != "",
+      DEhierarchy != 13,
+      DEsampScheme == 'Baltic SPF regional',
+      SpeciesLaName %in% c('Sprattus sprattus')
+    ) |>
+    select(
+      FTid,
+      FOid,
+      LEid,
+      DEhierarchy,
+      metier6,
+      DEyear,
+      SDctry,
+      VDlenCat,
+      SAsampWtLive,
+      Area,
+      SpeciesLaName
+    ) |>
+    mutate(Trip_id = ifelse((!is.na(FTid) &
+                               FTid != "") &
+                              (is.na(LEid) |
+                                 LEid == ""), FTid, LEid)) |>
+    mutate(Trip_id = as.character(ifelse(
+      Trip_id == "" & DEhierarchy == 13, FOid, Trip_id
+    ))) |>
+    rename(
+      MetierLvl6 = metier6,
+      Year = DEyear,
+      FlagCountry = SDctry,
+      VesselLengthCategory = VDlenCat
+    ) |>
+    distinct() |>
+    group_by(Year,
+             FlagCountry,
+             Area,
+             SpeciesLaName,
+             MetierLvl6,
+             VesselLengthCategory) |>
+    summarise(
+      NoPSU = n_distinct(Trip_id, na.rm = TRUE),
+      WeigthKg = sum(SAsampWtLive / 1000, na.rm =  TRUE)
+    ) -> samplingPart
+  
+  cl_data |>
+    rename(
+      MetierLvl6 = CLmetier6,
+      Year = CLyear,
+      FlagCountry = CLvesselFlagCountry,
+      VesselLengthCategory = CLvesselLengthCategory,
+      Area = CLarea
+    ) |>
+    filter(
+      Year %in% unique(samplingPart$Year),
+      SpeciesLaName %in% unique(samplingPart$SpeciesLaName)
+    ) |>
+    group_by(Year,
+             FlagCountry,
+             Area,
+             SpeciesLaName,
+             MetierLvl6,
+             VesselLengthCategory) |>
+    summarise(LandingsT = sum(CLscientificWeight_ton, na.rm = TRUE)) -> LandingsPart
+  
+  samplingPart %>%
+    full_join(LandingsPart) -> samplingVSlandings
+  
+  samplingVSlandings |>
+    mutate(Gear = str_sub(MetierLvl6, end = 3)) %>%
+    group_by(
+      #Area,
+      Gear,
+      Year,
+      FlagCountry
+    ) %>%
+    summarise(
+      NoPSU = sum(NoPSU, na.rm = TRUE),
+      LandingsT = sum(LandingsT, na.rm = TRUE)
+    ) |>
+    mutate(NoPSU = ifelse(NoPSU == 0, NA, NoPSU)) ->
+    samplingVSlandingsF_SPR
+  
+  
+  ggplot(samplingVSlandingsF_SPR, aes(y = factor(FlagCountry), x = factor(Gear))) +  ## global aes
+    facet_wrap( ~ Year, ncol = 3) +
+    geom_tile(aes(fill = LandingsT), na.rm = TRUE) +         ## to get the rect filled
+    geom_point(aes(size = NoPSU), shape = 1, stroke = 1)  +    ## geom_point for circle illusion
+    scale_fill_distiller(
+      palette = "Spectral",
+      direction = -1,
+      trans = 'log10',
+      na.value = "transparent"
+    ) +
+    labs(
+       x ='Gear',
+       y = 'Country',
+       fill = "Landings (t)",
+       size = "No. of PSU",
+       title = "Baltic SPF regional - Sprattus sprattus",
+     ) +
+    theme_bw()
+
+```
+
+
+
+# Total landings by harbour (TOP 20) {.tabset}
+The plot below shows the total landings in 1000 tons by harbour.
+
+## Clupea harengus - TOP 20 harbours
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode =='HER',
+         CLyear == params$year-2) |>
+  group_by(CLlandingLocation) |>
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton))|>
+  arrange(desc(CLscientificWeight_1000ton)) |>
+  top_n(20) |>
+  mutate(CLyear = params$year-2)->sub_cl1
+
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode =='HER',
+         CLyear == params$year-1) |>
+  group_by(CLlandingLocation) |>
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton))|>
+  arrange(desc(CLscientificWeight_1000ton)) |>
+  top_n(20) |>
+  mutate(CLyear = params$year-1)->sub_cl2
+
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode =='HER',
+         CLyear == params$year) |>
+  group_by(CLlandingLocation) |>
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton))|>
+  arrange(desc(CLscientificWeight_1000ton)) |>
+  top_n(20) |>
+  mutate(CLyear = params$year)->sub_cl3
+
+sub_cl <- bind_rows(sub_cl1, sub_cl2, sub_cl3)
+
+sub_cl %>%  mutate(
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA
+       )-> df
+
+
+result <- pointsMap_func2(df,
+                          title = '', #Landings (1000 t) by Harbour
+                          var_name = 'CLscientificWeight_1000ton',
+                          facet_name = 'CLyear',  # Poprawiono
+                          var_spatial_name = 'CLlandingLocation',
+                          spatial_dataset_name = 'Harbours',
+                          spatial_dataset_var_name = 'Harbour',
+                          plot_labels = TRUE,
+                          saveResults = FALSE,
+                          outputPath,
+                          Catch_group_name = NA,
+                          extraShp_name = 'StatRectshp',
+                          newVarName = NA,
+                          addToTitle = NA,
+                          RCGregion = 'BA'
+                         )
+
+  
+result
+```
+
+## Sprattus sprattus - TOP 20 harbours
+\* The coordinates of the LVVNT harbour are not available, so it is not shown on the map.
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode =='SPR',
+         CLyear == params$year-2) |>
+  group_by(CLlandingLocation) |>
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton))|>
+  arrange(desc(CLscientificWeight_1000ton)) |>
+  top_n(20) |>
+  mutate(CLyear = params$year-2)->sub_cl1
+
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode =='SPR',
+         CLyear == params$year-1) |>
+  group_by(CLlandingLocation) |>
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton))|>
+  arrange(desc(CLscientificWeight_1000ton)) |>
+  top_n(20) |>
+  mutate(CLyear = params$year-1)->sub_cl2
+
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode =='SPR',
+         CLyear == params$year) |>
+  group_by(CLlandingLocation) |>
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton))|>
+  arrange(desc(CLscientificWeight_1000ton)) |>
+  top_n(20) |>
+  mutate(CLyear = params$year)->sub_cl3
+
+sub_cl <- bind_rows(sub_cl1, sub_cl2, sub_cl3)
+
+sub_cl %>%  mutate(
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA
+       )-> df
+
+
+result <- pointsMap_func2(df,
+                          title = '', #Landings (1000 t) by Harbour
+                          var_name = 'CLscientificWeight_1000ton',
+                          facet_name = 'CLyear',  # Poprawiono
+                          var_spatial_name = 'CLlandingLocation',
+                          spatial_dataset_name = 'Harbours',
+                          spatial_dataset_var_name = 'Harbour',
+                          plot_labels = TRUE,
+                          saveResults = FALSE,
+                          outputPath,
+                          Catch_group_name = NA,
+                          extraShp_name = 'StatRectshp',
+                          newVarName = NA,
+                          addToTitle = NA,
+                          RCGregion = 'BA'
+                         )
+
+  
+result
+```
+
+
+# Total landings by Statistical Rectangle{.tabset}
+## 2022
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('SPR','HER'),
+         CLyear == 2022) %>%
+  group_by(CLspeciesFaoCode,CLvesselFlagCountry, CLstatisticalRectangle) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr = CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         func = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA,
+         Region = 'BA')-> df
+
+result <- scatterpieMap_func(df = df,
+                  var = "CLscientificWeight_ton",
+                              groupBy = "CLstatisticalRectangle",
+                              groupBy2 = "CLvesselFlagCountry",
+                              facet = "CLspeciesFaoCode",
+                              func = "sum",
+                              type_of_threshold = 'none',
+                              points_coord = StatRectshp,
+                              newVarName = "Landings (t)",
+                              addToTitle = NA,
+                              value_of_threshold = NA,
+                              plot_labels = FALSE,
+                              Catch_group_name = NA,
+                              addExtraShp = TRUE,
+                              extraShp = FAOshp,
+                              color_palette = NA,
+                              filter_column  = NA,
+                              filter_type = NA,
+                              filter_threshold = NA,
+                              filter_func = NA)
+result
+
+
+```
+
+## 2023
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('SPR','HER'),
+         CLyear == 2023) %>%
+  group_by(CLspeciesFaoCode,CLvesselFlagCountry, CLstatisticalRectangle) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         func = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA,
+         Region = 'BA')-> df
+
+result <- scatterpieMap_func(df = df,
+                  var = "CLscientificWeight_ton",
+                              groupBy = "CLstatisticalRectangle",
+                              groupBy2 = "CLvesselFlagCountry",
+                              facet = "CLspeciesFaoCode",
+                              func = "sum",
+                              type_of_threshold = 'none',
+                              points_coord = StatRectshp,
+                              newVarName = "Landings (t)",
+                              addToTitle = NA,
+                              value_of_threshold = NA,
+                              plot_labels = FALSE,
+                              Catch_group_name = NA,
+                              addExtraShp = TRUE,
+                              extraShp = FAOshp,
+                              color_palette = NA,
+                              filter_column  = NA,
+                              filter_type = NA,
+                              filter_threshold = NA,
+                              filter_func = NA)
+result
+
+```
+
+## 2024
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('SPR','HER'),
+         CLyear == 2024) %>%
+  group_by(CLspeciesFaoCode,CLvesselFlagCountry, CLstatisticalRectangle) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         func = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA,
+         Region = 'BA')-> df
+
+result <- scatterpieMap_func(df = df,
+                  var = "CLscientificWeight_ton",
+                              groupBy = "CLstatisticalRectangle",
+                              groupBy2 = "CLvesselFlagCountry",
+                              facet = "CLspeciesFaoCode",
+                              func = "sum",
+                              type_of_threshold = 'none',
+                              points_coord = StatRectshp,
+                              newVarName = "Landings (t)",
+                              addToTitle = NA,
+                              value_of_threshold = NA,
+                              plot_labels = FALSE,
+                              Catch_group_name = NA,
+                              addExtraShp = TRUE,
+                              extraShp = FAOshp,
+                              color_palette = NA,
+                              filter_column  = NA,
+                              filter_type = NA,
+                              filter_threshold = NA,
+                              filter_func = NA)
+result
+
+```
+
+
+# Total landings by Area{.tabset}
+## 2022
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('SPR','HER'),
+         CLyear == 2022) %>%
+  group_by(CLspeciesFaoCode,CLvesselFlagCountry, AreaMap) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         func = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA,
+         Region = 'BA')-> df
+
+result <- scatterpieMap_func(df = df,
+                  var = "CLscientificWeight_ton",
+                              groupBy = "AreaMap",
+                              groupBy2 = "CLvesselFlagCountry",
+                              facet = "CLspeciesFaoCode",
+                              func = "sum",
+                              type_of_threshold = 'none',
+                              points_coord = FAOshp,
+                              newVarName = "Landings (t)",
+                              addToTitle = NA,
+                              value_of_threshold = NA,
+                              plot_labels = FALSE,
+                              Catch_group_name = NA,
+                              addExtraShp = TRUE,
+                              extraShp = FAOshp,
+                              color_palette = NA,
+                              filter_column  = NA,
+                              filter_type = NA,
+                              filter_threshold = NA,
+                              filter_func = NA)
+result
+```
+
+## 2023
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('SPR','HER'),
+         CLyear == 2023) %>%
+  group_by(CLspeciesFaoCode,CLvesselFlagCountry, AreaMap) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         func = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA,
+         Region = 'BA')-> df
+
+result <- scatterpieMap_func(df = df,
+                  var = "CLscientificWeight_ton",
+                              groupBy = "AreaMap",
+                              groupBy2 = "CLvesselFlagCountry",
+                              facet = "CLspeciesFaoCode",
+                              func = "sum",
+                              type_of_threshold = 'none',
+                              points_coord = FAOshp,
+                              newVarName = "Landings (t)",
+                              addToTitle = NA,
+                              value_of_threshold = NA,
+                              plot_labels = FALSE,
+                              Catch_group_name = NA,
+                              addExtraShp = TRUE,
+                              extraShp = FAOshp,
+                              color_palette = NA,
+                              filter_column  = NA,
+                              filter_type = NA,
+                              filter_threshold = NA,
+                              filter_func = NA)
+result
+
+```
+
+## 2024
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('SPR','HER'),
+         CLyear == 2024) %>%
+  group_by(CLspeciesFaoCode,CLvesselFlagCountry, AreaMap) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         func = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA,
+         Region = 'BA')-> df
+
+result <- scatterpieMap_func(df = df,
+                  var = "CLscientificWeight_ton",
+                              groupBy = "AreaMap",
+                              groupBy2 = "CLvesselFlagCountry",
+                              facet = "CLspeciesFaoCode",
+                              func = "sum",
+                              type_of_threshold = 'none',
+                              points_coord = FAOshp,
+                              newVarName = "Landings (t)",
+                              addToTitle = NA,
+                              value_of_threshold = NA,
+                              plot_labels = FALSE,
+                              Catch_group_name = NA,
+                              addExtraShp = TRUE,
+                              extraShp = FAOshp,
+                              color_palette = NA,
+                              filter_column  = NA,
+                              filter_type = NA,
+                              filter_threshold = NA,
+                              filter_func = NA)
+result
+
+```
+
+# Landings abroad, small pelagics{.tabset}
+
+The plot below shows the flow of the small pelagics landings between the vessel Flag Country (left), Harbour Country (center) and the Landing Country (right). Width of each line is proportional to landings. Harbour Country is the country code obtained from the CLlandingLocation.'
+
+## Clupea harengus{.tabset}
+### 2022
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('HER'),
+         CLyear == 2022)%>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
+
+func_riverplot(df = cl_river,
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
+
+```
+
+### 2023
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('HER'),
+         CLyear == 2023)%>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
+
+func_riverplot(df = cl_river,
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
+
+```
+
+### 2024
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('HER'),
+         CLyear == 2024)%>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
+
+func_riverplot(df = cl_river,
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
+
+```
+
+## Sprattus sprattus {.tabset}
+### 2022
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('SPR'),
+         CLyear == 2022)%>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
+
+result<-func_riverplot(df = cl_river,
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
+result
+```
+
+### 2023
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('SPR'),
+         CLyear == 2023)%>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
+
+result<-func_riverplot(df = cl_river,
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
+result
+```
+
+### 2024
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('SPR'),
+         CLyear == 2024)%>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
+
+result<-func_riverplot(df = cl_river,
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
+result
+```
