@@ -29,6 +29,7 @@ yearSelected = 2024
 regionSelected = 'BA'# One of: 'BA', 'NA', 'NSEA'
 dataprepDate = 20250521 # Date on which data where prepared.
 dataprepDateCL = 20250527
+dataprepDateCE = 20250527
 
 ## Set wd 
 setwd("D:/RCG-RDBES-Overviews/") # Kasia machine
@@ -45,6 +46,9 @@ source("RegionalOverviews/overviews_reports_RDBES/case_studies_overviews_RDBES/s
 
 ## Load prepared data
 source("RegionalOverviews/overviews_reports_RDBES/case_studies_overviews_RDBES/scripts/loadDataMultiannual.R")
+
+## Load auxiliary data
+source("RegionalOverviews/overviews_reports_RDBES/case_studies_overviews_RDBES/scripts/loadAuxFiles.R")
 
 ## Load UNLOCODE data/ shp files
 source("RegionalOverviews/overviews_reports_RDBES/case_studies_overviews_RDBES/scripts/loadMaps.R")
