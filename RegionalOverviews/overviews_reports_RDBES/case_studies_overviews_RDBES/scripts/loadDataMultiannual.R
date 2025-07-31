@@ -39,11 +39,17 @@ load(
   paste(params$data_dir_CL, '/', params$CLfileName,'.Rdata', sep = "")
 ); cl = cl_rcg # shorter name 
 
+# Load CE data
+load(
+  paste(params$data_dir_CL, '/', params$CEfileName,'.Rdata', sep = "")
+); ce = ce_rcg # shorter name 
+
 # put some necessary data prep part below
 ######################
 # FILTER the data out
 ######################
 cl <- cl[CLyear %in% c(params$year, params$year-1, params$year-2)]
+ce <- ce[CEyear %in% c(params$year, params$year-1, params$year-2)]
 
 cs <- cs[DEyear %in% c(params$year, params$year-1, params$year-2)]
 
