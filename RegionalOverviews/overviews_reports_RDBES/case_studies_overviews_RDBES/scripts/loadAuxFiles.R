@@ -23,8 +23,7 @@ cat("\n")
 assign("last.warning", NULL, envir = baseenv()) # Credits: https://stackoverflow.com/questions/5725106/r-how-to-clear-all-warnings
 
 ## Load auxiliary data 
-colours <- read.table("RegionalOverviews/data/colourCountryTab.txt", header = T) #RDBESvisualise
-
+colours <- read.table("https://raw.githubusercontent.com/ices-tools-dev/RDBESvisualise/refs/heads/dev/data/colourCountryTab.txt", header = TRUE)
 # Print end message
 if(is_empty(warnings())){
   cat("\n")

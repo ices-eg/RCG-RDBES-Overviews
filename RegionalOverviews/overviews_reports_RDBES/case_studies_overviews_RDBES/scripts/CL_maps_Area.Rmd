@@ -1,0 +1,113 @@
+# Total landings by Area{.tabset}
+## `r params$year-2`
+```{r echo=FALSE, fig.height=7, fig.width=14, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('SPR','HER'),
+         CLyear == params$year-2) %>%
+  group_by(CLspeciesFaoCode,CLvesselFlagCountry, AreaMap) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         func = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA,
+         Region = 'BA')-> df
+
+result <- scatterpieMap_func(df = df,
+                  var = "CLscientificWeight_ton",
+                              groupBy = "AreaMap",
+                              groupBy2 = "CLvesselFlagCountry",
+                              facet = "CLspeciesFaoCode",
+                              func = "sum",
+                              type_of_threshold = 'none',
+                              points_coord = FAOshp,
+                              newVarName = "Landings (t)",
+                              addToTitle = NA,
+                              value_of_threshold = NA,
+                              plot_labels = FALSE,
+                              Catch_group_name = NA,
+                              addExtraShp = TRUE,
+                              extraShp = FAOshp,
+                              color_palette = colours,
+                              filter_column  = NA,
+                              filter_type = NA,
+                              filter_threshold = NA,
+                              filter_func = NA)
+result
+```
+
+## `r params$year-1`
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('SPR','HER'),
+         CLyear == params$year-1) %>%
+  group_by(CLspeciesFaoCode,CLvesselFlagCountry, AreaMap) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         func = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA,
+         Region = 'BA')-> df
+
+result <- scatterpieMap_func(df = df,
+                  var = "CLscientificWeight_ton",
+                              groupBy = "AreaMap",
+                              groupBy2 = "CLvesselFlagCountry",
+                              facet = "CLspeciesFaoCode",
+                              func = "sum",
+                              type_of_threshold = 'none',
+                              points_coord = FAOshp,
+                              newVarName = "Landings (t)",
+                              addToTitle = NA,
+                              value_of_threshold = NA,
+                              plot_labels = FALSE,
+                              Catch_group_name = NA,
+                              addExtraShp = TRUE,
+                              extraShp = FAOshp,
+                              color_palette = colours,
+                              filter_column  = NA,
+                              filter_type = NA,
+                              filter_threshold = NA,
+                              filter_func = NA)
+result
+
+```
+
+## `r params$year`
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('SPR','HER'),
+         CLyear == params$year) %>%
+  group_by(CLspeciesFaoCode,CLvesselFlagCountry, AreaMap) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         func = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA,
+         Region = 'BA')-> df
+
+result <- scatterpieMap_func(df = df,
+                  var = "CLscientificWeight_ton",
+                              groupBy = "AreaMap",
+                              groupBy2 = "CLvesselFlagCountry",
+                              facet = "CLspeciesFaoCode",
+                              func = "sum",
+                              type_of_threshold = 'none',
+                              points_coord = FAOshp,
+                              newVarName = "Landings (t)",
+                              addToTitle = NA,
+                              value_of_threshold = NA,
+                              plot_labels = FALSE,
+                              Catch_group_name = NA,
+                              addExtraShp = TRUE,
+                              extraShp = FAOshp,
+                              color_palette = colours,
+                              filter_column  = NA,
+                              filter_type = NA,
+                              filter_threshold = NA,
+                              filter_func = NA)
+result
+
+```
