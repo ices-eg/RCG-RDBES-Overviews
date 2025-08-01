@@ -61,11 +61,11 @@ scatterpieMap_func = function(df,
   
   if (groupBy_name == "CLstatisticalRectangle" | groupBy_name == "CEstatisticalRectangle") groupBy_name <- "Statistical Rectangle"
   if (groupBy_name == "AreaMap") groupBy_name <- "Area"
-  if (groupBy2_name == "CLvesselFlagCountry" | groupBy2_name == "CEvesselFlagCountry") groupBy2_name <- "Country"
+  if (groupBy2_name == "CLvesselFlagCountry" | groupBy2_name == "CEvesselFlagCountry") groupBy2_name <- "FlagCountry"
   
   
   if (groupBy_name == "Statistical Rectangle"){
-    xlim <- range(mdf[!is.na(mdf$lat) & !is.na(mdf$lon), ]$lon) + c(-1/3, 1/3)
+    xlim <- range(mdf[!is.na(mdf$lat) & !is.na(mdf$lon), ]$lon) + c(-1/6, 1/6)
     ylim <- range(mdf[!is.na(mdf$lat) & !is.na(mdf$lon), ]$lat) + c(-1/6,1/6)
   }else{
   xlim <- range(mdf[!is.na(mdf$lat) & !is.na(mdf$lon), ]$lon) + c(-5, 5)
@@ -119,14 +119,11 @@ scatterpieMap_func = function(df,
   
   unique_bys <- mdf2 %>% distinct(!!groupBy2) %>% nrow()
   
-  if (length(color_palette) == 1 && is.na(color_palette) & groupBy2_name == "Country") { 
-  color_palette <- list( 'BE' = '#E41A1C', 'DE' = '#3D72BF', 'DK' = '#40B252', 'EE' = '#7A6D92', 
-        'ES' = '#D44D4B', 'FI' = '#FFCF05', 'FR' = '#DBD430', 'IE' = '#AD483E', 
-        'LT' = '#FD8BCC', 'LV' = '#999999', 'NL' = '#8DD3C7', 'PL' = '#FFFFB3', 
-        'PT' = '#BEBADA', 'SE' = '#FA8072')
-  }else if (length(color_palette) == 1 && is.na(color_palette)){
+    if (length(color_palette) == 1 && is.na(color_palette)){
     color_palette <- scales::hue_pal()(unique_bys)
     names(color_palette) <- sort(unique(mdf2[[groupBy2]]))
+    }else{
+      color_palette<-setNames(as.list(color_palette[[2]]), color_palette[[1]])
   }
   radius <- 0.3
   radiusMultiply <- ifelse(groupBy_name %in% c('Area', 'AreaMap','FishingGround', 'Division'), 4,
@@ -143,8 +140,15 @@ scatterpieMap_func = function(df,
     ungroup() %>%
     mutate(radius = total / max(total, na.rm = TRUE) * radiusMultiply * radius)
 
-  if(addExtraShp==TRUE){
+  if(groupBy_name %in% c('Area','AreaMap', 'FishingGround')){
     ggplot()+
+      geom_sf(data = points_coord, fill = NA , na.rm = TRUE, size = 0.5, color = gray(.3))->p
+  }else{
+    ggplot()->p
+  }  
+  
+  if(addExtraShp==TRUE){
+    p+
       geom_sf(data = extraShp,
             fill = NA, 
             na.rm = TRUE,
@@ -152,6 +156,13 @@ scatterpieMap_func = function(df,
             color = gray(.3))->p
   }else{
     ggplot() -> p
+  }
+  p+
+    geom_sf(data = m,  fill = "antiquewhite")->p
+  
+  if(groupBy_name == 'LandingCountry' & groupBy2_name == 'FlagCountry'){
+    p+
+      geom_sf(data = st_as_sf(mdf), aes(fill = groupBy) , na.rm = TRUE)->p # for foreign part
   }
   p <- p +
     geom_sf(data = m, fill = "antiquewhite") +
