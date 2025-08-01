@@ -74,23 +74,14 @@ barplot <- function(data = data,
       data<- merge(all_combinations, data, by = c("facet", "grp", "x"), all.x = TRUE)
       data[is.na(y), y := 0]
       
-      
-      # data[, x_reordered := paste0(x, "__", facet)]
-      # # x_reordered jako faktor w odpowiedniej kolejności
-      # data[, x_reordered := factor(x_reordered, levels = unique(x_reordered))]
-      
     }else{
  
     data <- data[ ,. (y = (y/sum(y, na.rm = T))*100,
                       grp = unique(grp)),
                   by = .(x)] 
     
-    # data[, x_reordered := x]
     }
     
-      # scale_x_reordered <- function(...) {
-      #   scale_x_discrete(labels = function(x) gsub("__.+$", "", x), ...)
-      # }    
       
     #plot struff
     p <- ggplot(data=data, aes(x = x, y = y, fill = grp)) + #_reordered, y = y, fill = grp)) + 
@@ -100,12 +91,11 @@ barplot <- function(data = data,
       ggtitle(paste(title)) +
       xlab(paste(xlab)) +
       ylab(paste(ylab)) + 
-      labs(fill = group)#+
-      # scale_x_reordered()
+      labs(fill = group)
     
     if(facet != ""){
 
-      p<- p +facet_wrap(~facet)#, scales = "free_x") 
+      p<- p +facet_wrap(~facet)
     }
       
     

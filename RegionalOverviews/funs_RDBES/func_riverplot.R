@@ -28,22 +28,16 @@ func_riverplot <-
     df$right <- df[ ,right]
     df$value <- df[ ,value]
     #colors
-    colourCountryTab <- read.table("../../data/colourCountryTab.txt", header = T) #RDBESvisualise
+    colourCountryTab <- colours
 
     colourCountryTab <- data.table(colourCountryTab)
     colourCountryTab$ISO2Code <- colourCountryTab$country
     colourCountryTab$colour5 <- colourCountryTab$color
     col1 <- colourCountryTab[ ,c("ISO2Code","colour5")]
-
-    # colours <- read.csv2("../../data/colours2.csv")
-    # country <- read.table("../../data/aux_countries.txt", sep = ",", header = T)
-    # names(country)[1] <- "CountryName"
-    # 
-    # col <- merge(colours, country, by = "CountryName", all.x = T)
-    # col1 <- col[, c("ISO2Code", "colour5")]
-     col2<-col1%>%
-       mutate(ISO2Code=paste0(ISO2Code," "))
-     col_river<-rbind(col1,col2)
+    
+    col2<-col1%>%
+      mutate(ISO2Code=paste0(ISO2Code," "))
+    col_river<-rbind(col1,col2)
     
  
     if (threesteps){
