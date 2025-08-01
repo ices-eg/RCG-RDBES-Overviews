@@ -1,0 +1,452 @@
+# Total landings and number of samples collected - Regional routine {.tabset}
+The matrices below show the total landing in tons and the number of samples collected in the Baltic SPF Regional in the years `r params$year - 2` - `r params$year` for the two main small pelagic species: Clupea harengus and Sprattus sprattus. For each species, two plots have been prepared: one group by area and gear, and the other group by country and gear.
+
+## Clupea harengus - Area/Gear
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+  
+  cl_data <- cl_rcg
+  
+  cs_rcg |>
+    filter(
+      SAcatchCat %in% c('Lan', 'Catch'),
+      !is.na(SAid) &
+        SAid != "",
+      DEhierarchy != 13,
+      DEsampScheme == 'Baltic SPF regional',
+      SpeciesLaName %in% c('Clupea harengus')
+    ) |>
+    select(
+      FTid,
+      FOid,
+      LEid,
+      DEhierarchy,
+      metier6,
+      DEyear,
+      SDctry,
+      VDlenCat,
+      SAsampWtLive,
+      Area,
+      SpeciesLaName
+    ) |>
+    mutate(Trip_id = ifelse((!is.na(FTid) &
+                               FTid != "") &
+                              (is.na(LEid) |
+                                 LEid == ""), FTid, LEid)) |>
+    mutate(Trip_id = as.character(ifelse(
+      Trip_id == "" & DEhierarchy == 13, FOid, Trip_id
+    ))) |>
+    rename(
+      MetierLvl6 = metier6,
+      Year = DEyear,
+      FlagCountry = SDctry,
+      VesselLengthCategory = VDlenCat
+    ) |>
+    distinct() |>
+    group_by(Year,
+             FlagCountry,
+             Area,
+             SpeciesLaName,
+             MetierLvl6,
+             VesselLengthCategory) |>
+    summarise(
+      NoPSU = n_distinct(Trip_id, na.rm = TRUE),
+      WeigthKg = sum(SAsampWtLive / 1000, na.rm =  TRUE)
+    ) -> samplingPart
+  
+  cl_data |>
+    rename(
+      MetierLvl6 = CLmetier6,
+      Year = CLyear,
+      FlagCountry = CLvesselFlagCountry,
+      VesselLengthCategory = CLvesselLengthCategory,
+      Area = CLarea
+    ) |>
+    filter(
+      Year %in% unique(samplingPart$Year),
+      SpeciesLaName %in% unique(samplingPart$SpeciesLaName)
+    ) |>
+    group_by(Year,
+             FlagCountry,
+             Area,
+             SpeciesLaName,
+             MetierLvl6,
+             VesselLengthCategory) |>
+    summarise(LandingsT = sum(CLscientificWeight_ton, na.rm = TRUE)) -> LandingsPart
+  
+  samplingPart %>%
+    full_join(LandingsPart) -> samplingVSlandings
+  
+  samplingVSlandings |>
+    mutate(Gear = str_sub(MetierLvl6, end = 3)) %>%
+    group_by(
+      Area,
+      Gear,
+      Year#,
+     # FlagCountry
+    ) %>%
+    summarise(
+      NoPSU = sum(NoPSU, na.rm = TRUE),
+      LandingsT = sum(LandingsT, na.rm = TRUE)
+    ) |>
+    mutate(NoPSU = ifelse(NoPSU == 0, NA, NoPSU)) ->
+    samplingVSlandingsF_HER
+  
+  
+  ggplot(samplingVSlandingsF_HER, aes(y = factor(Area), x = factor(Gear))) +  ## global aes
+    facet_wrap( ~ Year, ncol = 3) +
+    geom_tile(aes(fill = LandingsT), na.rm = TRUE) +         ## to get the rect filled
+    geom_point(aes(size = NoPSU), shape = 1, stroke = 1)  +    ## geom_point for circle illusion
+    scale_fill_distiller(
+      palette = "Spectral",
+      direction = -1,
+      trans = 'log10',
+      na.value = "transparent"
+    ) +
+    labs(
+       x ='Gear',
+       y = 'Area',
+       fill = "Landings (t)",
+       size = "No. of PSU",
+       title = "Baltic SPF regional - Clupea harengus",
+     ) +
+    theme_bw()+
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+## Clupea harengus - Country/Gear
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+  
+  cl_data <- cl_rcg
+  
+  cs_rcg |>
+    filter(
+      SAcatchCat %in% c('Lan', 'Catch'),
+      !is.na(SAid) &
+        SAid != "",
+      DEhierarchy != 13,
+      DEsampScheme == 'Baltic SPF regional',
+      SpeciesLaName %in% c('Clupea harengus')
+    ) |>
+    select(
+      FTid,
+      FOid,
+      LEid,
+      DEhierarchy,
+      metier6,
+      DEyear,
+      SDctry,
+      VDlenCat,
+      SAsampWtLive,
+      Area,
+      SpeciesLaName
+    ) |>
+    mutate(Trip_id = ifelse((!is.na(FTid) &
+                               FTid != "") &
+                              (is.na(LEid) |
+                                 LEid == ""), FTid, LEid)) |>
+    mutate(Trip_id = as.character(ifelse(
+      Trip_id == "" & DEhierarchy == 13, FOid, Trip_id
+    ))) |>
+    rename(
+      MetierLvl6 = metier6,
+      Year = DEyear,
+      FlagCountry = SDctry,
+      VesselLengthCategory = VDlenCat
+    ) |>
+    distinct() |>
+    group_by(Year,
+             FlagCountry,
+             Area,
+             SpeciesLaName,
+             MetierLvl6,
+             VesselLengthCategory) |>
+    summarise(
+      NoPSU = n_distinct(Trip_id, na.rm = TRUE),
+      WeigthKg = sum(SAsampWtLive / 1000, na.rm =  TRUE)
+    ) -> samplingPart
+  
+  cl_data |>
+    rename(
+      MetierLvl6 = CLmetier6,
+      Year = CLyear,
+      FlagCountry = CLvesselFlagCountry,
+      VesselLengthCategory = CLvesselLengthCategory,
+      Area = CLarea
+    ) |>
+    filter(
+      Year %in% unique(samplingPart$Year),
+      SpeciesLaName %in% unique(samplingPart$SpeciesLaName)
+    ) |>
+    group_by(Year,
+             FlagCountry,
+             Area,
+             SpeciesLaName,
+             MetierLvl6,
+             VesselLengthCategory) |>
+    summarise(LandingsT = sum(CLscientificWeight_ton, na.rm = TRUE)) -> LandingsPart
+  
+  samplingPart %>%
+    full_join(LandingsPart) -> samplingVSlandings
+  
+  samplingVSlandings |>
+    mutate(Gear = str_sub(MetierLvl6, end = 3)) %>%
+    group_by(
+      #Area,
+      Gear,
+      Year,
+      FlagCountry
+    ) %>%
+    summarise(
+      NoPSU = sum(NoPSU, na.rm = TRUE),
+      LandingsT = sum(LandingsT, na.rm = TRUE)
+    ) |>
+    mutate(NoPSU = ifelse(NoPSU == 0, NA, NoPSU)) ->
+    samplingVSlandingsF_HER
+  
+  
+  ggplot(samplingVSlandingsF_HER, aes(y = factor(FlagCountry), x = factor(Gear))) +  ## global aes
+    facet_wrap( ~ Year, ncol = 3) +
+    geom_tile(aes(fill = LandingsT), na.rm = TRUE) +         ## to get the rect filled
+    geom_point(aes(size = NoPSU), shape = 1, stroke = 1)  +    ## geom_point for circle illusion
+    scale_fill_distiller(
+      palette = "Spectral",
+      direction = -1,
+      trans = 'log10',
+      na.value = "transparent"
+    ) +
+    labs(
+       x ='Gear',
+       y = 'Country',
+       fill = "Landings (t)",
+       size = "No. of PSU",
+       title = "Baltic SPF regional - Clupea harengus",
+     ) +
+    theme_bw()+
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+## Sprattus sprattus - Area/Gear
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+  
+  cl_data <- cl_rcg
+  
+  cs_rcg |>
+    filter(
+      SAcatchCat %in% c('Lan', 'Catch'),
+      !is.na(SAid) &
+        SAid != "",
+      DEhierarchy != 13,
+      DEsampScheme == 'Baltic SPF regional',
+      SpeciesLaName %in% c('Sprattus sprattus')
+    ) |>
+    select(
+      FTid,
+      FOid,
+      LEid,
+      DEhierarchy,
+      metier6,
+      DEyear,
+      SDctry,
+      VDlenCat,
+      SAsampWtLive,
+      Area,
+      SpeciesLaName
+    ) |>
+    mutate(Trip_id = ifelse((!is.na(FTid) &
+                               FTid != "") &
+                              (is.na(LEid) |
+                                 LEid == ""), FTid, LEid)) |>
+    mutate(Trip_id = as.character(ifelse(
+      Trip_id == "" & DEhierarchy == 13, FOid, Trip_id
+    ))) |>
+    rename(
+      MetierLvl6 = metier6,
+      Year = DEyear,
+      FlagCountry = SDctry,
+      VesselLengthCategory = VDlenCat
+    ) |>
+    distinct() |>
+    group_by(Year,
+             FlagCountry,
+             Area,
+             SpeciesLaName,
+             MetierLvl6,
+             VesselLengthCategory) |>
+    summarise(
+      NoPSU = n_distinct(Trip_id, na.rm = TRUE),
+      WeigthKg = sum(SAsampWtLive / 1000, na.rm =  TRUE)
+    ) -> samplingPart
+  
+  cl_data |>
+    rename(
+      MetierLvl6 = CLmetier6,
+      Year = CLyear,
+      FlagCountry = CLvesselFlagCountry,
+      VesselLengthCategory = CLvesselLengthCategory,
+      Area = CLarea
+    ) |>
+    filter(
+      Year %in% unique(samplingPart$Year),
+      SpeciesLaName %in% unique(samplingPart$SpeciesLaName)
+    ) |>
+    group_by(Year,
+             FlagCountry,
+             Area,
+             SpeciesLaName,
+             MetierLvl6,
+             VesselLengthCategory) |>
+    summarise(LandingsT = sum(CLscientificWeight_ton, na.rm = TRUE)) -> LandingsPart
+  
+  samplingPart %>%
+    full_join(LandingsPart) -> samplingVSlandings
+  
+  samplingVSlandings |>
+    mutate(Gear = str_sub(MetierLvl6, end = 3)) %>%
+    group_by(
+      Area,
+      Gear,
+      Year#,
+      #FlagCountry
+    ) %>%
+    summarise(
+      NoPSU = sum(NoPSU, na.rm = TRUE),
+      LandingsT = sum(LandingsT, na.rm = TRUE)
+    ) |>
+    mutate(NoPSU = ifelse(NoPSU == 0, NA, NoPSU)) ->
+    samplingVSlandingsF_SPR
+  
+  
+  ggplot(samplingVSlandingsF_SPR, aes(y = factor(Area), x = factor(Gear))) +  ## global aes
+    facet_wrap( ~ Year, ncol = 3) +
+    geom_tile(aes(fill = LandingsT), na.rm = TRUE) +         ## to get the rect filled
+    geom_point(aes(size = NoPSU), shape = 1, stroke = 1)  +    ## geom_point for circle illusion
+    scale_fill_distiller(
+      palette = "Spectral",
+      direction = -1,
+      trans = 'log10',
+      na.value = "transparent"
+    ) +
+    labs(
+       x ='Gear',
+       y = 'Area',
+       fill = "Landings (t)",
+       size = "No. of PSU",
+       title = "Baltic SPF regional - Sprattus sprattus",
+     ) +
+    theme_bw()
+
+```
+
+## Sprattus sprattus - Country/Gear
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+  
+  cl_data <- cl_rcg
+  
+  cs_rcg |>
+    filter(
+      SAcatchCat %in% c('Lan', 'Catch'),
+      !is.na(SAid) &
+        SAid != "",
+      DEhierarchy != 13,
+      DEsampScheme == 'Baltic SPF regional',
+      SpeciesLaName %in% c('Sprattus sprattus')
+    ) |>
+    select(
+      FTid,
+      FOid,
+      LEid,
+      DEhierarchy,
+      metier6,
+      DEyear,
+      SDctry,
+      VDlenCat,
+      SAsampWtLive,
+      Area,
+      SpeciesLaName
+    ) |>
+    mutate(Trip_id = ifelse((!is.na(FTid) &
+                               FTid != "") &
+                              (is.na(LEid) |
+                                 LEid == ""), FTid, LEid)) |>
+    mutate(Trip_id = as.character(ifelse(
+      Trip_id == "" & DEhierarchy == 13, FOid, Trip_id
+    ))) |>
+    rename(
+      MetierLvl6 = metier6,
+      Year = DEyear,
+      FlagCountry = SDctry,
+      VesselLengthCategory = VDlenCat
+    ) |>
+    distinct() |>
+    group_by(Year,
+             FlagCountry,
+             Area,
+             SpeciesLaName,
+             MetierLvl6,
+             VesselLengthCategory) |>
+    summarise(
+      NoPSU = n_distinct(Trip_id, na.rm = TRUE),
+      WeigthKg = sum(SAsampWtLive / 1000, na.rm =  TRUE)
+    ) -> samplingPart
+  
+  cl_data |>
+    rename(
+      MetierLvl6 = CLmetier6,
+      Year = CLyear,
+      FlagCountry = CLvesselFlagCountry,
+      VesselLengthCategory = CLvesselLengthCategory,
+      Area = CLarea
+    ) |>
+    filter(
+      Year %in% unique(samplingPart$Year),
+      SpeciesLaName %in% unique(samplingPart$SpeciesLaName)
+    ) |>
+    group_by(Year,
+             FlagCountry,
+             Area,
+             SpeciesLaName,
+             MetierLvl6,
+             VesselLengthCategory) |>
+    summarise(LandingsT = sum(CLscientificWeight_ton, na.rm = TRUE)) -> LandingsPart
+  
+  samplingPart %>%
+    full_join(LandingsPart) -> samplingVSlandings
+  
+  samplingVSlandings |>
+    mutate(Gear = str_sub(MetierLvl6, end = 3)) %>%
+    group_by(
+      #Area,
+      Gear,
+      Year,
+      FlagCountry
+    ) %>%
+    summarise(
+      NoPSU = sum(NoPSU, na.rm = TRUE),
+      LandingsT = sum(LandingsT, na.rm = TRUE)
+    ) |>
+    mutate(NoPSU = ifelse(NoPSU == 0, NA, NoPSU)) ->
+    samplingVSlandingsF_SPR
+  
+  
+  ggplot(samplingVSlandingsF_SPR, aes(y = factor(FlagCountry), x = factor(Gear))) +  ## global aes
+    facet_wrap( ~ Year, ncol = 3) +
+    geom_tile(aes(fill = LandingsT), na.rm = TRUE) +         ## to get the rect filled
+    geom_point(aes(size = NoPSU), shape = 1, stroke = 1)  +    ## geom_point for circle illusion
+    scale_fill_distiller(
+      palette = "Spectral",
+      direction = -1,
+      trans = 'log10',
+      na.value = "transparent"
+    ) +
+    labs(
+       x ='Gear',
+       y = 'Country',
+       fill = "Landings (t)",
+       size = "No. of PSU",
+       title = "Baltic SPF regional - Sprattus sprattus",
+     ) +
+    theme_bw()
+
+```

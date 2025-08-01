@@ -28,6 +28,11 @@ suppressPackageStartupMessages(library(kableExtra))
 suppressPackageStartupMessages(library(crayon))
 suppressPackageStartupMessages(library(DT))
 suppressPackageStartupMessages(library(networkD3))
+suppressPackageStartupMessages(library(patchwork))
+# library(remotes)
+# 
+# install_github("ices-tools-dev/RDBESvisualise@dev", build_vignettes = TRUE)
+suppressPackageStartupMessages(library(RDBESvisualise))
 
 # Print end message
 if(is_empty(warnings())){
