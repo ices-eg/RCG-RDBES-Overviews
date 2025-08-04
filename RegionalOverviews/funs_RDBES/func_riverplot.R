@@ -23,10 +23,14 @@ func_riverplot <-
     require(data.table)
     
     # transform name of variable to field in df 
-    df <- as.data.frame(df)
-    df$left <- df[ ,left]
-    df$right <- df[ ,right]
-    df$value <- df[ ,value]
+    if(nrow(df)==0){
+      print('No data')
+      }else{
+        df <- as.data.frame(df)
+        df$left <- df[ ,left]
+        df$right <- df[ ,right]
+        df$value <- df[ ,value]
+        
     #colors
     colourCountryTab <- colours
 
@@ -38,7 +42,7 @@ func_riverplot <-
     col2<-col1%>%
       mutate(ISO2Code=paste0(ISO2Code," "))
     col_river<-rbind(col1,col2)
-    
+
  
     if (threesteps){
       df$center <- df[ ,center]  
@@ -49,6 +53,7 @@ func_riverplot <-
        mutate(ISO2Code=paste0(ISO2Code," "))
       col_river<-rbind(col_river,col3)
       df$check<-ifelse(df$center==df$right,'','add')
+      if (nrow(df[df$check==''& df$left==df$right,])!=0){
       final_data1<-df[df$check==''& df$left==df$right,c('left','right','value')]      
       final_data1$right <- paste0(toupper(final_data1$right)," ")
       final_data2<-df[df$check==''&df$left==df$right,c('left','right','value')]      
@@ -56,6 +61,7 @@ func_riverplot <-
       final_data2$left <- paste0(toupper(final_data2$left)," ")
       final_data11<-rbind(final_data1,final_data2)
       final_data<-final_data11
+    }
       if (nrow(df[df$check==''&df$left!=df$right,])!=0){
       final_data3<-df[df$check==''&df$left!=df$right,c('left','right','value')] 
       final_data3$right <- paste0(toupper(final_data3$right)," ")
@@ -134,5 +140,6 @@ func_riverplot <-
                   NodeGroup = "group",
                   nodeWidth=40, fontSize=13, nodePadding=20,
                   LinkGroup = "left")
+    }
     }
   }
