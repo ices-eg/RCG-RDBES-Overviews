@@ -68,9 +68,12 @@ func_riverplot <-
       final_data4<-df[df$check==''&df$left!=df$right,c('right','value')] 
       final_data4$left <- paste0(toupper(final_data4$right)," ")      
       final_data4$right <- paste0(toupper(final_data4$right),"  ")
-      final_data22<-rbind(final_data3,final_data4)
+      final_data22<-rbind(final_data3,final_data4)   
+      }
+      if (exists('final_data11') & exists('final_data22')){
       final_data<-rbind(final_data11,final_data22)
       }
+   
       if(nrow(df[df$check=='add',])!=0){
       subset1<-df[df$check=='add',c('left','center','value')]
       subset1$center <- paste0(toupper(subset1$center)," ")
