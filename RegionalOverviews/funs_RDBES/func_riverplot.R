@@ -31,21 +31,35 @@ func_riverplot <-
         df$right <- df[ ,right]
         df$value <- df[ ,value]
         
+    #arrange NA-Nambia
+        df$right <- ifelse(is.na(df$right),"NA",as.character(df$right))
+        df$left <-ifelse(is.na(df$left),"NA",as.character(df$left))
+        
     #colors
-    colourCountryTab <- colours
-
-    colourCountryTab <- data.table(colourCountryTab)
+    colourCountryTab <- data.table(colours)
     colourCountryTab$ISO2Code <- colourCountryTab$country
     colourCountryTab$colour5 <- colourCountryTab$color
+    
     col1 <- colourCountryTab[ ,c("ISO2Code","colour5")]
     
+    # fix Nambia - NA issue
+    na_rows <- which(is.na(col1$ISO2Code))
+    if (length(na_rows) > 0) {
+      #select only first row with NA
+      col1 <- col1[-na_rows[-1], ]
+      col1$ISO2Code <- ifelse(is.na(col1$ISO2Code),"NA",col1$ISO2Code)
+    }
     col2<-col1%>%
       mutate(ISO2Code=paste0(ISO2Code," "))
+    
     col_river<-rbind(col1,col2)
-
+ 
  
     if (threesteps){
       df$center <- df[ ,center]  
+      #fix NA-Nambia issue
+      df$center <- ifelse(is.na(df$center),"NA",as.character(df$center))
+      
       df$right <- toupper(df$right)
       df$left <- toupper(df$left)
       df$center <- toupper(df$center)
@@ -68,7 +82,8 @@ func_riverplot <-
       final_data4<-df[df$check==''&df$left!=df$right,c('right','value')] 
       final_data4$left <- paste0(toupper(final_data4$right)," ")      
       final_data4$right <- paste0(toupper(final_data4$right),"  ")
-      final_data22<-rbind(final_data3,final_data4)   
+      final_data22<-rbind(final_data3,final_data4)  
+      final_data<-final_data22
       }
       if (exists('final_data11') & exists('final_data22')){
       final_data<-rbind(final_data11,final_data22)
@@ -83,7 +98,11 @@ func_riverplot <-
       subset2$right <- paste0(toupper(subset2$right),"  ")
       subset2%>%rename('left'='center')->subset2
       subset<-rbind(subset1,subset2)
-      final_data<-rbind(final_data,subset)
+      if (exists('final_data')){
+        final_data<-rbind(final_data,subset)}else{
+            final_data<-subset
+        }
+   
       }
 
       nodes <- data.frame(name=c(as.character(final_data$left),
@@ -104,6 +123,7 @@ func_riverplot <-
       # Connection must be provided using id, not using real name of field
       final_data$IDleft=match(final_data$left, nodes$name)-1 
       final_data$IDright=match(final_data$right, nodes$name)-1
+      
       sankeyNetwork(Links = final_data, Nodes = nodes,
                     Source = "IDleft", Target = "IDright",
                     Value = "value", NodeID = "name", 
