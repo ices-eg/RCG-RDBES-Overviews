@@ -28,6 +28,7 @@ suppressPackageStartupMessages(library(kableExtra))
 suppressPackageStartupMessages(library(crayon))
 suppressPackageStartupMessages(library(DT))
 suppressPackageStartupMessages(library(networkD3))
+suppressPackageStartupMessages(library(htmltools))
 suppressPackageStartupMessages(library(patchwork))
 # library(remotes)
 # 
