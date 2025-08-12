@@ -1,7 +1,7 @@
 ## Sampling (CS){.tabset}
 
 ### Hierarchies
-The table below presents number of sampling schemes Country vs hierarchy, including national and regional routine. The number of routines related to regional sampling scheme is presented in brackets.
+The table below presents number of sampling schemes with small pelagic catches. Country vs hierarchy, including national and regional routine. The number of routines related to regional sampling scheme is presented in brackets.
 
 ```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
 #prepare subset of data
