@@ -34,6 +34,7 @@ suppressPackageStartupMessages(library(crayon))
 suppressPackageStartupMessages(library(flextable))
 suppressPackageStartupMessages(library(patchwork))
 suppressPackageStartupMessages(library(networkD3))
+suppressPackageStartupMessages(library(htmltools))
 
 # Print end message
 if(is_empty(warnings())){

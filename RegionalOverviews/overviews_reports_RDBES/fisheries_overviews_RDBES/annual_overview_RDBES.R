@@ -46,6 +46,7 @@ source("RegionalOverviews/overviews_reports_RDBES/fisheries_overviews_RDBES/scri
 
 ## Load functions 
 source("RegionalOverviews/overviews_reports_RDBES/fisheries_overviews_RDBES/scripts/loadFunctions.R")
+ source("RegionalOverviews/overviews_reports_RDBES/fisheries_overviews_RDBES/scripts/loadAuxFiles.R")
 
 # Parameters are defined based on user selection
 source("RegionalOverviews/overviews_reports_RDBES/fisheries_overviews_RDBES/scripts/parametersDefinition.R")
