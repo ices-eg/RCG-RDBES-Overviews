@@ -114,14 +114,20 @@ barplot <- function(data = data,
       col2 <- setNames(object = col2$colour5, nm = col2$unique_x)
       
       #plot struff
-      p1 <- ggplot(data=data, aes(x = reorder(x, -y), y = y, fill = grp)) +
+      p0 <- ggplot(data=data, aes(x = reorder(x, -y), y = y, fill = grp)) +
         geom_bar(stat="identity") +
         theme_bw() +
         theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
         ggtitle(paste(title)) +
         xlab(paste(xlab)) +
-        ylab(paste(ylab)) +
-        scale_fill_manual(values = col2)
+        ylab(paste(ylab)) 
+      
+      if(group %like% "Country" || col_cou == T){
+        p1 <- p0 + scale_fill_manual(values = col)
+      }else{
+        p1 <- p0 + scale_fill_manual(values = col2)
+      }
+      
       
       df <- data.frame(x=names(t2),y=t2)
       if (group != "") {
@@ -131,13 +137,23 @@ barplot <- function(data = data,
         if (group == "")
           p1 <- p1 + theme(legend.position="none")
       }
-      p2 <- ggplot(data=df, aes(x = reorder(x, -y), y = y, fill = grp)) +
+      p2_0 <- ggplot(data=df, aes(x = reorder(x, -y), y = y, fill = grp)) +
         geom_bar(stat="identity") +
         theme_bw() +
         theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
         xlab(paste(xlab)) +
-        ylab(paste("")) +
-        scale_fill_manual(values = col2)#sub_col[length(t1[!t1 %in% t2])+1:length(sub_col)])
+        ylab(paste("")) 
+      
+      if(group %like% "Country" || col_cou == T){
+        p2 <- p2_0 +
+          scale_fill_manual(values = col)#sub_col[length(t1[!t1 %in% t2])+1:length(sub_col)])
+        
+      }else{
+        p2 <- p2_0 +
+          scale_fill_manual(values = col2)#sub_col[length(t1[!t1 %in% t2])+1:length(sub_col)])
+        
+      }
+      
       
       p2 <- p2 + theme(legend.position="none")
       
