@@ -277,7 +277,8 @@ barplot1(data = sub_cs,
 						 y = "NumLengthFish",
 						 xlab = "Country",
 						 ylab = "Number of individuals measured",
-						 title = ""
+						 title = "",
+						 col_cou=T
 						 )
 ```
 <br>

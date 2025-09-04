@@ -197,12 +197,11 @@ barplot <- function(data = data,
 
   	  # Read country colours if requested
   if (col_cou || grepl("Country", group)) {
-    colours <- read.csv2("../../data/colours2.csv")
-    country <- read.table("../../data/aux_countries.txt", sep = ",", header = TRUE)
-    names(country)[1] <- "CountryName"
-    col <- merge(colours, country, by = "CountryName", all.x = TRUE)
-    col <- col[, c("ISO2Code", "colour5")]
-    col <- setNames(col$colour5, col$ISO2Code)
+    colours <- data.table(colours)
+    colours$ISO2Code <- colours$country
+    colours$colour5 <- colours$color
+    col <- colours[ ,c("ISO2Code","colour5")]
+    col <- setNames(object = col$colour5, nm = col$ISO2Code)
   }
 
   data <- as.data.frame(data)

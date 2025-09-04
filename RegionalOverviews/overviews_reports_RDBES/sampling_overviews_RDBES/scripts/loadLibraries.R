@@ -27,6 +27,7 @@ suppressPackageStartupMessages(library(knitr))
 suppressPackageStartupMessages(library(kableExtra))
 suppressPackageStartupMessages(library(crayon))
 suppressPackageStartupMessages(library(DT))
+suppressPackageStartupMessages(library(tidytext))
 
 # Print end message
 if(is_empty(warnings())){

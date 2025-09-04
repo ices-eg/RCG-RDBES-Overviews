@@ -35,9 +35,9 @@ dataprepDateCE = 20250527
 
 ## Set wd 
 #setwd("Path to RCGs local repo")
-setwd("F:/Documentos/PNAB/2025/000_RCG_IntersessionalWork/Fisheries_Overviews/RCG-RDBES-Overviews-master/")
+#setwd("F:/Documentos/PNAB/2025/000_RCG_IntersessionalWork/Fisheries_Overviews/RCG-RDBES-Overviews-master/")
 #setwd("C:/Use/0_GitHub/RCG-RDBES-Overviews") # Lucia's machine
-#setwd("D:/RCG-RDBES-Overviews/") # Kasia machine
+setwd("D:/RCG-RDBES-Overviews/") # Kasia machine
 
 ## Load libraries
 source("RegionalOverviews/overviews_reports_RDBES/sampling_overviews_RDBES/scripts/loadLibraries.R")
