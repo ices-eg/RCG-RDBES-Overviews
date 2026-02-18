@@ -1,0 +1,69 @@
+## Effort (CE){.tabset}
+The data present in this part includes TOP 20 metiers (the landing in that metiers was the highest in all present years)
+
+### Number of trips by metier lvl6
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+sub_cl_top_base <- cl%>%
+   filter(CatchGroup == 'small pelagic')%>%
+   group_by(CLyear, CLmetier6) %>%
+   summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+   top_n(20)
+sub_ce <- ce|>
+  filter(CEmetier6 %in% sub_cl_top_base$CLmetier6)|>
+  group_by(CEyear, CEmetier6, CEvesselFlagCountry) |>
+  summarise(CEnumberOfDominantTrips = sum(CEnumberOfDominantTrips))
+
+barplot(data = sub_ce, 
+      x = "CEmetier6",
+      y = "CEnumberOfDominantTrips",
+      ylab = "Number of trips")
+
+```
+
+### Number of trips by metier lvl6 and country
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+sub_ce <- ce|>
+  filter(CEmetier6 %in% sub_cl_top_base$CLmetier6)|>
+  group_by(CEyear, CEmetier6, CEvesselFlagCountry) |>
+  summarise(CEnumberOfDominantTrips = sum(CEnumberOfDominantTrips))
+
+barplot(data = sub_ce,  
+       x = "CEmetier6", 
+       y = "CEnumberOfDominantTrips", 
+       group = "CEvesselFlagCountry", 
+       ylab = "Number of trips (%)", 
+       asPct = T,
+       facet = "CEyear") 
+
+```
+
+### Days at sea by metier lvl6
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+sub_ce <- ce|>
+  filter(CEmetier6 %in% sub_cl_top_base$CLmetier6)|>
+  group_by(CEyear, CEmetier6, CEvesselFlagCountry) |>
+  summarise(CEoffDaysAtSea = sum(CEofficialDaysAtSea))
+
+barplot(data = sub_ce, 
+      x = "CEmetier6",
+      y = "CEoffDaysAtSea",
+      ylab = "Days at Sea")
+
+```
+
+### Days at sea by metier lvl6 and country
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+sub_ce <- ce|>
+  filter(CEmetier6 %in% sub_cl_top_base$CLmetier6)|>
+  group_by(CEyear, CEmetier6, CEvesselFlagCountry) |>
+  summarise(CEoffDaysAtSea = sum(CEofficialDaysAtSea))
+
+barplot(data = sub_ce,  
+       x = "CEmetier6", 
+       y = "CEoffDaysAtSea", 
+       group = "CEvesselFlagCountry", 
+       ylab = "Days at sea (%)", 
+       asPct = T,
+       facet = "CEyear") 
+
+```

@@ -16,22 +16,25 @@ barplot <- function(data = data,
                      ylab = "",
                      xlab = "",
                      col_cou= F,
-                     save_plot_to_list=TRUE){
+                     save_plot_to_list=TRUE,
+                     facet =  ""){ # is available only with asPac=T
   
+ #need to be exported in rdbesvisualise package
+ # RDBESvisualise::colourCountryTab
+
   
-  #colour
-  colours <- read.csv2("../../data/colours2.csv")  
-  country <- read.table("../../data/aux_countries.txt", sep = ",", header = T)
-  names(country)[1] <- "CountryName"
-  
-  col <- merge(colours, country, by = "CountryName", all.x = T)
-  col <- col[, c("ISO2Code", "colour5")]
+  colours <- data.table(colours)
+  colours$ISO2Code <- colours$country
+  colours$colour5 <- colours$color
+  col <- colours[ ,c("ISO2Code","colour5")]
   col <- setNames(object = col$colour5, nm = col$ISO2Code)
 
   # set parameters
   data <- data.frame(data)
   data$x <- data[, x]
   data$y <- data[, y]
+  if(facet!="") 
+    data$facet <- data[, facet]
   
   if(is.factor(data$x)){
     data$x<-as.character(data$x)
@@ -44,23 +47,57 @@ barplot <- function(data = data,
   }
   
   setDT(data)
-  data <- data[ ,. (y = sum(y, na.rm = T)),
-                        by = .(x, grp)] 
+  
+  # Ustal globalną kolejność x na podstawie sum(y), zanim cokolwiek przekształcimy
+  x_order <- data[, .(y_sum = sum(.SD[[1]], na.rm = TRUE)), by = x, .SDcols = y]
+  x_order <- x_order[order(-y_sum), x]
+  data[, x := factor(x, levels = x_order)]
+  
+  setorder(data, x)
+  
+  if(facet!= "") {
+    data <- data[ , .(y = sum(y, na.rm = T)), by = .(x, grp, facet)]
+  } else {
+    data <- data[ , .(y = sum(y, na.rm = T)), by = .(x, grp)]
+  }
   
   #
   if (asPct == T) {
+    if(facet != ""){
+      data <- data[ ,. (y = (y/sum(y, na.rm = T))*100,
+                        grp = unique(grp)),
+                    by = .(x,facet)] 
+      all_combinations <- CJ(facet = unique(data$facet),
+                             grp = unique(data$grp),
+                             x = unique(data$x),
+                             unique = TRUE)
+      data<- merge(all_combinations, data, by = c("facet", "grp", "x"), all.x = TRUE)
+      data[is.na(y), y := 0]
+      
+    }else{
+ 
     data <- data[ ,. (y = (y/sum(y, na.rm = T))*100,
                       grp = unique(grp)),
                   by = .(x)] 
     
+    }
+    
+      
     #plot struff
-    p <- ggplot(data=data, aes(x = as.factor(x), y = y, fill = grp)) +
+    p <- ggplot(data=data, aes(x = x, y = y, fill = grp)) + #_reordered, y = y, fill = grp)) + 
       geom_bar(stat="identity") +
       theme_bw() +
       theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
       ggtitle(paste(title)) +
       xlab(paste(xlab)) +
-      ylab(paste(ylab)) + labs(fill = group)
+      ylab(paste(ylab)) + 
+      labs(fill = group)
+    
+    if(facet != ""){
+
+      p<- p +facet_wrap(~facet)
+    }
+      
     
   } else {
 
@@ -74,17 +111,23 @@ barplot <- function(data = data,
       col2<-subset(colours, select = colour5)
       col2<-distinct(col2)
       col2 <- as.data.table(cbind(col2[1:length(unique_x),c("colour5")], unique_x))
-      col2 <- setNames(object = col2$V1, nm = col2$unique_x)
+      col2 <- setNames(object = col2$colour5, nm = col2$unique_x)
       
       #plot struff
-      p1 <- ggplot(data=data, aes(x = reorder(x, -y), y = y, fill = grp)) +
+      p0 <- ggplot(data=data, aes(x = reorder(x, -y), y = y, fill = grp)) +
         geom_bar(stat="identity") +
         theme_bw() +
         theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
         ggtitle(paste(title)) +
         xlab(paste(xlab)) +
-        ylab(paste(ylab)) +
-        scale_fill_manual(values = col2)
+        ylab(paste(ylab)) 
+      
+      if(group %like% "Country" || col_cou == T){
+        p1 <- p0 + scale_fill_manual(values = col)
+      }else{
+        p1 <- p0 + scale_fill_manual(values = col2)
+      }
+      
       
       df <- data.frame(x=names(t2),y=t2)
       if (group != "") {
@@ -94,13 +137,23 @@ barplot <- function(data = data,
         if (group == "")
           p1 <- p1 + theme(legend.position="none")
       }
-      p2 <- ggplot(data=df, aes(x = reorder(x, -y), y = y, fill = grp)) +
+      p2_0 <- ggplot(data=df, aes(x = reorder(x, -y), y = y, fill = grp)) +
         geom_bar(stat="identity") +
         theme_bw() +
         theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
         xlab(paste(xlab)) +
-        ylab(paste("")) +
-        scale_fill_manual(values = col2)#sub_col[length(t1[!t1 %in% t2])+1:length(sub_col)])
+        ylab(paste("")) 
+      
+      if(group %like% "Country" || col_cou == T){
+        p2 <- p2_0 +
+          scale_fill_manual(values = col)#sub_col[length(t1[!t1 %in% t2])+1:length(sub_col)])
+        
+      }else{
+        p2 <- p2_0 +
+          scale_fill_manual(values = col2)#sub_col[length(t1[!t1 %in% t2])+1:length(sub_col)])
+        
+      }
+      
       
       p2 <- p2 + theme(legend.position="none")
       
@@ -118,6 +171,7 @@ barplot <- function(data = data,
       ylab(paste(ylab))
     }
     }
+
   
   if (group %like% "Country" || col_cou == T)
     p <- p + scale_fill_manual(values = col)
@@ -143,12 +197,11 @@ barplot <- function(data = data,
 
   	  # Read country colours if requested
   if (col_cou || grepl("Country", group)) {
-    colours <- read.csv2("../../data/colours2.csv")
-    country <- read.table("../../data/aux_countries.txt", sep = ",", header = TRUE)
-    names(country)[1] <- "CountryName"
-    col <- merge(colours, country, by = "CountryName", all.x = TRUE)
-    col <- col[, c("ISO2Code", "colour5")]
-    col <- setNames(col$colour5, col$ISO2Code)
+    colours <- data.table(colours)
+    colours$ISO2Code <- colours$country
+    colours$colour5 <- colours$color
+    col <- colours[ ,c("ISO2Code","colour5")]
+    col <- setNames(object = col$colour5, nm = col$ISO2Code)
   }
 
   data <- as.data.frame(data)

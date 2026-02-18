@@ -34,6 +34,7 @@ load(
 ######################
 # FILTER the data out
 ######################
+fleetreg <- as.data.table(fleetreg)
 
 fleetreg <- fleetreg[License_Ind == "Y",
                      c(

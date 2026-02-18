@@ -1,0 +1,326 @@
+## Sampling (CS){.tabset}
+
+### Hierarchies
+The table below presents number of sampling schemes with small pelagic catches. Country vs hierarchy, including national and regional routine. The number of routines related to regional sampling scheme is presented in brackets.
+
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+#prepare subset of data
+#all national and regional routines
+cs |>
+  filter(CatchGroup == 'small pelagic',
+         SAcatchCat %in% c('Lan', 'Catch')) |>
+  select(DEhierarchy, SDctry, DEsampScheme) |>
+  distinct() |>
+  group_by(SDctry, DEhierarchy) |>
+  count() |>
+  arrange(DEhierarchy) |>
+  pivot_wider(names_from = DEhierarchy, values_from = n) |>
+  rename(`Country/Hierarchy` = SDctry) -> SDsummary
+
+cs |>
+  filter(CatchGroup == 'small pelagic',
+         SAcatchCat %in% c('Lan', 'Catch')) |>
+  select(SDctry, DEsampScheme) |>
+  distinct() |>
+  group_by(SDctry) |>
+  count() |>
+  rename(`Country/Hierarchy` = SDctry,
+         Total = n) -> summarizedCol
+
+SDsummary <- SDsummary |>
+  left_join(summarizedCol, by = "Country/Hierarchy")
+
+summarizedRow <- cs |>
+  filter(CatchGroup == 'small pelagic',
+         SAcatchCat %in% c('Lan', 'Catch')) |>
+  select(DEhierarchy, DEsampScheme) |>
+  distinct() |>
+  group_by(DEhierarchy) |>
+  count() |>
+  arrange(DEhierarchy) |>
+  pivot_wider(names_from = DEhierarchy, values_from = n)|>
+  mutate(`Country/Hierarchy` = "Total")
+
+summarizedRowTotal <- cs |>
+  filter(CatchGroup == 'small pelagic',
+         SAcatchCat %in% c('Lan', 'Catch')) |>
+  select(DEsampScheme) |>
+  distinct() |>
+  count() |>
+  rename(Total = n)
+
+cbind(summarizedRow,summarizedRowTotal) -> summarizedRow
+SDsummary <- bind_rows(SDsummary, summarizedRow)
+
+
+SDsummary <- SDsummary |>
+  mutate(across(everything(), ~ replace_na(as.character(.), "")))
+# only regional routines
+
+cs |>
+  select(DEhierarchy, SDctry, DEsampScheme,DEsampSchemeType,SAcatchCat) |>
+  filter(DEsampSchemeType %in% c('RegPilCF','RegPilIB','RegRouCF'),
+         SAcatchCat %in% c('Lan', 'Catch')) |>
+  select(DEhierarchy, SDctry, DEsampScheme) |>
+  distinct() |>
+  group_by(SDctry, DEhierarchy) |>
+  count() |>
+  arrange(DEhierarchy) |>
+  pivot_wider(names_from = DEhierarchy, values_from = n) |>
+  rename(`Country/Hierarchy` = SDctry) -> SDsummaryType
+
+cs |>
+  select(DEhierarchy, SDctry, DEsampScheme,DEsampSchemeType,SAcatchCat) |>
+  filter(DEsampSchemeType %in% c('RegPilCF','RegPilIB','RegRouCF'),
+         SAcatchCat %in% c('Lan', 'Catch')) |>
+  select(SDctry, DEsampScheme) |>
+  distinct() |>
+  group_by(SDctry) |>
+  count() |>
+  rename(`Country/Hierarchy` = SDctry,
+         Total = n) -> summarizedCol
+
+SDsummaryType <- SDsummaryType |>
+  left_join(summarizedCol, by = "Country/Hierarchy")
+
+summarizedRow <- cs |>
+  select(DEhierarchy, SDctry, DEsampScheme,DEsampSchemeType,SAcatchCat) |>
+  filter(DEsampSchemeType %in% c('RegPilCF','RegPilIB','RegRouCF'),
+         SAcatchCat %in% c('Lan', 'Catch')) |>
+  distinct() |>
+  group_by(DEhierarchy) |>
+  count() |>
+  arrange(DEhierarchy) |>
+  pivot_wider(names_from = DEhierarchy, values_from = n)|>
+  mutate(`Country/Hierarchy` = "Total")
+
+summarizedRowTotal <- cs |>
+  filter(CatchGroup == 'small pelagic',
+         DEsampSchemeType %in% c('RegPilCF','RegPilIB','RegRouCF'),
+         SAcatchCat %in% c('Lan', 'Catch')) |>
+  select(DEsampScheme) |>
+  distinct() |>
+  count() |>
+  rename(Total = n)
+
+cbind(summarizedRow,summarizedRowTotal) -> summarizedRow
+SDsummaryType <- bind_rows(SDsummaryType, summarizedRow)
+
+SDsummaryType <- SDsummaryType |>
+  mutate(across(everything(), ~ replace_na(as.character(.), "")))
+
+# merge tables with prefix. I want numbers of regional routine in brackets
+combined <- SDsummary |>
+  left_join(SDsummaryType, by = "Country/Hierarchy", suffix = c("", ".y"))
+
+combined <- combined |>
+  mutate(across(ends_with(".y"), ~ paste0("(", replace_na(as.character(.), "0"), ")")))
+
+# merge cells from both tables
+for(col in colnames(SDsummary)[-1]) {
+  combined[[col]] <- paste0(combined[[col]], combined[[paste0(col, ".y")]])
+}
+
+# delete columns with ".y"
+combined <- combined |>
+  select(-ends_with(".y"))|>
+  mutate(across(everything(), ~ gsub("\\(NA\\)", "", .)),
+         across(everything(), ~ gsub("\\(0\\)", "", .)),
+         across(everything(), ~ gsub("\\(\\)", "", .)))
+
+kable(combined, align = "c")|>
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) |>
+  column_spec(1, width = "4cm")|>
+  column_spec(2:ncol(combined), width = "3cm")
+
+```
+
+### Fishing Trips {.tabset}
+The total number of fishing trips, including national and regional routines. The number of records related to regional sampling schemes is represented by points on the plot.
+
+#### Clupea harengus
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+
+cs_rcg |>
+  filter(
+    SAcatchCat %in% c('Lan', 'Catch'),!is.na(FTid) &
+      SAid != "",
+    DEhierarchy != 13,
+    DEsampScheme == 'Baltic SPF regional',
+    SpeciesLaName %in% c('Clupea harengus')
+  ) |>
+     select(
+       FTid,
+       FTsampType,
+       DEyear,
+       Area,
+       DEsampScheme,
+       SpeciesLaName
+     ) |>
+  distinct()|>
+    rename(
+      Year = DEyear,
+      Trip_id = FTid,
+      SamplingPerformed= FTsampType
+    ) |>
+    group_by(Year,
+             Area,
+             SamplingPerformed) |>
+    summarise(
+      NoTrip = n_distinct(Trip_id, na.rm = TRUE)) -> samplingRegional
+
+cs_rcg |>
+  filter(
+    SAcatchCat %in% c('Lan', 'Catch'),
+    !is.na(FTid) & SAid != "",
+    DEhierarchy != 13,
+    SpeciesLaName %in% c('Clupea harengus'))|>
+     select(
+       FTid,
+       FTsampType,
+       DEyear,
+       Area,
+       SpeciesLaName
+     ) |>
+  distinct()|>
+    rename(
+      Year = DEyear,
+      Trip_id = FTid,
+      SamplingPerformed= FTsampType
+    ) |>
+    group_by(Year,
+             Area,
+             SamplingPerformed) |>
+    summarise(
+      NoTrip_all = n_distinct(Trip_id, na.rm = TRUE)) -> samplingAll
+      
+samplingAll %>%
+    full_join(samplingRegional) -> samplingNoTrips
+
+samplingNoTrips |>
+  group_by(Year,SamplingPerformed,Area) |>
+  summarise(
+    NoTrip_regional = sum(NoTrip, na.rm=TRUE),
+    NoTrip_all = sum(NoTrip_all, na.rm=TRUE)
+  ) -> samplingNoTrips
+
+ggplot(samplingNoTrips, aes(y = factor(Area), x = factor(SamplingPerformed))) +  ## global aes
+    facet_wrap( ~ Year, ncol = 3) +
+    geom_tile(aes(fill = NoTrip_all), na.rm = TRUE) +         ## to get the rect filled
+    geom_point(data = subset(samplingNoTrips,NoTrip_regional != 0),aes(size = NoTrip_regional), shape = 1, stroke = 1)  + 
+    scale_fill_distiller(
+      palette = "Spectral",
+      direction = -1,
+      trans = 'log10',
+      na.value = "transparent"
+    ) +
+    labs(
+       x ='Sampling performed',
+       y = 'Area',
+       fill = "All Trips",
+       title = "Baltic SPF regional - Clupea harengus",
+     ) +
+        geom_text(aes(label = ifelse(NoTrip_regional == 0, "", NoTrip_regional)),
+                      nudge_x =  0.08,
+                  hjust = 0,
+                  size = 2)+
+        geom_text(aes(label = NoTrip_all),
+                    hjust = 0,         
+            nudge_x = -0.45,   
+            size = 2)+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+    theme_bw()
+```
+
+#### Sprattus sprattus
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+cs_rcg |>
+  filter(
+    SAcatchCat %in% c('Lan', 'Catch'),!is.na(FTid) &
+      SAid != "",
+    DEhierarchy != 13,
+    DEsampScheme == 'Baltic SPF regional',
+    SpeciesLaName %in% c('Sprattus sprattus')
+  ) |>
+     select(
+       FTid,
+       FTsampType,
+       DEyear,
+       Area,
+       DEsampScheme,
+       SpeciesLaName
+     ) |>
+  distinct()|>
+    rename(
+      Year = DEyear,
+      Trip_id = FTid,
+      SamplingPerformed= FTsampType
+    ) |>
+    group_by(Year,
+             Area,
+             SamplingPerformed) |>
+    summarise(
+      NoTrip = n_distinct(Trip_id, na.rm = TRUE)) -> samplingRegional
+
+cs_rcg |>
+  filter(
+    SAcatchCat %in% c('Lan', 'Catch'),
+    !is.na(FTid) & SAid != "",
+    DEhierarchy != 13,
+    SpeciesLaName %in% c('Sprattus sprattus'))|>
+     select(
+       FTid,
+       FTsampType,
+       DEyear,
+       Area,
+       SpeciesLaName
+     ) |>
+  distinct()|>
+    rename(
+      Year = DEyear,
+      Trip_id = FTid,
+      SamplingPerformed= FTsampType
+    ) |>
+    group_by(Year,
+             Area,
+             SamplingPerformed) |>
+    summarise(
+      NoTrip_all = n_distinct(Trip_id, na.rm = TRUE)) -> samplingAll
+      
+samplingAll %>%
+    full_join(samplingRegional) -> samplingNoTrips
+
+samplingNoTrips |>
+  group_by(Year,SamplingPerformed,Area) |>
+  summarise(
+    NoTrip_regional = sum(NoTrip, na.rm=TRUE),
+    NoTrip_all = sum(NoTrip_all, na.rm=TRUE)
+  ) -> samplingNoTrips
+
+ggplot(samplingNoTrips, aes(y = factor(Area), x = factor(SamplingPerformed))) +  ## global aes
+    facet_wrap( ~ Year, ncol = 3) +
+    geom_tile(aes(fill = NoTrip_all), na.rm = TRUE) +         ## to get the rect filled
+    geom_point(data = subset(samplingNoTrips,NoTrip_regional != 0),aes(size = NoTrip_regional), shape = 1, stroke = 1)  + 
+    scale_fill_distiller(
+      palette = "Spectral",
+      direction = -1,
+      trans = 'log10',
+      na.value = "transparent"
+    ) +
+    labs(
+       x ='Sampling performed',
+       y = 'Area',
+       fill = "All Trips",
+       title = "Baltic SPF regional - Sprattus sprattus",
+     ) +
+        geom_text(aes(label = ifelse(NoTrip_regional == 0, "", NoTrip_regional)),
+                      nudge_x =  0.08,
+                  hjust = 0,
+                  size = 2)+
+        geom_text(aes(label = NoTrip_all),
+                    hjust = 0,         
+            nudge_x = -0.45,   
+            size = 2)+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+    theme_bw()
+```

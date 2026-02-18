@@ -1,0 +1,119 @@
+# Landings abroad, small pelagics{.tabset}
+
+The plot below shows the flow of the small pelagics landings between the vessel Flag Country (left), Harbour Country (center) and the Landing Country (right). Width of each line is proportional to landings. Harbour Country is the country code obtained from the CLlandingLocation.
+
+## Clupea harengus{.tabset}
+### `r params$year-2`
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('HER'),
+         CLyear == params$year-2)%>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
+
+func_riverplot(df = cl_river,
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
+
+```
+
+### `r params$year-1`
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('HER'),
+         CLyear == params$year-1)%>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
+
+func_riverplot(df = cl_river,
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
+
+```
+
+### `r params$year`
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('HER'),
+         CLyear == params$year)%>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
+
+func_riverplot(df = cl_river,
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
+
+```
+
+## Sprattus sprattus {.tabset}
+### `r params$year-2`
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('SPR'),
+         CLyear == params$year-2)%>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
+
+result<-func_riverplot(df = cl_river,
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
+result
+```
+
+### `r params$year-1`
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('SPR'),
+         CLyear == params$year-1)%>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
+
+result<-func_riverplot(df = cl_river,
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
+result
+```
+
+### `r params$year`
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('SPR'),
+         CLyear == params$year)%>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
+
+result<-func_riverplot(df = cl_river,
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
+result
+```

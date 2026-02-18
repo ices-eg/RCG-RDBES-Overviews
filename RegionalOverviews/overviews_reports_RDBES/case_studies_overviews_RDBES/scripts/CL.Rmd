@@ -1,0 +1,274 @@
+## Landings (CL){.tabset}
+### Species {.tabset}
+
+#### `r params$year-2`
+
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+
+smallPelag <- cl%>% filter(CatchGroup=='small pelagic',
+                           CLyear==params$year-2)
+
+sub_cl<- smallPelag %>%
+  group_by(CLyear,SpeciesLaName) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20, wt=CLscientificWeight_1000ton)
+
+barplot(data = sub_cl, 
+      x = "SpeciesLaName",
+      y = "CLscientificWeight_1000ton",
+      ylab = "Landings (1000 t)")
+
+
+```
+
+#### `r params$year-1`
+
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+
+smallPelag <- cl%>% filter(CatchGroup=='small pelagic',
+                           CLyear==params$year-1)
+
+sub_cl<- smallPelag %>%
+  group_by(CLyear,SpeciesLaName) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20, wt=CLscientificWeight_1000ton)
+
+barplot(data = sub_cl, 
+      x = "SpeciesLaName",
+      y = "CLscientificWeight_1000ton",
+      ylab = "Landings (1000 t)")
+
+
+```
+
+#### `r params$year`
+
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+
+smallPelag <- cl%>% filter(CatchGroup=='small pelagic',
+                           CLyear==params$year)
+
+sub_cl<- smallPelag %>%
+  group_by(CLyear,SpeciesLaName) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20, wt=CLscientificWeight_1000ton)
+
+barplot(data = sub_cl, 
+      x = "SpeciesLaName",
+      y = "CLscientificWeight_1000ton",
+      ylab = "Landings (1000 t)")
+
+
+```
+
+### Species and country
+
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+sub_cl_2<- cl%>%
+  filter(CatchGroup=='small pelagic')%>%
+  group_by(CLyear, SpeciesLaName, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_1000ton_total = sum(CLscientificWeight_1000ton))
+
+sub_cl_top <- cl%>% 
+  filter(CatchGroup=='small pelagic') %>%
+  arrange(desc(CLscientificWeight_1000ton)) %>%
+  top_n(20)
+
+sub_cl_top$Top <- "TOP"
+sub_cl_2_top <- left_join(sub_cl_2,sub_cl_top,by=c("SpeciesLaName","CLyear","CLvesselFlagCountry"))
+
+sub_cl_2_top <- sub_cl_2_top %>%
+  filter(Top=='TOP')
+
+barplot(data = sub_cl_2_top,
+      x = "SpeciesLaName",
+      y = "CLscientificWeight_1000ton_total",
+      group = "CLvesselFlagCountry",
+      title = "Landings (1000 t) by Species and Country",
+      ylab = "Proportion of Landings (%)",
+      asPct = T,
+      col_cou= T,
+      facet= "CLyear")
+```
+
+### Fleet and country
+
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+
+barplot(data = cl%>%filter(CatchGroup=='small pelagic'),
+      x = "CLvesselFlagCountry",
+      y = "CLscientificWeight_1000ton",
+      group = "CLvesselLengthCategory",
+      ylab = "Proportion of Landings (%)",
+      asPct = T,
+      facet = "CLyear")
+```
+
+### Metier lvl5 {.tabset}
+
+#### `r params$year-2`
+
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+#data prep
+sub_cl_top <- cl%>%
+  filter(CatchGroup == 'small pelagic',
+         CLyear == params$year-2)%>%
+  mutate(CLmetier5 = substr(CLmetier6, 1, 7))%>%
+  group_by(CLyear, CLmetier5) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20)
+
+barplot(data = sub_cl_top,
+      x = "CLmetier5",
+      y = "CLscientificWeight_1000ton",
+      ylab = "Landings (1000 t)")
+```
+
+#### `r params$year-1`
+
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+#data prep
+sub_cl_top <- cl%>%
+  filter(CatchGroup == 'small pelagic',
+         CLyear == params$year-1)%>%
+  mutate(CLmetier5 = substr(CLmetier6, 1, 7))%>%
+  group_by(CLyear, CLmetier5) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20)
+
+barplot(data = sub_cl_top,
+      x = "CLmetier5",
+      y = "CLscientificWeight_1000ton",
+      ylab = "Landings (1000 t)")
+```
+
+#### `r params$year`
+
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+#data prep
+sub_cl_top <- cl%>%
+  filter(CatchGroup == 'small pelagic',
+         CLyear == params$year)%>%
+  mutate(CLmetier5 = substr(CLmetier6, 1, 7))%>%
+  group_by(CLyear, CLmetier5) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20)
+
+barplot(data = sub_cl_top,
+      x = "CLmetier5",
+      y = "CLscientificWeight_1000ton",
+      ylab = "Landings (1000 t)")
+```
+
+### Metier lvl5 and country
+
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+sub_cl_top <- cl%>%
+  filter(CatchGroup == 'small pelagic')%>%
+  mutate(CLmetier5 = substr(CLmetier6, 1, 7))%>%
+  group_by(CLyear, CLmetier5) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20)
+
+sub_cl_2 <- cl%>%
+  filter(CatchGroup == 'small pelagic') %>%
+    mutate(CLmetier5 = substr(CLmetier6, 1, 7))%>%
+  group_by(CLyear, CLmetier5, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_1000ton_total = sum(CLscientificWeight_1000ton))
+
+sub_cl_top$Top <- "TOP"
+sub_cl_2_top <- left_join(sub_cl_2,sub_cl_top,by=c("CLmetier5","CLyear"))
+
+sub_cl_2_top <- sub_cl_2_top %>%
+  filter(Top=='TOP')
+
+barplot(data = sub_cl_2_top, 
+      x = "CLmetier5",
+      y = "CLscientificWeight_1000ton_total",
+      group = "CLvesselFlagCountry",
+      ylab = "Proportion of Landings (%)",
+      asPct = T,
+    facet = "CLyear")
+```
+
+### Metier lvl6 {.tabset}
+
+#### `r params$year-2`
+
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+#data prep
+sub_cl_top <- cl%>%
+  filter(CatchGroup == 'small pelagic',
+         CLyear == params$year-2)%>%
+  group_by(CLyear, CLmetier6) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20)
+
+barplot(data = sub_cl_top,
+      x = "CLmetier6",
+      y = "CLscientificWeight_1000ton",
+      ylab = "Landings (1000 t)")
+```
+
+#### `r params$year-1`
+
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+#data prep
+sub_cl_top <- cl%>%
+  filter(CatchGroup == 'small pelagic',
+         CLyear == params$year-1)%>%
+  group_by(CLyear, CLmetier6) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20)
+
+barplot(data = sub_cl_top,
+      x = "CLmetier6",
+      y = "CLscientificWeight_1000ton",
+      ylab = "Landings (1000 t)")
+```
+
+#### `r params$year`
+
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+#data prep
+sub_cl_top <- cl%>%
+  filter(CatchGroup == 'small pelagic',
+         CLyear == params$year)%>%
+  group_by(CLyear, CLmetier6) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20)
+
+barplot(data = sub_cl_top,
+      x = "CLmetier6",
+      y = "CLscientificWeight_1000ton",
+      ylab = "Landings (1000 t)")
+```
+
+### Metier lvl6 and country
+
+```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+sub_cl_top_base <- cl%>%
+  filter(CatchGroup == 'small pelagic')%>%
+  group_by(CLyear, CLmetier6) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20)
+
+sub_cl_2 <- cl%>%
+  filter(CatchGroup == 'small pelagic') %>%
+  group_by(CLyear, CLmetier6, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_1000ton_total = sum(CLscientificWeight_1000ton))
+
+sub_cl_top_base$Top <- "TOP"
+sub_cl_2_top <- left_join(sub_cl_2,sub_cl_top_base,by=c("CLmetier6","CLyear"))
+
+sub_cl_2_top <- sub_cl_2_top %>%
+  filter(Top=='TOP')
+
+barplot(data = sub_cl_2_top, 
+      x = "CLmetier6",
+      y = "CLscientificWeight_1000ton_total",
+      group = "CLvesselFlagCountry",
+      ylab = "Proportion of Landings (%)",
+      asPct = T,
+    facet = "CLyear")
+```

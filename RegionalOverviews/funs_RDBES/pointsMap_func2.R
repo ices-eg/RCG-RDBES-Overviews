@@ -33,19 +33,7 @@ pointsMap_func2 <- function(df,
   require(dplyr)
   require(viridis)
   require(ggrepel)
-  var_name = 'CLscientificWeight_1000ton'
-  facet_name = 'CLyear'
-  var_spatial_name = 'CLlandingLocation'
-  spatial_dataset_name = 'Harbours'
-  spatial_dataset_var_name = 'Harbour'
-  plot_labels = FALSE
-  saveResults = FALSE
   
-  Catch_group_name = NA
-  extraShp_name = 'StatRectshp'
-  newVarName = NA
-  addToTitle = NA
-  RCGregion = 'BA'
   # load worldmap
   ne_countries <- ne_countries(scale = "medium", returnclass = "sf")
   
@@ -160,7 +148,7 @@ pointsMap_func2 <- function(df,
   # # If there is any additional information to the title
  # if(!is.na(addToTitle)){ title = paste(title, ' (',addToTitle, ')', sep ='')}
   # Removing missing values
-  # Removing missing values
+
   df_spatial <- df_spatial[!is.na(df_spatial$lat) & !is.na(df_spatial$lon), ]
   
   # Creating the plot
@@ -204,11 +192,11 @@ pointsMap_func2 <- function(df,
   
   
   # Adding facet if necessary
- 
-   # plt <- plt + facet_wrap(vars(facet))  # Adding facet
- 
-  
-  return(plt)
+  if (!is.na(facet)) {
+   plt <- plt + facet_wrap(vars(facet))  # Adding facet
+  }
+
+    return(plt)
   
   
 }

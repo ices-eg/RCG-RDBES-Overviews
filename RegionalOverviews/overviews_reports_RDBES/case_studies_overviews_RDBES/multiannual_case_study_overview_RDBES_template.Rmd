@@ -1,0 +1,77 @@
+---
+title: "Multiannual Case Study Overview"
+date: "`r format(Sys.time(), '%d.%m.%Y')`"
+output:
+  html_document:
+    toc: true
+    fig_caption: yes
+    
+params:
+  eval: TRUE
+  set_subtitle: "Title"
+  region: 'BA'
+  year: 2024
+  logo_path: "../../data/logo/logo RCG BALTIC.PNG"
+  data_dir_CS: '../../data_RDBES/002_prepared/20250425/RCG_BA'
+  data_dir_CL: '../../data_RDBES/002_prepared/20250425/RCG_BA'
+  data_dir_CE: '../../data_RDBES/002_prepared/20250425/RCG_BA'
+  CSfileName: 'RDBES_RCG_BA_CS_2022_2024_prepared_20250521'
+  CLfileName: 'RDBES_RCG_BA_CL_2021_2024_prepared_20250527'
+  CEfileName: 'RDBES_RCG_BA_CE_2021_2024_prepared_20250527'
+
+---
+
+---
+subtitle: `r paste(dplyr::case_when(params$region=='BA'~'Baltic,',params$region=='NA'~'North Atlantic',params$region=='NSEA'~'North Sea and Eastern Arctic'), params$year-2,'-',params$year, sep = " ")`
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+options(scipen = 999)
+```
+
+```{r, echo=FALSE}
+  htmltools::img(src = knitr::image_uri(params$logo_path), 
+               alt = 'logo', 
+               style = 'position:absolute; top:0; right:0; padding:10px;',width="300px", height="100px")
+```
+
+**Disclaimer**
+The tables and figures of the overviews presented in this document are made for the coordination of EU regional fisheries data collection purposes and are not designed for any other use. Data used for producing the outputs are extracted from the Regional Database and Estimating System (RDBES). The data 2022,2023,2024 was collected under the RCG 2025 data call for the Baltic Sea, North Sea, Eastern Arctic and the North Atlantic regions and the latest version used was downloaded from the system on the 27th of May 2025. Due to different aggregations and reporting authorities, data can differ from those used e.g. for assessments or technical reports. 
+
+The respective scripts and calculations used for data displaying are publicly available via the RCG GitHub (https://github.com/ices-eg/RCG-RDBES-Overviews) and subject to change as the work of the group progresses.
+
+# Introduction
+The present Case Study Overview displays summary information on the statistics for EU sampling of commercial landings included in the [Regional Data Base and Estimation System (RDBES)](https://www.ices.dk/data/data-portals/Pages/rdbes.aspx), which is used to store detailed commercial fisheries and sampling data.
+
+The RDBES is hosted at the International Council for Exploration of the Sea (ICES) and its data is property of EU Member States with usage governed by the Data use license for the Regional Database (RDB). It is a regionally coordinated database platform covering fisheries by region (e.g. North Atlantic Ocean, North Sea, Baltic Sea) and is a main resource used by the Regional Coordination Groups [(RCG)](https://www.fisheries-rcg.eu/rcg-nansea/) to coordinate data collection of EU fisheries. 
+
+To allow for the variety of sampling designs used in different institutes and countries the RDBES identifies a number of different sampling hierarchies, which represent the different hierarchical sampling techniques that are used in practice.  Two types of hierarchy are used in the model. The upper hierarchies describe how a sample is selected, and they are numbered from 1 to 13. The lower hierarchies describe what type of length-frequency or biological variables are measured for that sample, and they are named with the letters from A to D.  All hierarchies are defined in terms of the tables they consist of and the relationships between them. 
+
+# General information of the small pelagic species landings {.tabset}
+The table below shows the landings in tons of the small pelagic species.
+
+
+```{r, child = "scripts/CL.Rmd"}
+```
+
+```{r, child = "scripts/CE.Rmd"}
+```
+
+```{r, child = "scripts/CS.Rmd"}
+```
+
+```{r, child = "scripts/CS_CL.Rmd"}
+```
+
+```{r, child = "scripts/CL_harbours.Rmd"}
+```
+
+```{r, child = "scripts/CL_maps_StatRect.Rmd"}
+```
+
+```{r, child = "scripts/CL_maps_Area.Rmd"}
+```
+
+```{r, child = "scripts/CL_landings_abroad.Rmd"}
+```
