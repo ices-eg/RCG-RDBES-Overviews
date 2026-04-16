@@ -10,12 +10,12 @@ params:
   set_subtitle: "Title"
   region: 'BA'
   year: 2024
-  logo_path: "../../data/logo/logo RCG BALTIC.PNG"
-  data_dir: '../../data_RDBES/002_prepared/20250429/RCG_BA'
-  data_dir_fleet: '../../RegionalOverviews/data/fleet_reg/output/2021'
-  RDBES_download_date: '01/01/2000'
-  CLfileName: 'RDBES_RCG_BA_CL_2024_2024_prepared_20250429'
-  CEfileName: 'RDBES_RCG_BA_CE_2024_2024_prepared_20250429'
+  logo_path: ""
+  data_dir: ''
+  data_dir_fleet: ''
+  RDBES_download_date: ''
+  CLfileName: ''
+  CEfileName: ''
   
 ---
 

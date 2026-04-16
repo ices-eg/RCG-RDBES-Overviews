@@ -29,14 +29,15 @@
 
 ## Custom the overview
 # Make your selection 
-yearSelected = 2024
-regionSelected = 'NA'# One of: 'BA', 'NA', 'NSEA'
+yearSelected = 2025
+regionSelected = 'NSEA'# One of: 'BA', 'NA', 'NSEA'
 downloadDataFromSP = 0 # One of: 1 (download from Share Point prepared data) or 0 (do not download and use data prepared locally - using "001_read_and_prepare_data_RDBES_CL_CE.R")
-dataprepDate = 20250425 # Date on which data where prepared. If prepared data are downloaded from ICES SP, then this is the date used for the data folder name on the ICES SP. 
+dataprepDate = 20260416 # Date on which data where prepared. If prepared data are downloaded from ICES SP, then this is the date used for the data folder name on the ICES SP. 
 
 ## Set wd 
 # setwd("//storage-lk.slu.se/home$/erqu0001/Desktop/HLab_GH/Public_Eros/RCGs") # eros machine
- setwd("D:/RCG-RDBES-Overviews/") # Kasia machine
+# setwd("D:/RCG-RDBES-Overviews/") # Kasia machine
+setwd("C:/Users/msuska/Documents/MIR/ices_wg/RCG-RDBES-Overviews") # Marta
 #setwd("Path to RCGs local repo")
 
 
