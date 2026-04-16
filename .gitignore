@@ -1,4 +1,3 @@
-RegionalOverviews/data
 RegionalOverviews/data_RDBES
 RegionalOverviews/results
 RegionalOverviews/overviews_reports_RDBES/fisheries_overviews_RDBES/results
@@ -9,8 +8,6 @@ RegionalOverviews/RegionalOverviews.Rproj
 *.tiff
 *.bak
 *.html
-*.Rdata
-*.csv
 .Rproj.user
 .Rhistory
 

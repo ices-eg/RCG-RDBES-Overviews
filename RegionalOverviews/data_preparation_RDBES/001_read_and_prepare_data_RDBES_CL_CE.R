@@ -22,7 +22,7 @@
 
 rm(list=ls())
 
-setwd("Path to RCGs local repo")
+#setwd("Path to RCGs local repo")
 
 library(data.table)
 gc()
@@ -42,9 +42,9 @@ getwd()
 ## ======================== 
 
 restrict_to_SSF_data <- FALSE
-target_region <- "RCG_BA" # RCG_BA, RCG_NA, RCG_NSEA
+target_region <- "RCG_NA" # RCG_BA, RCG_NA, RCG_NSEA
 year_start <- 2021
-year_end <- 2024
+year_end <- 2025
 time_tag<-format(Sys.time(), "%Y%m%d")
 
 ## =========================== 
@@ -67,7 +67,7 @@ if (!dir.exists(dir_output_rcg)){
 ## ======================== 
 ## Here we obtain raw RDBES data. 
 #  The preferable choice is to use a function downloading the data from the SharePoint. Alternatively, data are to be manually downloaded. 
-source("RegionalOverviews/funs_RDBES/func_download_data_from_sharepoint.r")
+#source("RegionalOverviews/funs_RDBES/func_download_data_from_sharepoint.r")
 # download_data_from_sharepoint(
  # sharepoint_address = "https://community.ices.dk/ExpertGroups/DataExpports/RCG/_layouts/15/start.aspx#/RCG%20Data/Forms/AllItems.aspx?View=%7BFC9DF179%2DB628%2D47C5%2DB2A4%2D1D945AB1BBE4%7D",#"Path to directory on SharePoint",
  # filename_vector = paste0(target_region, ".zip"), 
@@ -86,11 +86,11 @@ aux_species <- read.csv("RegionalOverviews/data/ASFIS_WoRMS.csv", sep=",", heade
 
 # reads RDBES data
 RDBESdataPath = 'RegionalOverviews/data_RDBES/001_raw'
-setwd('RegionalOverviews/data_RDBES/001_raw')
+#setwd('RegionalOverviews/data_RDBES/001_raw')
 
 
-file_cl <- paste(RDBESdataPath, "/RDBES CL/CommercialLanding.csv", sep = '')
-file_ce <- paste(RDBESdataPath, "/RDBES CE/CommercialEffort.csv" , sep = '') 
+file_cl <- paste(RDBESdataPath, "/RCG_NANSEA/RDBES CL/CommercialLanding.csv", sep = '') # RCG_BA or RCG_NANSEA
+file_ce <- paste(RDBESdataPath, "/RCG_NANSEA/RDBES CE/CommercialEffort.csv" , sep = '') 
 
 # read data
 cl <- data.table::fread(file_cl, stringsAsFactors=FALSE, verbose=FALSE, sep=",", na.strings="NULL",quote = "")
@@ -421,6 +421,7 @@ cl_rcg[,SpeciesLaName:=aux_species$ScientificName[match(cl_rcg$CLspeciesCode, au
 
 # QCA: should yield TRUE otherwise debug
 nrow(cl_rcg[is.na(SpeciesLaName),]) == 0
+unique(cl_rcg[is.na(SpeciesLaName),]$CLspeciesCode)
 dim(cl_rcg[is.na(SpeciesLaName),])
 
 ## Evaluate the need to put all "Trachurus" as "Trachurus spp", except "Trachurus trachurus"
@@ -524,16 +525,16 @@ if (restrict_to_SSF_data==FALSE)
 	save(cl_rcg, file_info_cl, file = paste(dir_output_rcg, paste("/RDBES",target_region,"CL", year_start, year_end, "prepared",time_tag, sep="_"),".Rdata", sep=""))
 	save(ce_rcg, file_info_ce, file = paste(dir_output_rcg, paste("/RDBES",target_region,"CE", year_start, year_end, "prepared",time_tag, sep="_"),".Rdata", sep=""))
 	
-	save(cl, file_info_cl, file = paste(dir_output_all, paste("/RDBES","All_Regions","CL", year_start, year_end, "prepared",time_tag, sep="_"),".Rdata", sep=""))
-	save(ce, file_info_ce, file = paste(dir_output_all, paste("/RDBES","All_Regions","CE", year_start, year_end, "prepared",time_tag, sep="_"),".Rdata", sep=""))
+	#save(cl, file_info_cl, file = paste(dir_output_all, paste("/RDBES","All_Regions","CL", year_start, year_end, "prepared",time_tag, sep="_"),".Rdata", sep=""))
+	#save(ce, file_info_ce, file = paste(dir_output_all, paste("/RDBES","All_Regions","CE", year_start, year_end, "prepared",time_tag, sep="_"),".Rdata", sep=""))
 	
 	} else  {
 	
 	print(1)
 	save(cl_rcg, file_info_cl, file = paste(dir_output_rcg, paste("/RDBES",target_region,"CL_SSF", year_start, year_end, "prepared",time_tag, sep="_"),".Rdata", sep=""))
 	save(ce_rcg, file_info_ce, file = paste(dir_output_rcg, paste("/RDBES",target_region,"CE_SSF", year_start, year_end, "prepared",time_tag, sep="_"),".Rdata", sep=""))
-	save(cl, file_info_cl, file = paste(dir_output_all, paste("/RDBES","All_Regions","CL_SSF", year_start, year_end, "prepared",time_tag, sep="_"),".Rdata", sep=""))
-	save(ce, file_info_ce, file = paste(dir_output_all, paste("/RDBES","All_Regions","CE_SSF", year_start, year_end, "prepared",time_tag, sep="_"),".Rdata", sep=""))
+	#save(cl, file_info_cl, file = paste(dir_output_all, paste("/RDBES","All_Regions","CL_SSF", year_start, year_end, "prepared",time_tag, sep="_"),".Rdata", sep=""))
+	#save(ce, file_info_ce, file = paste(dir_output_all, paste("/RDBES","All_Regions","CE_SSF", year_start, year_end, "prepared",time_tag, sep="_"),".Rdata", sep=""))
 	}
 
 # NOTE: 'cl' and 'ce' data files were not prepared as the 'cl_rcg' and the 'ce_rcg' - do we want to save them anyway??

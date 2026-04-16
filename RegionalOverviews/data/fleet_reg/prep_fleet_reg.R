@@ -5,7 +5,7 @@ library(data.table)
 MS_country<-c("BEL","DEU" ,"DNK","ESP","EST","FIN","FRA","IRL","LTU","LVA",
               "NLD","POL","PRT","SWE")
 #change year
-year<-2024
+year<-2025
 
 #check the separator used in input files (',' or ';')
 separator<-";"
