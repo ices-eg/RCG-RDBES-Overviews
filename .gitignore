@@ -9,8 +9,6 @@ RegionalOverviews/RegionalOverviews.Rproj
 *.tiff
 *.bak
 *.html
-*.Rdata
-*.csv
 .Rproj.user
 .Rhistory
 
