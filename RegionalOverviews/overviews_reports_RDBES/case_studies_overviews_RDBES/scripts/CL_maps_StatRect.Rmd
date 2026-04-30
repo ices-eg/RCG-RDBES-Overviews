@@ -1,9 +1,10 @@
 # Total landings by Statistical Rectangle{.tabset}
-## `r params$year-2`
+##  Clupea harengus{.tabset}
+### `r params$year-2`
 ```{r echo=FALSE, fig.height=10, fig.width=18, message=FALSE, warning=FALSE, dpi=150, results="asis", cache=FALSE}
 cl %>%
   filter(CatchGroup == 'small pelagic',
-         CLspeciesFaoCode %in% c('SPR','HER'),
+         CLspeciesFaoCode %in% c('HER'),
          CLyear == params$year-2) %>%
   group_by(CLspeciesFaoCode,CLvesselFlagCountry, CLstatisticalRectangle) %>%
   summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
@@ -38,11 +39,11 @@ result
 
 ```
 
-## `r params$year-1`
+### `r params$year-1`
 ```{r echo=FALSE, fig.height=10, fig.width=18, message=FALSE, warning=FALSE, dpi=150, results="asis", cache=FALSE}
 cl %>%
   filter(CatchGroup == 'small pelagic',
-         CLspeciesFaoCode %in% c('SPR','HER'),
+         CLspeciesFaoCode %in% c('HER'),
          CLyear == params$year-1) %>%
   group_by(CLspeciesFaoCode,CLvesselFlagCountry, CLstatisticalRectangle) %>%
   summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
@@ -76,11 +77,127 @@ result
 
 ```
 
-## `r params$year`
+### `r params$year`
 ```{r echo=FALSE, fig.height=10, fig.width=18, message=FALSE, warning=FALSE, dpi=150, results="asis", cache=FALSE}
 cl %>%
   filter(CatchGroup == 'small pelagic',
-         CLspeciesFaoCode %in% c('SPR','HER'),
+         CLspeciesFaoCode %in% c('HER'),
+         CLyear == params$year) %>%
+  group_by(CLspeciesFaoCode,CLvesselFlagCountry, CLstatisticalRectangle) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         func = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA,
+         Region = 'BA')-> df
+
+result <- scatterpieMap_func_new(df = df,
+                  var = "CLscientificWeight_ton",
+                              groupBy = "CLstatisticalRectangle",
+                              groupBy2 = "CLvesselFlagCountry",
+                              facet = "CLspeciesFaoCode",
+                              func = "sum",
+                              type_of_threshold = 'none',
+                              points_coord = StatRectshp,
+                              newVarName = "Landings (t)",
+                              addToTitle = NA,
+                              value_of_threshold = NA,
+                              plot_labels = FALSE,
+                              Catch_group_name = NA,
+                              addExtraShp = TRUE,
+                              extraShp = FAOshp,
+                              color_palette = colours,
+                              filter_column  = NA,
+                              filter_type = NA,
+                              filter_threshold = NA,
+                              filter_func = NA)
+result
+
+```
+
+##  Sprattus sprattus{.tabset}
+### `r params$year-2`
+```{r echo=FALSE, fig.height=10, fig.width=18, message=FALSE, warning=FALSE, dpi=150, results="asis", cache=FALSE}
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('SPR'),
+         CLyear == params$year-2) %>%
+  group_by(CLspeciesFaoCode,CLvesselFlagCountry, CLstatisticalRectangle) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr = CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         func = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA,
+         Region = 'BA')-> df
+
+result <- scatterpieMap_func_new(df = df,
+                  var = "CLscientificWeight_ton",
+                              groupBy = "CLstatisticalRectangle",
+                              groupBy2 = "CLvesselFlagCountry",
+                              facet = "CLspeciesFaoCode",
+                              func = "sum",
+                              type_of_threshold = 'none',
+                              points_coord = StatRectshp,
+                              newVarName = "Landings (t)",
+                              addToTitle = NA,
+                              value_of_threshold = NA,
+                              plot_labels = FALSE,
+                              Catch_group_name = NA,
+                              addExtraShp = TRUE,
+                              extraShp = FAOshp,
+                              color_palette = colours,
+                              filter_column  = NA,
+                              filter_type = NA,
+                              filter_threshold = NA,
+                              filter_func = NA)
+result
+
+
+```
+
+### `r params$year-1`
+```{r echo=FALSE, fig.height=10, fig.width=18, message=FALSE, warning=FALSE, dpi=150, results="asis", cache=FALSE}
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('SPR'),
+         CLyear == params$year-1) %>%
+  group_by(CLspeciesFaoCode,CLvesselFlagCountry, CLstatisticalRectangle) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         func = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA,
+         Region = 'BA')-> df
+
+result <- scatterpieMap_func_new(df = df,
+                  var = "CLscientificWeight_ton",
+                              groupBy = "CLstatisticalRectangle",
+                              groupBy2 = "CLvesselFlagCountry",
+                              facet = "CLspeciesFaoCode",
+                              func = "sum",
+                              type_of_threshold = 'none',
+                              points_coord = StatRectshp,
+                              newVarName = "Landings (t)",
+                              addToTitle = NA,
+                              value_of_threshold = NA,
+                              plot_labels = FALSE,
+                              Catch_group_name = NA,
+                              addExtraShp = TRUE,
+                              extraShp = FAOshp,
+                              color_palette = colours,
+                              filter_column  = NA,
+                              filter_type = NA,
+                              filter_threshold = NA,
+                              filter_func = NA)
+result
+
+```
+
+### `r params$year`
+```{r echo=FALSE, fig.height=10, fig.width=18, message=FALSE, warning=FALSE, dpi=150, results="asis", cache=FALSE}
+cl %>%
+  filter(CatchGroup == 'small pelagic',
+         CLspeciesFaoCode %in% c('SPR'),
          CLyear == params$year) %>%
   group_by(CLspeciesFaoCode,CLvesselFlagCountry, CLstatisticalRectangle) %>%
   summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
