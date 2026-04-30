@@ -37,7 +37,7 @@ options(scipen = 999)
 ```
 
 **Disclaimer**
-The tables and figures of the overviews presented in this document are made for the coordination of EU regional fisheries data collection purposes and are not designed for any other use. Data used for producing the outputs are extracted from the Regional Database and Estimating System (RDBES). The data 2022,2023,2024 was collected under the RCG 2025 data call for the Baltic Sea, North Sea, Eastern Arctic and the North Atlantic regions and the latest version used was downloaded from the system on the 27th of May 2025. Due to different aggregations and reporting authorities, data can differ from those used e.g. for assessments or technical reports. 
+The tables and figures of the overviews presented in this document are made for the coordination of EU regional fisheries data collection purposes and are not designed for any other use. Data used for producing the outputs are extracted from the Regional Database and Estimating System (RDBES). The data 2023,2024,2025 was collected under the RCG 2026 data call for the Baltic Sea, North Sea, Eastern Arctic and the North Atlantic regions and the latest version used was downloaded from the system on the 13th of April 2026. Due to different aggregations and reporting authorities, data can differ from those used e.g. for assessments or technical reports. 
 
 The respective scripts and calculations used for data displaying are publicly available via the RCG GitHub (https://github.com/ices-eg/RCG-RDBES-Overviews) and subject to change as the work of the group progresses.
 
