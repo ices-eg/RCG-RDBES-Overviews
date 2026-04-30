@@ -6,7 +6,7 @@
 #- converded to RDBES data format (K.Krakówka)
 #- removed group_func (K.Krakówka)
 
-scatterpieMap_func = function(df,
+scatterpieMap_func_inactive = function(df,
                               var,
                               groupBy,
                               groupBy2,
