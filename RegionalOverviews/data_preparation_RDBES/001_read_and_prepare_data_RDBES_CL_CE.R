@@ -186,6 +186,8 @@ cl[,FlagCountry_Loa:=paste(CLvesselFlagCountry, CLvesselLengthCategory, sep="_")
 cl[,HarbourCountry2:=substring(CLlandingLocation,1,2)]
 cl[,HarbourCountry:=aux_countries$ISO3Code[match(HarbourCountry2, aux_countries$ISO2Code)]]
 
+nrow(cl[is.na(HarbourCountry) & !is.na(HarbourCountry2),]) == 0
+unique(cl[is.na(HarbourCountry) & !is.na(HarbourCountry2),]$HarbourCountry2)
 # ======================
 # CE 
 # ======================
