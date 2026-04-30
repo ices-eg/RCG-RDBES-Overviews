@@ -25,14 +25,14 @@
 
 ## Custom the overview
 # Make your selection 
-yearSelected = 2024
+yearSelected = 2025
 regionSelected = 'BA'# One of: 'BA', 'NA', 'NSEA'
-dataprepDate = 20250521 # Date on which data where prepared.
-dataprepDateCL = 20250527
-dataprepDateCE = 20250527
+dataprepDate = 20260430 # Date on which data where prepared.
+dataprepDateCL = 20260416
+dataprepDateCE = 20260416
 
 ## Set wd 
-setwd("D:/RCG-RDBES-Overviews/") # Kasia machine
+setwd("C:/GIT/RCG-RDBES-Overviews/") # Kasia machine
 #setwd("Path to RCGs local repo")
 
 ## Load libraries
