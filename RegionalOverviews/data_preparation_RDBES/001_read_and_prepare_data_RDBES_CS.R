@@ -43,7 +43,8 @@ getwd()
 year_start <- 2023
 year_end <- 2025
 time_tag <- format(Sys.time(), "%Y%m%d")
-target_region <- 'RCG_NA'
+target_region <- 'RCG_NANSEA'
+
 ## ===========================
 ## Create directory structure
 ## ===========================
@@ -97,8 +98,8 @@ for (H in c('H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H13')) {
   #   )
   # )
   file <- list.files(
-    path = "RegionalOverviews/data_RDBES/001_raw/NANSEA_2025_04-17",
-    pattern = paste0("^HCS_", H, "_NANSEA_2026_04_17_.*\\.zip$"),
+    path = paste0("RegionalOverviews/data_RDBES/001_raw/",target_region,"/CS"),
+    pattern = paste0("^HCS_", H, "_.*\\.zip$"),
     full.names = TRUE)
   
   temp <- createRDBESDataObject(
