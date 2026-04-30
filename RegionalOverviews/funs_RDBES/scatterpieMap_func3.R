@@ -1,4 +1,8 @@
-scatterpieMap_func <- function(df,
+# work in progress
+# better version of scatterpieMap_func
+# for now only checked for Baltic
+
+scatterpieMap_func_new <- function(df,
                                var,
                                groupBy,
                                groupBy2,
@@ -38,10 +42,33 @@ scatterpieMap_func <- function(df,
   group_sym <- sym(groupBy)
   groupBy2_name <- groupBy2
   subgroup_sym <- sym(groupBy2)
-  
+  func_name <- func
   
   facet_flag <- !is.na(facet)
   facet_sym <- if (facet_flag) sym(facet) else NULL
+  facet_name <- if (facet_flag) facet else NULL
+  
+  if (groupBy_name == "CLstatisticalRectangle" | groupBy_name == "CEstatisticalRectangle") groupBy_name <- "Statistical Rectangle"
+  if (groupBy_name == "AreaMap") groupBy_name <- "Area"
+  if (groupBy2_name == "CLvesselFlagCountry" | groupBy2_name == "CEvesselFlagCountry") groupBy2_name <- "FlagCountry"
+  
+  if (func_name %in% c('sum')) {
+    if (func_name == "sum") func_name <- "Sum"
+    title <- paste(func_name, ' of ', ifelse(is.na(newVarName), var_name, newVarName), ' by ', groupBy_name, sep = '')
+  } else {
+    title <- paste(func_name, ' ', ifelse(is.na(newVarName), var_name, newVarName), ' by ', groupBy_name, sep = '')
+  }
+  
+  if (!is.na(Catch_group_name) & Catch_group_name != 'NULL') title <- paste(title, ' (', Catch_group_name, ')', sep = '')
+  if (!is.na(addToTitle)) title <- paste(title, ' (', addToTitle, ')', sep = '')
+  
+  if ((type_of_threshold == 'percent' & value_of_threshold == 100) | type_of_threshold == 'none') {
+    subtitle <- 'All data'
+  } else if (type_of_threshold == 'percent') {
+    subtitle <- paste('Including ', groupBy_name, 's accounting for ', value_of_threshold, '% of ', ifelse(is.na(newVarName), var_name, newVarName), sep = "")
+  } else {
+    subtitle <- paste('Displaying top ', value_of_threshold, ' ', groupBy_name, 's', sep = "")
+  }
   
   if (nrow(df) == 0) stop("Empty dataset")
   
@@ -149,7 +176,14 @@ scatterpieMap_func <- function(df,
       ),
       color = "grey20", size = 0.5
     ) +
-    scale_fill_manual(values = color_palette, name = groupBy2)
+    scale_fill_manual(values = color_palette, name = groupBy2_name)+
+    labs(
+      title = title,
+      subtitle = subtitle,
+      x = 'Longitude',
+      y = 'Latitude',
+      fill = groupBy2_name
+    )
   
   # view
   p <- p +
