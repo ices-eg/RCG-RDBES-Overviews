@@ -1,6 +1,6 @@
 # Total landings by Statistical Rectangle{.tabset}
 ## `r params$year-2`
-```{r echo=FALSE,  message=FALSE, warning=FALSE,  results="asis", cache=FALSE}
+```{r echo=FALSE, fig.height=10, fig.width=18, message=FALSE, warning=FALSE, dpi=150, results="asis", cache=FALSE}
 cl %>%
   filter(CatchGroup == 'small pelagic',
          CLspeciesFaoCode %in% c('SPR','HER'),
@@ -13,7 +13,7 @@ cl %>%
          value_of_threshold = NA,
          Region = 'BA')-> df
 
-result <- scatterpieMap_func(df = df,
+result <- scatterpieMap_func_new(df = df,
                   var = "CLscientificWeight_ton",
                               groupBy = "CLstatisticalRectangle",
                               groupBy2 = "CLvesselFlagCountry",
@@ -39,7 +39,7 @@ result
 ```
 
 ## `r params$year-1`
-```{r echo=FALSE,  message=FALSE, warning=FALSE, results="asis", cache=FALSE}
+```{r echo=FALSE, fig.height=10, fig.width=18, message=FALSE, warning=FALSE, dpi=150, results="asis", cache=FALSE}
 cl %>%
   filter(CatchGroup == 'small pelagic',
          CLspeciesFaoCode %in% c('SPR','HER'),
@@ -52,7 +52,7 @@ cl %>%
          value_of_threshold = NA,
          Region = 'BA')-> df
 
-result <- scatterpieMap_func(df = df,
+result <- scatterpieMap_func_new(df = df,
                   var = "CLscientificWeight_ton",
                               groupBy = "CLstatisticalRectangle",
                               groupBy2 = "CLvesselFlagCountry",
@@ -77,7 +77,7 @@ result
 ```
 
 ## `r params$year`
-```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+```{r echo=FALSE, fig.height=10, fig.width=18, message=FALSE, warning=FALSE, dpi=150, results="asis", cache=FALSE}
 cl %>%
   filter(CatchGroup == 'small pelagic',
          CLspeciesFaoCode %in% c('SPR','HER'),
@@ -90,7 +90,7 @@ cl %>%
          value_of_threshold = NA,
          Region = 'BA')-> df
 
-result <- scatterpieMap_func(df = df,
+result <- scatterpieMap_func_new(df = df,
                   var = "CLscientificWeight_ton",
                               groupBy = "CLstatisticalRectangle",
                               groupBy2 = "CLvesselFlagCountry",

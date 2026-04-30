@@ -68,8 +68,8 @@ scatterpieMap_func = function(df,
     xlim <- range(mdf[!is.na(mdf$lat) & !is.na(mdf$lon), ]$lon) + c(-1/6, 1/6)
     ylim <- range(mdf[!is.na(mdf$lat) & !is.na(mdf$lon), ]$lat) + c(-1/6,1/6)
   }else{
-  xlim <- range(mdf[!is.na(mdf$lat) & !is.na(mdf$lon), ]$lon) + c(-5, 5)
-  ylim <- range(mdf[!is.na(mdf$lat) & !is.na(mdf$lon), ]$lat) + c(-4,4)
+    xlim <- range(mdf[!is.na(mdf$lat) & !is.na(mdf$lon), ]$lon) + c(-5, 5)
+    ylim <- range(mdf[!is.na(mdf$lat) & !is.na(mdf$lon), ]$lat) + c(-4,4)
   }
   
   if(unique(df$Region) != 'NSEA'){
@@ -98,7 +98,7 @@ scatterpieMap_func = function(df,
   
   m <- ne_countries(scale = "medium", returnclass = "sf")
   
-
+  
   if (func_name %in% c('sum')) {
     if (func_name == "sum") func_name <- "Sum"
     title <- paste(func_name, ' of ', ifelse(is.na(newVarName), var_name, newVarName), ' by ', groupBy_name, sep = '')
@@ -119,16 +119,17 @@ scatterpieMap_func = function(df,
   
   unique_bys <- mdf2 %>% distinct(!!groupBy2) %>% nrow()
   
-    if (length(color_palette) == 1 && is.na(color_palette)){
+  if (length(color_palette) == 1 && is.na(color_palette)){
     color_palette <- scales::hue_pal()(unique_bys)
     names(color_palette) <- sort(unique(mdf2[[groupBy2]]))
-    }else{
-      color_palette<-setNames(as.list(color_palette[[2]]), color_palette[[1]])
+  }else{
+    color_palette<-setNames(as.list(color_palette[[2]]), color_palette[[1]])
   }
-  radius <- 0.3
+  radius <- 0.4
   radiusMultiply <- ifelse(groupBy_name %in% c('Area', 'AreaMap','FishingGround', 'Division'), 4,
                            ifelse(groupBy_name %in% c('Harbour', 'LandingCountry', 'FlagCountry'), 3, 1))
   if (unique(df$Region) == 'BS') radiusMultiply <- radiusMultiply * 2 / 3
+  
   
   pie_data <- mdf2 %>%
     rename(value = !!var, group = !!groupBy, subgroup = !!groupBy2) %>%
@@ -138,8 +139,14 @@ scatterpieMap_func = function(df,
            ymax = cumsum(frac) * 2 * pi,
            ymin = (cumsum(frac) - frac) * 2 * pi) %>%
     ungroup() %>%
-    mutate(radius = total / max(total, na.rm = TRUE) * radiusMultiply * radius)
-
+    mutate(radius = pmax(
+      sqrt(total / max(total, na.rm = TRUE)) * radiusMultiply * radius,
+      0.01
+    ))
+  
+  pie_data <- pie_data %>%
+    arrange(desc(total), group, ymin)
+  
   if(groupBy_name %in% c('Area','AreaMap', 'FishingGround')){
     ggplot()+
       geom_sf(data = points_coord, fill = NA , na.rm = TRUE, size = 0.5, color = gray(.3))->p
@@ -150,10 +157,10 @@ scatterpieMap_func = function(df,
   if(addExtraShp==TRUE){
     p+
       geom_sf(data = extraShp,
-            fill = NA, 
-            na.rm = TRUE,
-            size = 0.5,
-            color = gray(.3))->p
+              fill = NA, 
+              na.rm = TRUE,
+              size = 0.5,
+              color = gray(.3))->p
   }else{
     ggplot() -> p
   }
@@ -169,8 +176,9 @@ scatterpieMap_func = function(df,
     coord_sf(crs = "+init=epsg:4326", xlim = xlim, ylim = ylim, expand = FALSE) +
     geom_arc_bar(data = pie_data,
                  aes(x0 = lon, y0 = lat, r0 = 0, r = radius,
-                     start = ymin, end = ymax, fill = subgroup),
-                 color = "black", size = 0.3) +
+                     start = ymin, end = ymax, fill = subgroup,
+                     group = group),
+                 color = "grey20", size = 0.6) +
     scale_fill_manual(values = color_palette, name = groupBy2_name) +
     labs(
       title = title,
