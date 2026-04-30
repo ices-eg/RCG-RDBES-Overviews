@@ -16,7 +16,7 @@
 
 rm(list = ls())
 
-setwd("D:/RCG-RDBES-Overviews")#("Path to RCGs local repo")
+# setwd("D:/RCG-RDBES-Overviews")#("Path to RCGs local repo")
 
 # library(remotes)
 # install_github("ices-tools-dev/RDBEScore@dev") # KK: in dev are my changes
@@ -40,8 +40,8 @@ getwd()
 ## Set params
 ## ========================
 
-year_start <- 2022
-year_end <- 2022
+year_start <- 2023
+year_end <- 2025
 time_tag <- format(Sys.time(), "%Y%m%d")
 target_region <- 'RCG_NA'
 ## ===========================
@@ -49,7 +49,8 @@ target_region <- 'RCG_NA'
 ## ===========================
 
 dir_output_rcg <- paste(
-  "D:/RCG-RDBES-Overviews/RegionalOverviews/data_RDBES/002_prepared/",
+  #"D:/RCG-RDBES-Overviews/RegionalOverviews/data_RDBES/002_prepared/",
+  "RegionalOverviews/data_RDBES/002_prepared/",                         # Lucía
   time_tag ,
   "/",
   target_region,
@@ -83,18 +84,28 @@ aux_species <- read.csv(
 )
 
 # reads RDBES data
-RDBESdataPath = 'RegionalOverviews/data_RDBES/001_raw'
-setwd('RegionalOverviews/data_RDBES/001_raw')
+# RDBESdataPath = 'RegionalOverviews/data_RDBES/001_raw'
+# setwd('RegionalOverviews/data_RDBES/001_raw') 
+
 
 for (H in c('H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H13')) {
+  # temp <- createRDBESDataObject(
+  #   input = paste0(
+  #     'D:/RCG-RDBES-Overviews/RegionalOverviews/data_RDBES/001_raw/RDBES CS/21052025/NANSEA/HCS_',
+  #     H,
+  #     '_NANSEA_2025_05_21.zip'
+  #   )
+  # )
+  file <- list.files(
+    path = "RegionalOverviews/data_RDBES/001_raw/NANSEA_2025_04-17",
+    pattern = paste0("^HCS_", H, "_NANSEA_2026_04_17_.*\\.zip$"),
+    full.names = TRUE)
+  
   temp <- createRDBESDataObject(
-    input = paste0(
-      'D:/RCG-RDBES-Overviews/RegionalOverviews/data_RDBES/001_raw/RDBES CS/21052025/NANSEA/HCS_',
-      H,
-      '_NANSEA_2025_05_21.zip'
-    )
-  )
+    input = file)
+
   validateRDBESDataObject(temp, verbose = FALSE) 
+  
   if (H != 'H13') {
     VD <- temp$VD
   }
