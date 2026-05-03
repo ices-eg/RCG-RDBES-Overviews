@@ -13930,3 +13930,13 @@ NA,NA,"Chitonidae",NA,NA,"Chitonidae",NA,"Animalia","Mollusca","Polyplacophora",
 NA,NA,"Aphroditidae",NA,NA,"Aphroditidae",NA,"Animalia","Annelida","Polychaeta","Phyllodocida","Aphroditidae","",NA,"",NA,"Aphroditidae",NA,NA,"other",NA
 NA,NA,"Polynoidae",NA,NA,"Polynoidae",NA,"Animalia","Annelida","Polychaeta","Phyllodocida","Polynoidae","",NA,"",NA,"Polynoidae",NA,NA,"other",NA
 NA,NA,"Sternaspidae",NA,NA,"Sternaspidae",NA,"Animalia","Annelida","Polychaeta","Terebellida","Sternaspidae","",NA,"",NA,"Sternaspidae",NA,NA,"other",NA
+"",NA,"Echiodon dentatus",126662,"exact","Echiodon dentatus",126662,"Animalia","Chordata","Teleostei","Ophidiiformes","Carapidae","Echiodon",NA,"dentatus",NA,"Echiodon dentatus","Toothed pearlfish",NA,"demersal",""
+"",NA,"Philine quadripartita",574582,"exact","Philine quadripartita",574582,"Animalia","Mollusca","Gastropoda","Cephalaspidea","Philinidae","Philine",NA,"quadripartita",NA,"Philine quadripartita","Lobe shell",NA,"molluscs",""
+"",NA,"Bathynectes longipes",107376,"exact","Bathynectes longipes",107376,"Animalia","Arthropoda","Malacostraca","Decapoda","Polybiidae","Bathynectes",NA,"longipes",NA,"Bathynectes longipes","Red swimming crab",NA,"crustaceans",""
+"",NA,"Coralliidae",125280,"exact","Coralliidae",125280,"Animalia","Cnidaria","Octocorallia","Scleralcyonacea","Coralliidae","",NA,"",NA,"Coralliidae","Precious corals",NA,"other",""
+"",NA,"Atelecyclidae",106748,"exact","Atelecyclidae",106748,"Animalia","Arthropoda","Malacostraca","Decapoda","Atelecyclidae","",NA,"",NA,"Atelecyclidae","Circular crabs",NA,"crustaceans",""
+"",NA,"Chitonidae",64,"exact","Chitonidae",64,"Animalia","Mollusca","Polyplacophora","Chitonida","Chitonidae","",NA,"",NA,"Chitonidae","Chitons",NA,"molluscs",""
+"",NA,"Polyclinum",103474,"exact","Polyclinum",103474,"Animalia","Chordata","Ascidiacea","Aplousobranchia","Polyclinidae","Polyclinum",NA,"",NA,"Polyclinum","Colonial sea squirt",NA,"other",""
+"",NA,"Diazona violacea",103733,"exact","Diazona violacea",103733,"Animalia","Chordata","Ascidiacea","Aplousobranchia","Diazonidae","Diazona",NA,"violacea",NA,"Diazona violacea","Football sea-squirt",NA,"other",""
+"",NA,NA,12612,"","",NA,"","","","","","",NA,"",NA,"","",NA,"",""
+"",NA,"Polychelidae",106793,"exact","Polychelidae",106793,"Animalia","Arthropoda","Malacostraca","Decapoda","Polychelidae","",NA,"",NA,"Polychelidae","Blind lobsters",NA,"crustaceans",""
