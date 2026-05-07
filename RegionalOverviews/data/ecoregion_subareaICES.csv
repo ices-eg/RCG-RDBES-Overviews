@@ -8,7 +8,9 @@
 27.8.e.2,Bay of Biscay
 27.9.a,Bay of Biscay
 27.9.b.2,Bay of Biscay
-27.5.b.2,Celtic Sea
+27.14.a,Icelandic Waters
+27.5.a,Icelandic Waters
+27.5.a.2,Icelandic Waters
 27.6.a,Celtic Sea
 27.6.b,Celtic Sea
 27.6.b.2,Celtic Sea
@@ -35,10 +37,14 @@
 27.7.k.1,Oceanic Northeast Atlantic
 27.8.d.1,Oceanic Northeast Atlantic
 27.8.e.1,Oceanic Northeast Atlantic
+27.9.b,Oceanic Northeast Atlantic
 27.9.b.1,Oceanic Northeast Atlantic
+27.10.a,Oceanic Northeast Atlantic
 27.10.a.1,Oceanic Northeast Atlantic
 27.10.b,Oceanic Northeast Atlantic
 27.12.c,Oceanic Northeast Atlantic
+27.12,Oceanic Northeast Atlantic
+27.12.a,Oceanic Northeast Atlantic
 27.12.a.1,Oceanic Northeast Atlantic
 27.12.b,Oceanic Northeast Atlantic
 27.14.b.1,Oceanic Northeast Atlantic
@@ -48,6 +54,7 @@
 27.4.c,Greater North Sea
 27.7.d,Greater North Sea
 27.7.e,Greater North Sea
+27.3.a,Greater North Sea
 27.3.a.20,Greater North Sea
 27.3.a.21,Greater North Sea
 27.3.c.22,Baltic Sea
