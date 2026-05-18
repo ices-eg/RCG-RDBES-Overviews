@@ -27,9 +27,9 @@
 # Make your selection 
 yearSelected = 2025
 regionSelected = 'BA'# One of: 'BA', 'NA', 'NSEA'
-dataprepDate = 20260430 # Date on which data where prepared.
-dataprepDateCL = 20260416
-dataprepDateCE = 20260416
+dataprepDate = 20260511 # Date on which data where prepared.
+dataprepDateCL = 20260507
+dataprepDateCE = 20260507
 
 ## Set wd 
 setwd("C:/GIT/RCG-RDBES-Overviews/") # Kasia machine
