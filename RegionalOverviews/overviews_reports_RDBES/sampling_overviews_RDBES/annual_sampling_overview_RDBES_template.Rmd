@@ -773,4 +773,4 @@ Not performed this year.
 
 ## Appendix A. Dates of data extraction
 
-The data referring to the present year was collected under the RCG 2025 data call for the 2024 data for the Baltic Sea, North Sea, Eastern Arctic and the North Atlantic regions and the last download from the system was performed on the 28th of May 2025 with the exception of information detailed in section “Overall fleet evolution” which was extracted from the EU Fleet Register (https://webgate.ec.europa.eu/fleet-europa/index_en) on the 4th of February 2025.
+The data referring to the present year was collected under the RCG 2026 data call for the 2025 data for the Baltic Sea, North Sea, Eastern Arctic and the North Atlantic regions and the last download from the system was performed on the 6th of May 2026 with the exception of information detailed in section “Overall fleet evolution” which was extracted from the EU Fleet Register (https://webgate.ec.europa.eu/fleet-europa/index_en) on the 16th of April 2026.

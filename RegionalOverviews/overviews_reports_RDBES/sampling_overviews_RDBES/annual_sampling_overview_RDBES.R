@@ -27,23 +27,26 @@
 
 ## Custom the overview
 # Make your selection 
-yearSelected = 2024
-regionSelected = 'BA'# One of: 'BA', 'NA', 'NSEA'
-dataprepDate = 20250521 # Date on which data where prepared.
-dataprepDateCL = 20250527
-dataprepDateCE = 20250527
+yearSelected = 2025
+regionSelected = 'NSEA'# One of: 'BA', 'NA', 'NSEA'
+dataprepDate = 20260513 # Date on which data where prepared.
+dataprepDateCL = 20260514
+dataprepDateCE = 20260514
 
 ## Set wd 
 #setwd("Path to RCGs local repo")
 #setwd("F:/Documentos/PNAB/2025/000_RCG_IntersessionalWork/Fisheries_Overviews/RCG-RDBES-Overviews-master/")
 #setwd("C:/Use/0_GitHub/RCG-RDBES-Overviews") # Lucia's machine
-setwd("D:/RCG-RDBES-Overviews/") # Kasia machine
+setwd("C:/GIT/RCG-RDBES-Overviews/") # Kasia machine
 
 ## Load libraries
 source("RegionalOverviews/overviews_reports_RDBES/sampling_overviews_RDBES/scripts/loadLibraries.R")
 
 ## Load functions 
 source("RegionalOverviews/overviews_reports_RDBES/sampling_overviews_RDBES/scripts/loadFunctions.R")
+
+## Load auxiliary data
+source("RegionalOverviews/overviews_reports_RDBES/case_studies_overviews_RDBES/scripts/loadAuxFiles.R")
 
 # Parameters are defined based on user selection
 source("RegionalOverviews/overviews_reports_RDBES/sampling_overviews_RDBES/scripts/parametersDefinition.R")
