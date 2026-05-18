@@ -6,7 +6,7 @@ The matrices below show the total landing in tons and the number of samples coll
   
   cl_data <- cl_rcg
   
-  cs_rcg |>
+  cs |>
     filter(
       SAcatchCat %in% c('Lan', 'Catch'),
       !is.na(SAid) &
@@ -119,7 +119,7 @@ The matrices below show the total landing in tons and the number of samples coll
   
   cl_data <- cl_rcg
   
-  cs_rcg |>
+  cs |>
     filter(
       SAcatchCat %in% c('Lan', 'Catch'),
       !is.na(SAid) &
@@ -232,7 +232,7 @@ The matrices below show the total landing in tons and the number of samples coll
   
   cl_data <- cl_rcg
   
-  cs_rcg |>
+  cs |>
     filter(
       SAcatchCat %in% c('Lan', 'Catch'),
       !is.na(SAid) &
@@ -344,7 +344,7 @@ The matrices below show the total landing in tons and the number of samples coll
   
   cl_data <- cl_rcg
   
-  cs_rcg |>
+  cs |>
     filter(
       SAcatchCat %in% c('Lan', 'Catch'),
       !is.na(SAid) &

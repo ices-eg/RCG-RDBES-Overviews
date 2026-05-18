@@ -141,7 +141,7 @@ The total number of fishing trips, including national and regional routines. The
 #### Clupea harengus
 ```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
 
-cs_rcg |>
+cs|>
   filter(
     SAcatchCat %in% c('Lan', 'Catch'),!is.na(FTid) &
       SAid != "",
@@ -169,7 +169,7 @@ cs_rcg |>
     summarise(
       NoTrip = n_distinct(Trip_id, na.rm = TRUE)) -> samplingRegional
 
-cs_rcg |>
+cs |>
   filter(
     SAcatchCat %in% c('Lan', 'Catch'),
     !is.na(FTid) & SAid != "",
@@ -234,7 +234,7 @@ ggplot(samplingNoTrips, aes(y = factor(Area), x = factor(SamplingPerformed))) + 
 
 #### Sprattus sprattus
 ```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
-cs_rcg |>
+cs |>
   filter(
     SAcatchCat %in% c('Lan', 'Catch'),!is.na(FTid) &
       SAid != "",
@@ -262,7 +262,7 @@ cs_rcg |>
     summarise(
       NoTrip = n_distinct(Trip_id, na.rm = TRUE)) -> samplingRegional
 
-cs_rcg |>
+cs |>
   filter(
     SAcatchCat %in% c('Lan', 'Catch'),
     !is.na(FTid) & SAid != "",
