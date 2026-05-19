@@ -1931,7 +1931,7 @@ barplot(data = sub_ce_top,
       x = "FlagCountry_Loa",
       y = "CEnumberOfDominantTrips",
       ylab = "Number of trips", 
-      col_cou = T)
+      col_cou = F)
 ```
 
 ### Number of trips by country and fleet
@@ -1953,8 +1953,7 @@ barplot(data = ce,
       y = "CEnumberOfDominantTrips",
       group = "CEvesselLengthCategory",
       ylab = "Number of trips (%)",
-      asPct = T, 
-      col_cou = T)
+      asPct = T)
 ```
 
 
