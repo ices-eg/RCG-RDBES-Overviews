@@ -121,6 +121,9 @@ if(params$region=='BA'){ # fixed wrong calculation of centroid of 27.3.d.30
 
 }
 
+FAOshp %>% mutate(AreaMap = F_CODE) -> FAOshp
+
+
 ```
 
 **Disclaimer**
@@ -639,13 +642,81 @@ barplot(data = cl%>%filter(CatchGroup == 'small pelagic'),
 
 #### Map area
 
-To be prepared for the next year.
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 27**: Spatial distribution of the small pelagics landings by area.'}
+# do we need information on for how many rows(%) there was a missing CLscientificWeight_ton? <-------------------------- to do
+
+# data prep
+cl %>%
+    filter(CatchGroup == 'small pelagic') %>%
+  group_by(CLyear, AreaMap) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA)-> df
+
+FAOshp2 = FAOshp %>% rename("Area" = "AreaMap") # a little bit of mess, tidy it up some day
+# for choropleth -> name of column with area in shp can not be the same as name of column with area in the df
+# for scatterpie -> name of column with area in shp has to be the same as name of column with area in the df
+# quick fix - two copies of the same shp
+
+# map
+result = choroplethMap_func2(
+  df,
+  var_name = 'CLscientificWeight_ton',
+  var_spatial_name = 'AreaMap',
+  facet_name = 'CLyear',
+  spatial_dataset_name = 'FAOshp2',
+  spatial_dataset_var_name = 'Area',
+  spatial_dataset_labels = FALSE,
+  saveResults = FALSE,
+  #outputPath,
+  displayInR = TRUE,
+  extraShp_name = NA,
+  var_name_new = NA,
+  addToTitle = NA
+)
+
+result[[1]]
+```
 
 #### Map area and flag country
 
-To be prepared for the next year.
+```{r echo=FALSE, fig.height=10, fig.width=18, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE, fig.cap = '**Figure 27**: Spatial distribution of the small pelagics landings by area and country.'}
+cl %>%
+  filter(CatchGroup == 'small pelagic') %>%
+  group_by(CLyear, CLvesselFlagCountry, AreaMap) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         func = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA)-> df
+
+result <- scatterpieMap_func_new(df = df,
+                  var = "CLscientificWeight_ton",
+                              groupBy = "AreaMap",
+                              groupBy2 = "CLvesselFlagCountry",
+                              facet = 'CLyear',
+                              func = "sum",
+                              type_of_threshold = 'none',
+                              points_coord = FAOshp,
+                              newVarName = "Landings (t)",
+                              addToTitle = NA,
+                              value_of_threshold = NA,
+                              plot_labels = FALSE,
+                              Catch_group_name = NA,
+                              addExtraShp = TRUE,
+                              extraShp = FAOshp,
+                              color_palette = colours,
+                              filter_column  = NA,
+                              filter_type = NA,
+                              filter_threshold = NA,
+                              filter_func = NA)
+result
+```
 
 ### Landings by metier, small pelagics {.tabset}
+
 #### Metier lvl5
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap = '**Figure 27**: Small pelagics landings by metier level 5 (top 20).'}
 #data prep
@@ -982,11 +1053,79 @@ barplot(data = cl[CatchGroup=='demersal',],
 
 #### Map area
 
-To be prepared for the next year.
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 27**: Spatial distribution of the demersal landings by area.'}
+# do we need information on for how many rows(%) there was a missing CLscientificWeight_ton? <-------------------------- to do
+
+# data prep
+cl %>%
+    filter(CatchGroup == 'demersal') %>%
+  group_by(CLyear, AreaMap) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA)-> df
+
+FAOshp2 = FAOshp %>% rename("Area" = "AreaMap") # a little bit of mess, tidy it up some day
+# for choropleth -> name of column with area in shp can not be the same as name of column with area in the df
+# for scatterpie -> name of column with area in shp has to be the same as name of column with area in the df
+# quick fix - two copies of the same shp
+
+# map
+result = choroplethMap_func2(
+  df,
+  var_name = 'CLscientificWeight_ton',
+  var_spatial_name = 'AreaMap',
+  facet_name = 'CLyear',
+  spatial_dataset_name = 'FAOshp2',
+  spatial_dataset_var_name = 'Area',
+  spatial_dataset_labels = FALSE,
+  saveResults = FALSE,
+  #outputPath,
+  displayInR = TRUE,
+  extraShp_name = NA,
+  var_name_new = NA,
+  addToTitle = NA
+)
+
+result[[1]]
+```
 
 #### Map area and flag country
 
-To be prepared for the next year.
+
+```{r echo=FALSE, fig.height=10, fig.width=18, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE, fig.cap = '**Figure 27**: Spatial distribution of the demersal landings by area and flag country.'}
+cl %>%
+  filter(CatchGroup == 'demersal') %>%
+  group_by(CLvesselFlagCountry, AreaMap) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         func = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA)-> df
+
+result <- scatterpieMap_func_new(df = df,
+                  var = "CLscientificWeight_ton",
+                              groupBy = "AreaMap",
+                              groupBy2 = "CLvesselFlagCountry",
+                              facet = NA,
+                              func = "sum",
+                              type_of_threshold = 'none',
+                              points_coord = FAOshp,
+                              newVarName = "Landings (t)",
+                              addToTitle = NA,
+                              value_of_threshold = NA,
+                              plot_labels = FALSE,
+                              Catch_group_name = NA,
+                              addExtraShp = TRUE,
+                              extraShp = FAOshp,
+                              color_palette = colours,
+                              filter_column  = NA,
+                              filter_type = NA,
+                              filter_threshold = NA,
+                              filter_func = NA)
+result
+```
 
 ### Landings by metier, demersal (without flatfish) {.tabset}
 #### Metier lvl5
@@ -1321,11 +1460,80 @@ barplot(data = cl[CatchGroup=='flatfish',],
 
 #### Map area
 
-To be prepared for the next year.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 27**: Spatial distribution of the flatfish landings by area.'}
+# do we need information on for how many rows(%) there was a missing CLscientificWeight_ton? <-------------------------- to do
+
+# data prep
+cl %>%
+    filter(CatchGroup == 'flatfish') %>%
+  group_by(CLyear, AreaMap) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA)-> df
+
+FAOshp2 = FAOshp %>% rename("Area" = "AreaMap") # a little bit of mess, tidy it up some day
+# for choropleth -> name of column with area in shp can not be the same as name of column with area in the df
+# for scatterpie -> name of column with area in shp has to be the same as name of column with area in the df
+# quick fix - two copies of the same shp
+
+# map
+result = choroplethMap_func2(
+  df,
+  var_name = 'CLscientificWeight_ton',
+  var_spatial_name = 'AreaMap',
+  facet_name = 'CLyear',
+  spatial_dataset_name = 'FAOshp2',
+  spatial_dataset_var_name = 'Area',
+  spatial_dataset_labels = FALSE,
+  saveResults = FALSE,
+  #outputPath,
+  displayInR = TRUE,
+  extraShp_name = NA,
+  var_name_new = NA,
+  addToTitle = NA
+)
+
+result[[1]]
+```
+
 
 #### Map area and flag country
 
-To be prepared for the next year.
+```{r echo=FALSE, fig.height=10, fig.width=18, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE, fig.cap = '**Figure 27**: Spatial distribution of the flatfish landings by area and flag country.'}
+cl %>%
+  filter(CatchGroup == 'flatfish') %>%
+  group_by(CLvesselFlagCountry, AreaMap) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         func = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA)-> df
+
+result <- scatterpieMap_func_new(df = df,
+                  var = "CLscientificWeight_ton",
+                              groupBy = "AreaMap",
+                              groupBy2 = "CLvesselFlagCountry",
+                              facet = NA,
+                              func = "sum",
+                              type_of_threshold = 'none',
+                              points_coord = FAOshp,
+                              newVarName = "Landings (t)",
+                              addToTitle = NA,
+                              value_of_threshold = NA,
+                              plot_labels = FALSE,
+                              Catch_group_name = NA,
+                              addExtraShp = TRUE,
+                              extraShp = FAOshp,
+                              color_palette = colours,
+                              filter_column  = NA,
+                              filter_type = NA,
+                              filter_threshold = NA,
+                              filter_func = NA)
+result
+```
 
 ### Landings by metier, flatfish {.tabset}
 #### Metier lvl5
@@ -1656,11 +1864,81 @@ barplot(data = cl[CatchGroup=='crustaceans',],
 
 #### Map area
 
-To be prepared for the next year.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 27**: Spatial distribution of the crustaceans landings by area.'}
+# do we need information on for how many rows(%) there was a missing CLscientificWeight_ton? <-------------------------- to do
+
+# data prep
+cl %>%
+    filter(CatchGroup == 'crustaceans') %>%
+  group_by(CLyear, AreaMap) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA)-> df
+
+FAOshp2 = FAOshp %>% rename("Area" = "AreaMap") # a little bit of mess, tidy it up some day
+# for choropleth -> name of column with area in shp can not be the same as name of column with area in the df
+# for scatterpie -> name of column with area in shp has to be the same as name of column with area in the df
+# quick fix - two copies of the same shp
+
+# map
+result = choroplethMap_func2(
+  df,
+  var_name = 'CLscientificWeight_ton',
+  var_spatial_name = 'AreaMap',
+  facet_name = 'CLyear',
+  spatial_dataset_name = 'FAOshp2',
+  spatial_dataset_var_name = 'Area',
+  spatial_dataset_labels = FALSE,
+  saveResults = FALSE,
+  #outputPath,
+  displayInR = TRUE,
+  extraShp_name = NA,
+  var_name_new = NA,
+  addToTitle = NA
+)
+
+result[[1]]
+```
+
 
 #### Map area and flag country
 
-To be prepared for the next year.
+```{r echo=FALSE, fig.height=10, fig.width=18, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE, fig.cap = '**Figure 27**: Spatial distribution of the crustaceans landings by area and flag country.'}
+cl %>%
+  filter(CatchGroup == 'crustaceans') %>%
+  group_by(CLvesselFlagCountry, AreaMap) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         func = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA)-> df
+
+result <- scatterpieMap_func_new(df = df,
+                  var = "CLscientificWeight_ton",
+                              groupBy = "AreaMap",
+                              groupBy2 = "CLvesselFlagCountry",
+                              facet = NA,
+                              func = "sum",
+                              type_of_threshold = 'none',
+                              points_coord = FAOshp,
+                              newVarName = "Landings (t)",
+                              addToTitle = NA,
+                              value_of_threshold = NA,
+                              plot_labels = FALSE,
+                              Catch_group_name = NA,
+                              addExtraShp = TRUE,
+                              extraShp = FAOshp,
+                              color_palette = colours,
+                              filter_column  = NA,
+                              filter_type = NA,
+                              filter_threshold = NA,
+                              filter_func = NA)
+result
+```
+
 
 ### Landings by metier, crustaceans {.tabset}
 #### Metier lvl5

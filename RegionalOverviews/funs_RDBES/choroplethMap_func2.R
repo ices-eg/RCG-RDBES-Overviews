@@ -93,7 +93,9 @@ if(!is.na(extraShp_name)) {
   spatial_dataset <- eval_tidy(as.symbol(spatial_dataset_name))
   spatial_dataset_var <- as.symbol(spatial_dataset_var_name)
   
-  extraShp <- eval_tidy(as.symbol(extraShp_name))
+  if(!is.na(extraShp_name)){
+    extraShp <- eval_tidy(as.symbol(extraShp_name))
+  }
   
   
   if(!is.na(facet_name)){
