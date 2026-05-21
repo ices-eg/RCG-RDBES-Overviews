@@ -131,11 +131,11 @@ The tables and figures of the overviews presented in this document are made for 
 
 Member States (MS) are responsible for uploading latest data and the latest year should be viewed as provisional. Data can be resubmitted by a MS for more than one previous year so there might be differences in earlier year reports, if countries update back in time. Responsibility for the quality of the data and comparability to other data sources lies with the MS that provided these data. The upload logs presented by MS regarding the data submitted to RDB can be found in the Share Point for Intersessional Work, under the folder "Data".
 
-The respective scripts and calculations used for data displaying are publicly available via the RCG GitHub (https://github.com/ices-eg/RCGs) and subject to change as the work of the group progresses.
+The respective scripts and calculations used for data displaying are publicly available via the RCG GitHub (https://github.com/ices-eg/RCG-RDBES-Overviews/) and subject to change as the work of the group progresses.
 
 # Introduction
 
-The present Catch and Effort Overview displays summary information on EU commercial landings (CL) and fishing effort (CE) statistics included in the Regional Data Base and Estimation System (RDBES), which is used to store detailed commercial fisheries and sampling data. These reports present summary information on landings volume and species composition and also the fishing effort of the EU fisheries by region, for 2023.
+The present Catch and Effort Overview displays summary information on EU commercial landings (CL) and fishing effort (CE) statistics included in the Regional Data Base and Estimation System (RDBES), which is used to store detailed commercial fisheries and sampling data. These reports present summary information on landings volume and species composition and also the fishing effort of the EU fisheries by region, for 2025
 
 The information included in the RDBES have improved when comparing with the previous Regional Database (RDB), and the outcomes of the data reported to RDBES can also result in more detailed information which may be very useful for different purposes and end users.
 
