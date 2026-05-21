@@ -34,8 +34,14 @@ scatterpieMap_func_new <- function(df,
   # CRS (może być 3035 / 2180 / cokolwiek metrycznego)
   # set parameteres for each region, for now only BALTIC
   #crs_use <- 3035 
+  if(regionSelected == 'BA'){ 
   crs_use <- "+proj=laea +lat_0=56 +lon_0=18"
-
+  } else if (regionSelected == 'NA'){
+    crs_use <- "+proj=laea +lat_0=45 +lon_0=-30 +datum=WGS84 +units=m +no_defs"  
+  } else if (regionSelected == 'NSEA'){
+    crs_use <- "+proj=laea +lat_0=72 +lon_0=40 +datum=WGS84 +units=m +no_defs"  
+  }
+  
   var_name <- var
   var_sym <- sym(var)
   groupBy_name <- groupBy
