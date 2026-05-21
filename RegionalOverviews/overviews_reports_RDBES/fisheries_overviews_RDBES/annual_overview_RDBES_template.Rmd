@@ -432,7 +432,7 @@ sub_cl_top %>%  mutate(
 result <- pointsMap_func2(df,
                           title = '', #Landings (1000 t) by Harbour
                           var_name = 'CLscientificWeight_1000ton',
-                          facet_name = 'CLyear',  # Poprawiono
+                          facet_name = 'CLyear',
                           var_spatial_name = 'CLlandingLocation',
                           spatial_dataset_name = 'Harbours',
                           spatial_dataset_var_name = 'Harbour',
@@ -450,6 +450,41 @@ result
 
 ```
 #### Map - harbour and flag country
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 15**: Map with the landing weight by main harbours (top 20).'}
+#TUU
+
+cl %>%
+  group_by(CLyear, CLvesselFlagCountry, CLlandingLocation) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         func = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA)-> df
+
+result <- scatterpieMap_func_new(df = df,
+                  var = "CLscientificWeight_ton",
+                              groupBy = "CLlandingLocation",
+                              groupBy2 = "CLvesselFlagCountry",
+                              facet = 'CLyear',
+                              func = "sum",
+                              type_of_threshold = 'none',
+                              points_coord = FAOshp,
+                              newVarName = "Landings (t)",
+                              addToTitle = NA,
+                              value_of_threshold = NA,
+                              plot_labels = FALSE,
+                              Catch_group_name = NA,
+                              addExtraShp = TRUE,
+                              extraShp = FAOshp,
+                              color_palette = colours,
+                              filter_column  = NA,
+                              filter_type = NA,
+                              filter_threshold = NA,
+                              filter_func = NA)
+result
+
+```
 
 To be prepared for the next year.
 

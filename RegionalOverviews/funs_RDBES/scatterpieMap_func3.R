@@ -50,6 +50,7 @@ scatterpieMap_func_new <- function(df,
   
   if (groupBy_name == "CLstatisticalRectangle" | groupBy_name == "CEstatisticalRectangle") groupBy_name <- "Statistical Rectangle"
   if (groupBy_name == "AreaMap") groupBy_name <- "Area"
+  if (groupBy_name == "CLlandingLocation") groupBy_name <- "Harbour"
   if (groupBy2_name == "CLvesselFlagCountry" | groupBy2_name == "CEvesselFlagCountry") groupBy2_name <- "FlagCountry"
   
   if (func_name %in% c('sum')) {
