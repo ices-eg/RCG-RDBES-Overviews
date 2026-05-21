@@ -449,6 +449,7 @@ result <- pointsMap_func2(df,
 result
 
 ```
+
 #### Map - harbour and flag country
 
 To be prepared for the next year.
@@ -1244,6 +1245,7 @@ barplot(data = sub_cl_2_top,
 ```
 
 #### Map - harbour
+
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 51**: Map with the landing weight of demersal species by main harbours (top 20).'}
 
 sub_cl_top %>%  mutate(
@@ -1652,6 +1654,7 @@ barplot(data = sub_cl_2_top,
 ```
 
 #### Map - harbour
+
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 69**: Map with the landing weight of flatfish species by main harbours (top 20).'}
 
 sub_cl_top %>%  mutate(
@@ -2057,6 +2060,7 @@ barplot(data = sub_cl_2_top,
 ```
 
 #### Map - harbour
+
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 87**: Map with the landing weight of crustacean species by main harbours (top 20).'}
 
 sub_cl_top %>%  mutate(
@@ -2497,7 +2501,34 @@ barplot(data = sub_ce_2_top,
 
 #### Map - harbour
 
-To be prepared for the next year.
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 110**: Distribution of the number of trips performed by country vessels with LOA below 10m, from the main harbours (top 20).'}
+sub_ce_top %>%  mutate(
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA
+       )-> df
+
+
+result <- pointsMap_func2(df,
+                          title = '', #Landings (1000 t) by Harbour
+                          var_name = 'CEnumberOfDominantTrips',
+                          facet_name = 'CEyear',  # Poprawiono
+                          var_spatial_name = 'CElandingLocation',
+                          spatial_dataset_name = 'Harbours',
+                          spatial_dataset_var_name = 'Harbour',
+                          plot_labels = TRUE,
+                          saveResults = FALSE,
+                          outputPath,
+                          Catch_group_name = NA,
+                          extraShp_name = 'StatRectshp',
+                          newVarName = NA,
+                          addToTitle = NA,
+                          RCGregion = 'BA'
+                         )
+
+result
+
+```
 
 ### 10 meteres and above {.tabset}
 #### Harbour
@@ -2540,8 +2571,34 @@ barplot(data = sub_ce_2_top,
 
 #### Map - harbour
 
-To be prepared for the next year.
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 110**: Distribution of the number of trips performed by country vessels with LOA 10m and above, from the main harbours (top 20).'}
+sub_ce_top %>%  mutate(
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA
+       )-> df
 
+
+result <- pointsMap_func2(df,
+                          title = '', #Landings (1000 t) by Harbour
+                          var_name = 'CEnumberOfDominantTrips',
+                          facet_name = 'CEyear',  # Poprawiono
+                          var_spatial_name = 'CElandingLocation',
+                          spatial_dataset_name = 'Harbours',
+                          spatial_dataset_var_name = 'Harbour',
+                          plot_labels = TRUE,
+                          saveResults = FALSE,
+                          outputPath,
+                          Catch_group_name = NA,
+                          extraShp_name = 'StatRectshp',
+                          newVarName = NA,
+                          addToTitle = NA,
+                          RCGregion = 'BA'
+                         )
+
+result
+
+```
 ## Spatal distribution of effort {.tabset}
 ### Below 10 meters
 
