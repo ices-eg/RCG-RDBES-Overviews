@@ -2670,7 +2670,7 @@ result[[1]]
 
 ## Appendix A. Dates of data extraction
 
-The data referring to the present year was collected under the RCG 2024 data call for the 2023 data for the Baltic Sea, North Sea, Eastern Arctic and the North Atlantic regions and the latest version used was downloaded from the system on the 29th of May 2024 with the exception of information detailed in section “2. Overall Fleet Evolution” which was extracted from the EU Fleet Register (https://webgate.ec.europa.eu/fleet-europa/index_en) on the March 2024.
+The data referring to the present year was collected under the RCG 2026 data call for the 2025 data for the Baltic Sea, North Sea, Eastern Arctic and the North Atlantic regions and the latest version used was downloaded from the system on the 14th of May 2026 with the exception of information detailed in section “2. Overall Fleet Evolution” which was extracted from the EU Fleet Register (https://webgate.ec.europa.eu/fleet-europa/index_en) on the March 2026.
 
 ## Appendix B. Species catch groups
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6}
