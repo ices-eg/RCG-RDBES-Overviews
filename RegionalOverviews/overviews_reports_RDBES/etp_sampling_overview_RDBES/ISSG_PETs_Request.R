@@ -18,6 +18,7 @@ library(readxl)
 library(ggplot2)
 library(patchwork)
 library(data.table)
+library(readxl)
 
 options(scipen = 999)
 options(tibble.width = Inf)
@@ -31,19 +32,19 @@ gc()
 year_start <- 2023
 year_end   <- 2025
 # BA
-#CEfilepath <- "RegionalOverviews/data_RDBES/002_prepared/20260416/RCG_BA/RDBES_RCG_BA_CE_2021_2025_prepared_20260416.Rdata"
-#CSfilepath <- "RegionalOverviews/data_RDBES/002_prepared/20260503/RCG_BA/RDBES_RCG_BA_CS_2023_2025_prepared_20260507.Rdata"
-#target_region <- 'RCG_BA' #  
+# CEfilepath <- "RegionalOverviews/data_RDBES/002_prepared/20260416/RCG_BA/RDBES_RCG_BA_CE_2021_2025_prepared_20260416.Rdata"
+# CSfilepath <- "RegionalOverviews/data_RDBES/002_prepared/20260503/RCG_BA/RDBES_RCG_BA_CS_2023_2025_prepared_20260507.Rdata"
+# target_region <- 'RCG_BA' #
 
 # NA
-#CEfilepath <- "RegionalOverviews/data_RDBES/002_prepared/20260416/RCG_NA/RDBES_RCG_NA_CE_2021_2025_prepared_20260416.Rdata"
-#CSfilepath <- "RegionalOverviews/data_RDBES/002_prepared/20260503/RCG_NA/RDBES_RCG_NA_CS_2023_2025_prepared_20260503.Rdata"
-#target_region <- 'RCG_NA' #  
+CEfilepath <- "RegionalOverviews/data_RDBES/002_prepared/20260416/RCG_NA/RDBES_RCG_NA_CE_2021_2025_prepared_20260416.Rdata"
+CSfilepath <- "RegionalOverviews/data_RDBES/002_prepared/20260503/RCG_NA/RDBES_RCG_NA_CS_2023_2025_prepared_20260503.Rdata"
+target_region <- 'RCG_NA' #
 
 # NSEA
-CEfilepath <- "RegionalOverviews/data_RDBES/002_prepared/20260416/RCG_NSEA/RDBES_RCG_NSEA_CE_2021_2025_prepared_20260416.Rdata"
-CSfilepath <- "RegionalOverviews/data_RDBES/002_prepared/20260503/RCG_NSEA/RDBES_RCG_NSEA_CS_2023_2025_prepared_20260503.Rdata"
-target_region <- 'RCG_NSEA' #   
+# CEfilepath <- "RegionalOverviews/data_RDBES/002_prepared/20260416/RCG_NSEA/RDBES_RCG_NSEA_CE_2021_2025_prepared_20260416.Rdata"
+# CSfilepath <- "RegionalOverviews/data_RDBES/002_prepared/20260503/RCG_NSEA/RDBES_RCG_NSEA_CS_2023_2025_prepared_20260503.Rdata"
+# target_region <- 'RCG_NSEA' #   
 
 # Read Data  ------------------------------------------------------------------- ####
 # ecoregion
@@ -57,9 +58,9 @@ head(cs_rcg)
 load(CEfilepath)
 head(ce_rcg)
 
-# Prepare data    -------------------------------------------------------------- ####
+# Sampling coverage  ----------------------------------------------------------- ####
 
-# .. Sampling     ---- ####
+# .. Prep Sampling     ---- ####
 
 # check:
 cs_rcg %>% 
@@ -156,7 +157,7 @@ n_distinct(cs$FTid)
 #write.table(res, file = "RegionalOverviews/overviews_reports_RDBES/etp_sampling_overview_RDBES/results/CheckTripsDiffAreaMetierEcoregion.csv", sep=",", dec=".", row.names = F)
 
 
-# .. Effort     ---- ####
+# .. Prep Effort     ---- ####
 
 head(ce_rcg)
 
@@ -181,12 +182,9 @@ sumCE <- ce %>% filter(CEyear %in% c(2023:2025)) %>%
             OffFishingDays = sum(CEofficialFishingDays),
             .groups = "drop")
 
-# Write table     
-#write.table(sumCE, file = "RegionalOverviews/overviews_reports_RDBES/etp_sampling_overview_RDBES/results/PETs_RDBES_Effort.csv", sep=",", dec=".", row.names = F)
 
+# .. Merge data     ---- ####
 
-
-# Merge data      -------------------------------------------------------------- ####
 TableSum_2 <- cs %>% group_by(DEyear,	SDctry,	EcoRegion,	FOgear) %>% #, FTsampler
   summarise(Ntrips = sum(FTidFrac, na.rm=T), .groups = "drop")  %>%
   mutate(across(c(DEyear, SDctry, EcoRegion, FOgear), as.character))
@@ -240,7 +238,8 @@ write.table(PETsTable, file = paste("RegionalOverviews/overviews_reports_RDBES/e
 #♥ en palangre no se distingu ealtura de bajura. nuestrso muestreos son de bajura
 
 
-# Plots      -------------------------------------------------------------- ####
+# .. Plots     ---- ####
+
 PETsTable %>% filter(is.na(SDctry))
 PETsTable %>% filter(is.na(FOgear))
 cs %>% filter(is.na(FOgear)) %>% distinct(DEhierarchy)  # hierarchy 4 does not provide info on the gear
@@ -292,3 +291,51 @@ ggsave(
 
 print(paste(i, "done")) 
 }
+
+
+
+
+# Species List      ----------------------------------------------------------- ####
+
+IS <- read.csv("RegionalOverviews/data_RDBES/001_raw/RCG_NANSEA/HSL_NANSEA_2026_05_06_122750996/IndividualSpeciesInSpeciesList.csv", header=T)
+SL <- read.csv("RegionalOverviews/data_RDBES/001_raw/RCG_NANSEA/HSL_NANSEA_2026_05_06_122750996/SpeciesList.csv", header=T)
+
+etpList    <- read_excel("RegionalOverviews/overviews_reports_RDBES/etp_sampling_overview_RDBES/ICES_ETP_bycatch_species_2026.xlsx", sheet ="Bycatch_ETP_species_region")
+AsfisWorms <- read.csv("RegionalOverviews/data/ASFIS_WoRMS_updt2025.csv", header = T)
+ecoregion <- read.csv("RegionalOverviews/data/ecoregion_subareaICES.csv", header=T)
+
+cs <- cs_rcg %>%
+  mutate( FTsampType = case_when(
+    DEhierarchy %in% c(5, 7, 8, 9)  ~ "OnShore",  # Guidelines: Hierarchies 5,7,8,& 9 are most used for on-shore sampling, but can be used for at-sea sampling as well.
+    DEhierarchy == 13               ~ "AtSea",    # Guidelines: Hierarchy 13 is most used for at-sea sampling, but can be used for on-shore sampling as well.
+    TRUE                            ~ FTsampType ) ) 
+
+cs_temp <- cs %>%
+  filter(FTsampType == "AtSea") %>%
+  distinct( DEhierarchy, DEyear, SDctry, DEsampScheme, FTsampType, FOarea, AreaMap, SLspeclistName, SLcatchFrac, SSuseCalcZero) %>%
+  left_join(ecoregion, by = c("AreaMap" = "ICESsubarea")) %>%
+  left_join(select(SL, SLyear, SLcountry, SLspeciesListName, SLcatchFraction , SLid),
+            by = c("DEyear" = "SLyear", "SDctry" = "SLcountry", "SLspeclistName" = "SLspeciesListName", "SLcatchFrac" = "SLcatchFraction")) 
+
+cs_sinSL <- cs_temp %>%
+  filter(is.na(SLid))    # some registers do not have species list reported
+  
+cs_conSL <- cs_temp %>%
+  filter(!is.na(SLid)) %>%   
+  left_join(select(IS, SLid, ISid, ISspeciesCode), by = c("SLid" = "SLid"), relationship = "many-to-many") %>%  # some sampling schemes use the same species list
+  left_join(select(AsfisWorms, X3A_CODE, Scientific_name, AphiaID ),
+            by = c("ISspeciesCode" = "AphiaID")) %>%
+  left_join(select(etpList, Scientific_name, Ecoregion, Taxon, ETP_Common_name = Common_name), by = c("Scientific_name" = "Scientific_name", "EcoRegion" = "Ecoregion") )
+
+cs_spList <- bind_rows(cs_conSL, cs_sinSL)
+
+
+ETPsum <- cs_spList %>% 
+  group_by(DEhierarchy, DEyear, SDctry, DEsampScheme, FTsampType, EcoRegion, SLspeclistName, SLcatchFrac) %>%
+  mutate(Nsp  = n_distinct(ISspeciesCode),
+         SSuseCalcZero = paste(unique(SSuseCalcZero), collapse = "_")) %>%
+  group_by(DEhierarchy, DEyear, SDctry, DEsampScheme, FTsampType, EcoRegion, SLspeclistName, SLcatchFrac, SSuseCalcZero, Taxon, Nsp) %>%
+  summarise(NspETP = n_distinct(ISspeciesCode[!is.na(ETP_Common_name)])) %>%
+  pivot_wider(names_from = "Taxon", values_from =  "NspETP", values_fill = 0) %>%
+  select(-'NA')
+
