@@ -1,5 +1,5 @@
 ---
-title: "Multiannual ISSG ETP Overview"
+title: "Multiannual ISSG ETP Overview  `r target_region`"
 date: "`r format(Sys.time(), '%d.%m.%Y')`"
 output:
   html_document:
@@ -12,7 +12,7 @@ params:
   set_subtitle: "Title"
   region: 'NA'
   # year: 2024
-  logo_path: "../../data/logo/logo RCG NA NS_EA.PNG"
+  #logo_path: "../../data/logo/logo RCG NA NS_EA.PNG"
   #data_dir_CS: 'RegionalOverviews/data_RDBES/002_prepared/20260503/RCG_BA/RDBES_RCG_BA_CS_2023_2025_prepared_20260507.Rdata'
   # data_dir_CL: '../../data_RDBES/002_prepared/20250425/RCG_BA'
   #data_dir_CE: '../../data_RDBES/002_prepared/20260416/RCG_BA/RDBES_RCG_BA_CE_2021_2025_prepared_20260416.Rdata'
@@ -75,7 +75,7 @@ options(scipen = 999)
 ```
 
 ```{r, echo=FALSE}
-  htmltools::img(src = knitr::image_uri(params$logo_path), 
+  htmltools::img(src = knitr::image_uri(logo_path), 
                alt = 'logo', 
                style = 'position:absolute; top:0; right:0; padding:10px;',width="300px", height="100px")
 ```
@@ -145,7 +145,7 @@ for (reg in regions) {
 
 # Species list table {.tabset}
 
-This table shows for each country and year, the sampling schemes considered and the name of the name of the species list asociated to them. For each species list and catch fraction, the table shows total number of species (Nsp) and the number of ETP species by taxon, namely fish, birds, mammals and turtles. It is important to highligth that this data is not showing  occurrences of ETP species, it is just showing the content of the Species List table (SL)
+This table shows for each country and year, the sampling schemes considered and the name of the name of the species list asociated to them. For each species list and catch fraction Dis/Catch, the table shows total number of species (Nsp) and the number of ETP species by taxon, namely fish, birds, mammals and turtles. It is important to highligth that this data is not showing  occurrences of ETP species, it is just showing the content of the Species List table (SL)
 
 The column SSuseCalcZero concatenates the different values of this variable in the sampling data.
 

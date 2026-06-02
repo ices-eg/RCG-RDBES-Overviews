@@ -37,21 +37,23 @@ year_end   <- 2025
 # BA
 # data_dir_CE <- "RegionalOverviews/data_RDBES/002_prepared/20260514/RCG_BA/RDBES_RCG_BA_CE_2025_2025_prepared_20260514.Rdata"
 # data_dir_CS <- "RegionalOverviews/data_RDBES/002_prepared/20260511/RCG_BA/RDBES_RCG_BA_CS_2021_2025_prepared_20260511.Rdata"
-data_dir_SL <- "RegionalOverviews/data_RDBES/002_prepared/20260511/RCG_BA/HSL_2026_05_06_143255842/"
+# data_dir_SL <- "RegionalOverviews/data_RDBES/002_prepared/20260511/RCG_BA/HSL_2026_05_06_143255842/"
+# logo_path   <-  "../../data/logo/logo RCG BALTIC.PNG"
 # target_region <- 'RCG_BA' #
 
 # NA
 data_dir_CE <- "RegionalOverviews/data_RDBES/002_prepared/20260514/RCG_NA/RDBES_RCG_NA_CE_2021_2025_prepared_20260514.Rdata"
 data_dir_CS <- "RegionalOverviews/data_RDBES/002_prepared/20260503/RCG_NA/RDBES_RCG_NA_CS_2023_2025_prepared_20260601.Rdata"
 data_dir_SL <- "RegionalOverviews/data_RDBES/002_prepared/20260503/RCG_NA/HSL_NANSEA_2026_05_06_122750996/"
+logo_path   <- "../../data/logo/logo RCG NA NS_EA.PNG"
 target_region <- 'RCG_NA' #
 
 # NSEA
 # data_dir_CE <- "RegionalOverviews/data_RDBES/002_prepared/20260514/RCG_NSEA/RDBES_RCG_NSEA_CE_2021_2025_prepared_20260514.Rdata"
 # data_dir_CS <- "RegionalOverviews/data_RDBES/002_prepared/20260503/RCG_NSEA/RDBES_RCG_NSEA_CS_2023_2025_prepared_20260513.Rdata"
 # data_dir_SL <- "RegionalOverviews/data_RDBES/002_prepared/20260503/RCG_NSEA/HSL_NANSEA_2026_05_06_122750996/"
-# target_region <- 'RCG_NSEA' #   
-
+# logo_path   <- "../../data/logo/logo RCG NA NS_EA.PNG"
+# target_region <- 'RCG_NSEA' #
 
 
 ## Load data  ------------------------------------------------------------------####
@@ -75,11 +77,13 @@ cs_rcg %>%
     select(SDctry, 
            DEyear, DEhierarchy, DEsampScheme, 
            FTsampType, 
+           FOarea, 
            SSobsTyp, SSuseCalcZero, SSobsActTyp,
            SAspeCode, SAspeCodeFAO, SAspecState, SAcatchCat, SAtotalWtLive, SAsampWtLive,
            SLspeclistName, SLcatchFrac, 
            OSid, LEid, FTid, FOid, SAid, SSid, SLid, FMid, BVid,
            metier6, AreaMap, SpeciesLaName) %>%
+    filter(DEyear %in% year_start:year_end) %>%
     mutate( FTsampType = case_when(
       DEhierarchy %in% c(5, 7, 8, 9)  ~ "OnShore",  # Guidelines: Hierarchies 5,7,8,& 9 are most used for on-shore sampling, but can be used for at-sea sampling as well.
       DEhierarchy == 13               ~ "AtSea",    # Guidelines: Hierarchy 13 is most used for at-sea sampling, but can be used for on-shore sampling as well.
@@ -142,7 +146,7 @@ cs_tab <- cs %>%
   select(
     FTid, FOid, LEid, DEhierarchy, DEyear,
     SDctry, DEsampScheme, FTsampType,
-    metier6, AreaMap,
+    metier6, AreaMap, FOarea,
     SSobsTyp, SSid, SAid, FMid, BVid
   )
 
@@ -152,11 +156,14 @@ cs_tab %>% filter(is.na(EcoRegion))
 
 cs_tab <- cs_tab %>%
   mutate( EcoRegion = case_when(
-    AreaMap %in% c("27.4")  ~ "Greater North Sea",  
+    FOarea %in% c("27.4")  ~ "Greater North Sea",
     TRUE                   ~ EcoRegion ) ) 
 
 # add fractional trips
-cs_tab <- cs_tab %>% group_by(FTid) %>% mutate(FTidFrac = 1/length(FTid)) %>% ungroup()
+cs_tab <- cs_tab %>% 
+  group_by(FTid) %>% 
+  mutate(FTidFrac = ifelse(is.na(FTid), NA, 1 / sum(!is.na(FTid)))) %>% 
+  ungroup()
 
 # Add gear
 cs_tab$gear                       <- substr(cs_tab$metier6,1,3)
@@ -238,10 +245,10 @@ SPlistSum <- cs_spList %>%
   summarise(NspETP = n_distinct(ISspeciesCode[!is.na(ETP_Common_name)]),.groups = "drop") %>%
   pivot_wider(names_from = "Taxon", values_from =  "NspETP", values_fill = 0) %>%
   select(-'NA') %>%
+  filter(!is.na(DEsampScheme) & Nsp!=0) %>%
+  filter(SLcatchFrac != "Lan") %>%
   mutate(across(c(SSuseCalcZero), ~na_if(., "NA")))
 
-cs %>% filter(is.na(SLspeclistName))
-SPlistSum %>% filter(is.na(SLspeclistName))
 
 ## Rmarkdown ------------------------------------------------------------------ ####
 
@@ -254,3 +261,11 @@ rmarkdown::render(
   envir = new.env(parent = globalenv()),
   encoding = 'UTF-8'
 )
+
+
+
+ce %>% filter(CEyear== 2023 & CEvesselFlagCountry == "IE", CEgear =="OTB" & EcoRegion == "Greater North Sea")
+cs %>% filter(DEyear== 2025 & SDctry == "PT" & substr(metier6,1,3) =="OTB")
+
+ce %>% filter(is.na(EcoRegion))
+cs_tab %>% filter(is.na(EcoRegion))
