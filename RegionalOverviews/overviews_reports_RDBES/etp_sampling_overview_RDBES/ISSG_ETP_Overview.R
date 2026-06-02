@@ -35,21 +35,21 @@ year_end   <- 2025
 # RDBES Data Paths
 
 # BA
-# data_dir_CE <- "RegionalOverviews/data_RDBES/002_prepared/20260416/RCG_BA/RDBES_RCG_BA_CE_2021_2025_prepared_20260416.Rdata"
-# data_dir_CS <- "RegionalOverviews/data_RDBES/002_prepared/20260503/RCG_BA/RDBES_RCG_BA_CS_2023_2025_prepared_20260507.Rdata"
-# data_dir_SL <- 
+# data_dir_CE <- "RegionalOverviews/data_RDBES/002_prepared/20260514/RCG_BA/RDBES_RCG_BA_CE_2025_2025_prepared_20260514.Rdata"
+# data_dir_CS <- "RegionalOverviews/data_RDBES/002_prepared/20260511/RCG_BA/RDBES_RCG_BA_CS_2021_2025_prepared_20260511.Rdata"
+data_dir_SL <- "RegionalOverviews/data_RDBES/002_prepared/20260511/RCG_BA/HSL_2026_05_06_143255842/"
 # target_region <- 'RCG_BA' #
 
 # NA
-data_dir_CE <- "RegionalOverviews/data_RDBES/002_prepared/20260416/RCG_NA/RDBES_RCG_NA_CE_2021_2025_prepared_20260416.Rdata"
-data_dir_CS <- "RegionalOverviews/data_RDBES/002_prepared/20260503/RCG_NA/RDBES_RCG_NA_CS_2023_2025_prepared_20260503.Rdata"
-data_dir_SL <- "RegionalOverviews/data_RDBES/001_raw/RCG_NANSEA/HSL_NANSEA_2026_05_06_122750996/"
+data_dir_CE <- "RegionalOverviews/data_RDBES/002_prepared/20260514/RCG_NA/RDBES_RCG_NA_CE_2021_2025_prepared_20260514.Rdata"
+data_dir_CS <- "RegionalOverviews/data_RDBES/002_prepared/20260503/RCG_NA/RDBES_RCG_NA_CS_2023_2025_prepared_20260601.Rdata"
+data_dir_SL <- "RegionalOverviews/data_RDBES/002_prepared/20260503/RCG_NA/HSL_NANSEA_2026_05_06_122750996/"
 target_region <- 'RCG_NA' #
 
 # NSEA
-# data_dir_CE <- "RegionalOverviews/data_RDBES/002_prepared/20260416/RCG_NSEA/RDBES_RCG_NSEA_CE_2021_2025_prepared_20260416.Rdata"
-# data_dir_CS <- "RegionalOverviews/data_RDBES/002_prepared/20260503/RCG_NSEA/RDBES_RCG_NSEA_CS_2023_2025_prepared_20260503.Rdata"
-# data_dir_SL <- "RegionalOverviews/data_RDBES/001_raw/RCG_NANSEA/HSL_NANSEA_2026_05_06_122750996/"
+# data_dir_CE <- "RegionalOverviews/data_RDBES/002_prepared/20260514/RCG_NSEA/RDBES_RCG_NSEA_CE_2021_2025_prepared_20260514.Rdata"
+# data_dir_CS <- "RegionalOverviews/data_RDBES/002_prepared/20260503/RCG_NSEA/RDBES_RCG_NSEA_CS_2023_2025_prepared_20260513.Rdata"
+# data_dir_SL <- "RegionalOverviews/data_RDBES/002_prepared/20260503/RCG_NSEA/HSL_NANSEA_2026_05_06_122750996/"
 # target_region <- 'RCG_NSEA' #   
 
 
@@ -69,13 +69,24 @@ cs_rcg %>%
   pivot_wider(names_from = FTsampType, values_from = NsampScheme)
 
   # Correct
+  # Select the columns that we need
   # Some Hierarchies do not have FTsampType (OnShre/AtSea). We assign them to the most ussual sampling type according to each Hierarchy
   cs <- cs_rcg %>%
+    select(SDctry, 
+           DEyear, DEhierarchy, DEsampScheme, 
+           FTsampType, 
+           SSobsTyp, SSuseCalcZero, SSobsActTyp,
+           SAspeCode, SAspeCodeFAO, SAspecState, SAcatchCat, SAtotalWtLive, SAsampWtLive,
+           SLspeclistName, SLcatchFrac, 
+           OSid, LEid, FTid, FOid, SAid, SSid, SLid, FMid, BVid,
+           metier6, AreaMap, SpeciesLaName) %>%
     mutate( FTsampType = case_when(
       DEhierarchy %in% c(5, 7, 8, 9)  ~ "OnShore",  # Guidelines: Hierarchies 5,7,8,& 9 are most used for on-shore sampling, but can be used for at-sea sampling as well.
       DEhierarchy == 13               ~ "AtSea",    # Guidelines: Hierarchy 13 is most used for at-sea sampling, but can be used for on-shore sampling as well.
-      TRUE                            ~ FTsampType ) ) 
+      TRUE                            ~ FTsampType )) 
+ 
 
+  
 # Check reported data
 cs %>% 
   group_by( DEhierarchy, FTsampType) %>%
@@ -117,8 +128,8 @@ cs %>%
 
 # Correct:
 cs %>% filter(DEsampScheme =="ESP-AZTI_DCF_Onboard_Sampling" ) 
-cs_prep <- cs %>% filter(DEsampScheme !="ESP-AZTI_DCF_Onboard_Sampling" ) 
-
+#cs_prep <- cs %>% filter(DEsampScheme !="ESP-AZTI_DCF_Onboard_Sampling" ) 
+# cs <- cs[DEsampScheme != "ESP-AZTI_DCF_Onboard_Sampling"]
 
 
 ## ETP table       ------------------------------------------------------------- ####
@@ -126,12 +137,12 @@ cs_prep <- cs %>% filter(DEsampScheme !="ESP-AZTI_DCF_Onboard_Sampling" )
 # Prepare CS data  ##
 
 # Filter
-cs_tab <- cs_prep %>%
+cs_tab <- cs %>%
   filter(FTsampType == "AtSea") %>%
   select(
     FTid, FOid, LEid, DEhierarchy, DEyear,
     SDctry, DEsampScheme, FTsampType,
-    FOgear, FOmetier6, FOarea, AreaMap,
+    metier6, AreaMap,
     SSobsTyp, SSid, SAid, FMid, BVid
   )
 
@@ -141,12 +152,15 @@ cs_tab %>% filter(is.na(EcoRegion))
 
 cs_tab <- cs_tab %>%
   mutate( EcoRegion = case_when(
-    FOarea %in% c("27.4")  ~ "Greater North Sea",  
+    AreaMap %in% c("27.4")  ~ "Greater North Sea",  
     TRUE                   ~ EcoRegion ) ) 
 
 # add fractional trips
 cs_tab <- cs_tab %>% group_by(FTid) %>% mutate(FTidFrac = 1/length(FTid)) %>% ungroup()
 
+# Add gear
+cs_tab$gear                       <- substr(cs_tab$metier6,1,3)
+cs_tab$gear[cs_tab$gear=="PS_"] <- "PS"
 
 # Prepare CE data  ##
 
@@ -175,35 +189,30 @@ sumCE <- ce %>% filter(CEyear %in% c(2023:2025)) %>%
 
 # Merge data     ---- ###
 
-TableSum_2 <- cs_tab %>% group_by(DEyear,	SDctry,	EcoRegion,	FOgear) %>% #, FTsampler
+TableSum_2 <- cs_tab %>% group_by(DEyear,	SDctry,	EcoRegion, gear) %>% #, FTsampler
   summarise(NtripsSamp = round(sum(FTidFrac, na.rm=T), digits=1), .groups = "drop")  %>%
-  mutate(across(c(DEyear, SDctry, EcoRegion, FOgear), as.character))
+  mutate(across(c(DEyear, SDctry, EcoRegion, gear), as.character))
 
 sumCE_2 <- sumCE %>% group_by(CEyear, CEvesselFlagCountry, CEgear, EcoRegion) %>%
   summarize(CE.Ntrips         = round(sum(Ntrips, na.rm=T), digits = 1), .groups = "drop") %>%
   mutate(across(c(CEyear, CEvesselFlagCountry, EcoRegion, CEgear), as.character))
 
-PETsTable <- TableSum_2 %>% full_join(sumCE_2, 
+ETPsTable <- TableSum_2 %>% full_join(sumCE_2, 
                                       by = c("DEyear"      = "CEyear",
                                              "SDctry"      = "CEvesselFlagCountry",
-                                             "FOgear"      = "CEgear",
-                                             "EcoRegion"   = "EcoRegion"))
+                                             "gear"        = "CEgear",
+                                             "EcoRegion"   = "EcoRegion")) %>%
+  mutate(across(c(NtripsSamp, CE.Ntrips), ~replace_na(., 0)))
 
-sort(unique(PETsTable$EcoRegion))
+sort(unique(ETPsTable$EcoRegion))
 
 
 
 ## Species List   ------------------------------------------------------------- ####
 
-cs_list <- cs_rcg %>%
-  mutate( FTsampType = case_when(
-    DEhierarchy %in% c(5, 7, 8, 9)  ~ "OnShore",  # Guidelines: Hierarchies 5,7,8,& 9 are most used for on-shore sampling, but can be used for at-sea sampling as well.
-    DEhierarchy == 13               ~ "AtSea",    # Guidelines: Hierarchy 13 is most used for at-sea sampling, but can be used for on-shore sampling as well.
-    TRUE                            ~ FTsampType ) ) 
-
-cs_list_temp <- cs_list %>%
+cs_list_temp <- cs %>%
   filter(FTsampType == "AtSea") %>%
-  distinct( DEhierarchy, DEyear, SDctry, DEsampScheme, FTsampType, FOarea, AreaMap, SLspeclistName, SLcatchFrac, SSuseCalcZero) %>%
+  distinct( DEhierarchy, DEyear, SDctry, DEsampScheme, FTsampType, AreaMap, SLspeclistName, SLcatchFrac, SSuseCalcZero) %>%
   left_join(ecoregion, by = c("AreaMap" = "ICESsubarea")) %>%
   left_join(select(SL, SLyear, SLcountry, SLspeciesListName, SLcatchFraction , SLid),
             by = c("DEyear" = "SLyear", "SDctry" = "SLcountry", "SLspeclistName" = "SLspeciesListName", "SLcatchFrac" = "SLcatchFraction")) 
@@ -221,16 +230,18 @@ cs_conSL <- cs_list_temp %>%
 cs_spList <- bind_rows(cs_conSL, cs_sinSL)
 
 
-ETPsum <- cs_spList %>% 
-  group_by(DEyear, SDctry, DEsampScheme, EcoRegion, SLspeclistName, SLcatchFrac) %>%
-  mutate(Nsp  = n_distinct(ISspeciesCode),
+SPlistSum <- cs_spList %>% 
+  group_by(DEyear, SDctry, DEhierarchy, DEsampScheme, EcoRegion, SLspeclistName, SLcatchFrac) %>%
+  mutate(Nsp  = n_distinct(ISspeciesCode, na.rm = TRUE),
          SSuseCalcZero = paste(unique(SSuseCalcZero), collapse = "_")) %>%
-  group_by(DEyear, SDctry, DEsampScheme, EcoRegion, SLspeclistName, SLcatchFrac, SSuseCalcZero, Taxon, Nsp) %>%
-  summarise(NspETP = n_distinct(ISspeciesCode[!is.na(ETP_Common_name)])) %>%
+  group_by(Yr = DEyear, Ctry = SDctry, Hier = DEhierarchy, EcoRegion, DEsampScheme,  SLspeclistName,  SLcatchFrac, SSuseCalcZero, Taxon, Nsp) %>%
+  summarise(NspETP = n_distinct(ISspeciesCode[!is.na(ETP_Common_name)]),.groups = "drop") %>%
   pivot_wider(names_from = "Taxon", values_from =  "NspETP", values_fill = 0) %>%
-  select(-'NA')
+  select(-'NA') %>%
+  mutate(across(c(SSuseCalcZero), ~na_if(., "NA")))
 
-
+cs %>% filter(is.na(SLspeclistName))
+SPlistSum %>% filter(is.na(SLspeclistName))
 
 ## Rmarkdown ------------------------------------------------------------------ ####
 

@@ -3,7 +3,7 @@ plot_sampling_heatmap <- function(data, region_name) {
   
   ggplot(
     dplyr::filter(data, EcoRegion == region_name), 
-    aes(y = factor(SDctry), x = factor(FOgear))
+    aes(y = factor(SDctry), x = factor(gear))
   ) +
     facet_wrap(EcoRegion ~ DEyear, ncol = 3) +
     
@@ -30,5 +30,5 @@ plot_sampling_heatmap <- function(data, region_name) {
     ) +
     
     theme_bw() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
 }

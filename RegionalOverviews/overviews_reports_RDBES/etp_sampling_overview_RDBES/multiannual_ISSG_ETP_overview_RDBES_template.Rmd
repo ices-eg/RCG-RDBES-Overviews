@@ -27,6 +27,48 @@ params:
 <!-- subtitle: `r paste(dplyr::case_when(params$region=='BA'~'Baltic,',params$region=='NA'~'North Atlantic',params$region=='NSEA'~'North Sea and Eastern Arctic'), params$year-2,'-',params$year, sep = " ")` -->
 <!-- --- -->
 
+
+<!-- # Format tables -->
+
+<style>
+table.dataTable {
+  font-size: 12px;
+}
+</style>
+
+<style>
+/* columnas 8-9 → títulos en varias líneas */
+table.tableSL thead th:nth-child(n+8):nth-child(-n+9) {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* columnas 6 y 7 → comportamiento con ellipsis */
+table.tableSL thead th:nth-child(5),
+table.tableSL tbody td:nth-child(5),
+table.tableSL thead th:nth-child(7),
+table.tableSL tbody td:nth-child(7){
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70px;
+}
+
+/* columnas 5 → comportamiento con ellipsis */
+table.tableSL thead th:nth-child(6),
+table.tableSL tbody td:nth-child(6){
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+</style>
+``
+
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
 options(scipen = 999)
@@ -40,62 +82,37 @@ options(scipen = 999)
 
 
 **Disclaimer**
-The tables and figures of the overviews presented in this document are made for the coordination of EU regional fisheries data collection purposes and are not designed for any other use. Data used for producing the outputs are extracted from the Regional Database and Estimating System (RDBES). The data 2022,2023,2024 was collected under the RCG 2025 data call for the Baltic Sea, North Sea, Eastern Arctic and the North Atlantic regions and the latest version used was downloaded from the system on the 27th of May 2025. Due to different aggregations and reporting authorities, data can differ from those used e.g. for assessments or technical reports. 
+The tables and figures of the overviews presented in this document are made for the coordination of EU regional fisheries data collection purposes and are not designed for any other use. Data used for producing the outputs are extracted from the Regional Database and Estimating System (RDBES). The data 2023,2024, 2025 was collected under the RCG 2026 data call for the Baltic Sea, North Sea, Eastern Arctic and the North Atlantic regions and the latest version used was downloaded from the system on the 5th of May 2026. Due to different aggregations and reporting authorities, data can differ from those used e.g. for assessments or technical reports. 
 
 The respective scripts and calculations used for data displaying are publicly available via the RCG GitHub (https://github.com/ices-eg/RCG-RDBES-Overviews) and subject to change as the work of the group progresses.
 
 # Introduction
-The present Case Study Overview displays summary information on the statistics for EU sampling of commercial landings included in the [Regional Data Base and Estimation System (RDBES)](https://www.ices.dk/data/data-portals/Pages/rdbes.aspx), which is used to store detailed commercial fisheries and sampling data.
+The present Overview displays summary information on the statistics for EU sampling of commercial fisheries included in the [Regional Data Base and Estimation System (RDBES)](https://www.ices.dk/data/data-portals/Pages/rdbes.aspx), which is used to store detailed commercial fisheries and sampling data.
 
 The RDBES is hosted at the International Council for Exploration of the Sea (ICES) and its data is property of EU Member States with usage governed by the Data use license for the Regional Database (RDB). It is a regionally coordinated database platform covering fisheries by region (e.g. North Atlantic Ocean, North Sea, Baltic Sea) and is a main resource used by the Regional Coordination Groups [(RCG)](https://www.fisheries-rcg.eu/rcg-nansea/) to coordinate data collection of EU fisheries. 
 
-To allow for the variety of sampling designs used in different institutes and countries the RDBES identifies a number of different sampling hierarchies, which represent the different hierarchical sampling techniques that are used in practice.  Two types of hierarchy are used in the model. The upper hierarchies describe how a sample is selected, and they are numbered from 1 to 13. The lower hierarchies describe what type of length-frequency or biological variables are measured for that sample, and they are named with the letters from A to D.  All hierarchies are defined in terms of the tables they consist of and the relationships between them. 
+In the RDBES data model the aggregated  effort and landings data are kept in the commercial landings (CL) and commercial effort (CE) tables. Sampling data is kept in the commercial sampling (CS) data. To allow for the variety of sampling designs used in different institutes and countries the RDBES identifies a number of different sampling hierarchies, which represent the different hierarchical sampling techniques that are used in practice.  
 
-# Sampling effort  {.tabset}
+# Methodology
+Only sampling schemes at-Sea are considered. Selected sampling squemes correspond to hierarchies 1 and 2.
+
+For the total effort, the metric used is the number of fractional trips. For the sampling effort, the number of trips sampled is used. When the same sampled trip is related with multiple areas and/or metiers, a proxi for fractional sampling trips is calculated by proportionally dividing the trip in the different areas/metiers.
+
+# Sampling effort table {.tabset}
 ## Year, country, ecoregion and gear
 The table below shows the Total effort and the number of trips sampled on board, by year, country, ecoregion and gear.
 
 ```{r echo=F}
 
 DT::datatable(
-  PETsTable,
+  ETPsTable,
   extensions = 'Buttons',
   filter = 'top', 
   options = list(
     dom = 'Bfrtip',
     buttons = list(
-      list(extend = 'csv', filename = 'PETsTable')#,
-    #  list(extend = 'excel', filename = 'PETsTable')
-    ),
-    pageLength = 20,
-    scrollX = TRUE,
-    autoWidth = TRUE
-  ),
-  #class = 'compact'
-  class = 'compact nowrap'
-)
-
-```
-
-## Year, country, and ecoregion
-The table below shows the Total effort and the number of trips sampled on board, by year, country, ecoregion and gear.
-
-```{r echo=F}
-
-temp <- PETsTable %>% group_by(DEyear, SDctry, EcoRegion) %>%
-  summarise(NtripsSamp = sum(NtripsSamp, na.rm=T),
-            CE.Ntrips  = sum(CE.Ntrips, na.rm=T))
-
-
-  DT::datatable(
-  temp,
-  extensions = 'Buttons',
-  filter = 'top', 
-  options = list(
-    dom = 'Bfrtip',
-    buttons = list(
-      list(extend = 'csv', filename = 'PETsTable')#,
-    #  list(extend = 'excel', filename = 'PETsTable')
+      list(extend = 'csv', filename = 'OnBoardEffortSampling')#,
+    #  list(extend = 'excel', filename = 'OnBoardEffortSampling')
     ),
     pageLength = 20,
     scrollX = TRUE,
@@ -110,58 +127,49 @@ temp <- PETsTable %>% group_by(DEyear, SDctry, EcoRegion) %>%
 
 
 # Sampling effort heatplot {.tabset}
-## Bay of Biscay and Iberian Coast - Area/Gear
-```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
 
- plot_sampling_heatmap(PETsTable, "Bay of Biscay and Iberian Coast")
+```{r echo=FALSE, results='asis', fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, cache=FALSE}
+regions <- ETPsTable %>%
+  dplyr::distinct(EcoRegion) %>%
+  dplyr::pull(EcoRegion) %>%
+  sort()
 
+for (reg in regions) {
+  cat("## ", reg, " - Area/Gear\n\n", sep = "")
+  print(plot_sampling_heatmap(ETPsTable, reg))
+  cat("\n\n")
+}
 ```
 
 
-## Celtic Seas - Area/Gear
-```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
 
-plot_sampling_heatmap(PETsTable, "Celtic Seas")
+# Species list table {.tabset}
 
-```
+This table shows for each country and year, the sampling schemes considered and the name of the name of the species list asociated to them. For each species list and catch fraction, the table shows total number of species (Nsp) and the number of ETP species by taxon, namely fish, birds, mammals and turtles. It is important to highligth that this data is not showing  occurrences of ETP species, it is just showing the content of the Species List table (SL)
 
-## Faroes - Area/Gear
-```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
+The column SSuseCalcZero concatenates the different values of this variable in the sampling data.
 
-plot_sampling_heatmap(PETsTable, "Faroes")
-
-```
-
-## Oceanic Northeast Atlantic - Area/Gear
-```{r echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE, dpi=100, results="asis", cache=FALSE}
-
-plot_sampling_heatmap(PETsTable, "Oceanic Northeast Atlantic")
-
-```
-
-# Species list {.tabset}
-
-In this table, we can see the number of ETP species by taxon, for each sampling scheme
 
 ```{r echo=F}
 
-
 DT::datatable(
-  ETPsum,
+  SPlistSum,
   extensions = 'Buttons',
-  filter = 'top', 
+  filter = 'top',
   options = list(
     dom = 'Bfrtip',
     buttons = list(
-      list(extend = 'csv', filename = 'PETsTable')#,
-    #  list(extend = 'excel', filename = 'PETsTable')
+      list(extend = 'csv', filename = 'SpeciesListSummary')#,
+    #  list(extend = 'excel', filename = 'SpeciesListSummary')
     ),
     pageLength = 20,
     scrollX = TRUE,
-    autoWidth = TRUE
+    autoWidth = FALSE
   ),
   #class = 'compact'
-  class = 'compact nowrap'
+  class = 'compact nowrap tableSL'
 )
+
+
 
 ```
