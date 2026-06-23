@@ -1,0 +1,104 @@
+## Section 4.2
+
+
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+# # SPRFMO i small pelagic, no filtering of catch group=small pelagic, because large pelagics are really minor case and in ce we would not be able to select small pelagic catch group
+# 
+# # Comments 2020
+# #KWdays always given
+# #DayAtSea not given - Poland not reported
+# 
+# # Comments 2021 - in this datacall it was clarified that in the column DayAtSea, Fishing days should be reported
+# 
+# 
+ceOrg %>%
+  filter(CEyear %in% params$allYears) %>%
+  filter(substr(CEarea,1,2) %in% c("87")) %>%
+  filter(is.na(CEscientificDaysAtSea))  -> brakDanych
+
+ceOrg %>%
+  filter(CEyear %in% params$allYears) %>%
+  group_by(CEyear, CEarea=substr(CEarea,1,2), CEvesselFlagCountry ) %>% #FishingActivityCategoryEuropeanLvl6
+  summarise(FishingDays = sum(CEscientificDaysAtSea, na.rm = TRUE)
+            #KWDays_1000x = sum(KWDays_1000x, na.rm = TRUE)
+            ) %>%
+  ungroup() %>%
+          # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(FishingDays = as.character(FishingDays)) %>%
+  mutate(FishingDays =  ifelse(FishingDays=='0' | is.na(FishingDays), 'NA', FishingDays)) %>%
+  pivot_wider(names_from = CEyear, values_from = c(FishingDays)) %>%
+  filter(substr(CEarea,1,2) %in% c("87")) %>%
+  select(-CEarea) %>%
+  rename(Country=CEvesselFlagCountry)-> table313_section42
+
+
+kable(table313_section42,  caption = paste('<b>Table 4.13 </b>SPRFMO small pelagic fishery effort (fishing days) by country from ',params$allYears[1] ,' to ', rev(params$allYears)[1], '.'))
+write_csv(table313_section42, paste(table_dir,'SPRFMO_effort_country.csv',
+                      sep = ""))
+
+if(nrow(brakDanych)>0){
+
+  ceOrg %>%
+  filter(CEyear %in% params$allYears) %>%
+  filter(substr(CEarea,1,2) %in% c("87")) %>%
+  filter(is.na(CEscientificDaysAtSea)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
+  group_by(CEvesselFlagCountry) %>%
+  summarise(numRecords = n()) -> tabela
+
+kable(tabela, caption = 'Number of records with missing LandingWeight per FlagCountry')
+
+}else{
+  cat('No missing data for FishingDays')
+
+}
+
+
+```
+  
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+
+
+clOrg %>%
+  filter(CLyear %in% params$allYears) %>%
+  filter(substr(CLarea,1,2) %in% c("87"))%>%
+  filter(is.na(CLscientificWeight_ton)) -> brakDanych
+
+clOrg %>%
+  filter(CLyear %in% params$allYears)  %>%
+  group_by(CLyear, CLarea=substr(CLarea,1,2), CLvesselFlagCountry ) %>% #FishingActivityCategoryEuropeanLvl6
+  summarise(LandingWeight_ton = round(sum(CLscientificWeight_ton, na.rm = TRUE))) %>%
+  ungroup() %>%
+            # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(LandingWeight_ton = as.character(LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton =  ifelse(LandingWeight_ton=='0' | is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>%
+  pivot_wider(names_from = CLyear, values_from = LandingWeight_ton)%>%
+  filter(CLarea %in% c("87") ) %>%
+  select(-CLarea) %>%
+  rename(Country=CLvesselFlagCountry)-> tabela
+
+kable(tabela, caption = paste('<b>Table 4.14 </b>SPRFMO small pelagic fishery total landings (tons) by country from ',params$allYears[1],' to ',rev(params$allYears)[1],'.', sep=''))
+write_csv(tabela, paste(table_dir,'SPRFMO_landings_country.csv',
+                      sep = ""))
+
+if(nrow(brakDanych)>0){
+
+  clOrg %>%
+  filter(CLyear %in% params$allYears) %>%
+  filter(substr(CLarea,1,2) %in% c("87")) %>%
+  filter(is.na(CLscientificWeight_ton)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
+  group_by(CLvesselFlagCountry) %>%
+  summarise(numRecords = n())-> tabela
+
+kable(tabela, caption = 'Number of records with missing LandingWeight per FlagCountry')
+
+}else{
+  cat('No missing data for LandingWeight')
+
+}
+
+
+```
+
+\newpage

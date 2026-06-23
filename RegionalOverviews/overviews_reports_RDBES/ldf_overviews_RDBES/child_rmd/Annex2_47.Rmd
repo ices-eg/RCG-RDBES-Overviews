@@ -1,0 +1,24 @@
+## Landings by species (tons) in 47 (Atlantic, Southeast) area.
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+cl2 %>%
+  filter(CLyear== params$year) %>%
+  filter(Area == "47" & (CLjurisdictionArea!='Angola' | is.na(CLjurisdictionArea) )) %>%
+  group_by(CLvesselFlagCountry, Species2) %>%
+  summarise(LandingWeight_ton = sum(CLscientificWeight_ton)) %>%
+  ungroup() %>%
+  mutate(LandingWeight_ton2 = ifelse(LandingWeight_ton<1, '<1', paste(round(LandingWeight_ton)))) %>%
+  select(CLvesselFlagCountry, Species2, LandingWeight_ton2) %>%
+                # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(LandingWeight_ton2 = as.character(LandingWeight_ton2)) %>%
+  mutate(LandingWeight_ton2 =  ifelse(LandingWeight_ton2=='0' | is.na(LandingWeight_ton2), 'NA', LandingWeight_ton2)) %>%
+  pivot_wider(names_from = CLvesselFlagCountry, values_from = LandingWeight_ton2, values_fill = '') %>%
+  arrange(Species2)-> annex2_5
+
+kable(annex2_5)
+write_csv(annex2_5, paste(table_dir,'Area47_landings_country_species.csv',
+                      sep = ""))
+
+```
+
+\newpage

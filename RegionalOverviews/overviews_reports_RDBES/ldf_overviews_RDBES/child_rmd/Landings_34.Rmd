@@ -1,0 +1,434 @@
+## Area 34 landings
+### Landings by country, area 34
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6,fig.cap='**Figure 34**:Landings (1000 t) by Country'}
+
+barplot(data = cl %>%
+  filter(substr(AreaMap,1,2)==34), 
+      x = "CLvesselFlagCountry",
+      y = "CLscientificWeight_1000ton",
+      #title = "Landings (1000 t) by Country",
+      ylab = "Sum of Landings (1000 t)",
+      col_cou = T )
+```
+
+### Landings by species, area 34 {.tabset}
+#### species
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 35**: Landings of the 20 main Species.'}
+
+sub_cl<- cl%>%
+  filter(substr(AreaMap,1,2)==34)%>%
+  group_by(CLyear,SpeciesLaName) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20, wt=CLscientificWeight_1000ton)
+barplot(data = sub_cl, 
+      x = "SpeciesLaName",
+      y = "CLscientificWeight_1000ton",
+      #title = "Landings (1000 t) by Species",
+      ylab = "Sum of Landings (1000 t)")
+
+```
+
+#### species and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 36**: Proportion of countries landings per main species landed (top 20).'}
+
+sub_cl_2<- cl%>%
+  filter(substr(AreaMap,1,2)==34)%>%
+  group_by(CLyear, SpeciesLaName, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_1000ton2 = sum(CLscientificWeight_1000ton))
+
+sub_cl_top <- sub_cl %>%
+  arrange(desc(CLscientificWeight_1000ton)) %>%
+  top_n(20)
+
+sub_cl_top$Top <- "TOP"
+sub_cl_2_top <- left_join(sub_cl_2,sub_cl_top,by="SpeciesLaName")
+
+sub_cl_2_top <- sub_cl_2_top %>%
+  filter(Top=='TOP')
+
+barplot(data = sub_cl_2_top,
+      x = "SpeciesLaName",
+      y = "CLscientificWeight_1000ton2",
+      group = "CLvesselFlagCountry",
+      groupNiceName = 'Vessel flag country',
+      #title = "Landings (1000 t) by Species and Country",
+      ylab = "Proportion of Landings (%)",
+      asPct = T)
+```
+
+#### species catch group
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 37**: Sum of the landings by species catch group.'}
+
+barplot(data = cl%>%
+  filter(substr(AreaMap,1,2)==34), 
+      x = "CatchGroup",
+      y = "CLscientificWeight_1000ton",
+      #title = "Landings (1000 t) by Species Catch Group",
+      ylab = "Landings (1000 t)")
+```
+
+#### species catch group and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 38**: Proportion of countries landings by species catch group.'}
+
+barplot(data = cl%>%
+  filter(substr(AreaMap,1,2)==34), 
+      x = "CatchGroup",
+      y = "CLscientificWeight_1000ton",
+      group = "CLvesselFlagCountry",
+  groupNiceName = 'Vessel flag country',
+      #title = "Landings by Species Catch Group and Country",
+      ylab = "Proportion of Landings (%)",
+      asPct = T )
+
+```
+### Landings by fleet, area 34 {.tabset}
+#### fleet
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 39**: Proportion of countries landings by vessel length category.'}
+barplot(data = cl%>%
+  filter(substr(AreaMap,1,2)==34), 
+      x = "CLvesselLengthCategory",
+      y = "CLscientificWeight_1000ton",
+      group = "CLvesselFlagCountry",
+  groupNiceName = 'Vessel flag country',
+      #title = "Landings by Vessel Length Category and Country",
+      ylab = "Proportion of Landings (%)",
+      asPct = T)
+
+```
+
+
+### Landings by division, area 34 {.tabset}
+#### division
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 40**: Landings (all species) distribution by division'}
+barplot(data = cl%>%
+  filter(substr(AreaMap,1,2)==34)%>%
+    rename(Division = AreaMap), 
+      x = "Division",
+      y = "CLscientificWeight_1000ton",
+      #title = "Landings (1000 t) by Area",
+      ylab = "Sum of Landings (1000 t)")
+
+```
+
+#### division and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 41**: Proportion of countries total landings by division'}
+barplot(data = cl%>%
+    rename(Division = AreaMap)%>%
+  filter(substr(Division,1,2)==34), 
+      x = "Division",
+      y = "CLscientificWeight_1000ton",
+      group = "CLvesselFlagCountry",
+  groupNiceName = 'Vessel flag country',
+      #title = "Landings (1000 t) by Area and Country",
+      ylab = "Proportion of Landings (%)",
+      asPct = T )
+
+```
+
+#### country and division
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 42**: Proportion of the total landings per division, by country.'}
+barplot(data = cl%>%
+    rename(Division = AreaMap)%>%
+        filter(substr(Division,1,2)==34), 
+      x = "CLvesselFlagCountry",
+      y = "CLscientificWeight_1000ton",
+      group = "Division",
+      #title = "Landings (1000 t) by Country and Area",
+      ylab = "Proportion of Landings (%)",
+      asPct = T)
+
+
+```
+
+#### map - division
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 43**: Sum of landings(1000 t) by Area 34'}
+# do we need information on for how many rows(%) there was a missing CLscientificWeight_ton? <-------------------------- to do
+
+# data prep
+cl %>%
+  filter(substr(AreaMap,1,2)==34)%>%
+  rename(`Division ` = AreaMap)%>%
+  group_by(CLyear, `Division `) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA)-> df
+
+# map
+result = choroplethMap_func2(
+  df,
+  var_name = 'CLscientificWeight_ton',
+  var_spatial_name = 'Division ',
+  facet_name = 'CLyear',
+  spatial_dataset_name = 'Divisionshp',
+  spatial_dataset_var_name = 'Division',
+  spatial_dataset_labels = FALSE,
+  saveResults = FALSE,
+  outputPath,
+  extraShp_name = NA,
+  displayInR = TRUE,
+  var_name_new = "Landing weight (ton)",
+  addToTitle = NA
+)
+result[[1]]
+
+```
+
+#### map - division & flag country
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 44**: Sum of landings(1000 t) by Area 34'}
+# data prep
+cl %>%
+  filter(substr(AreaMap,1,2)==34)%>%
+  rename(Division = AreaMap)%>%
+  group_by(CLyear, Division, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  mutate(pr= CLscientificWeight_1000ton/sum(CLscientificWeight_1000ton, na.rm = TRUE)*100,
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA,
+         Region = 'LDF')-> df
+
+# map
+result <- scatterpieMap_func(df = df,
+                  var = "CLscientificWeight_1000ton",
+                              groupBy = "Division",
+                              groupBy2 = "CLvesselFlagCountry",
+                              facet = NA,
+                              func = "sum",
+                              type_of_threshold = 'none',
+                              points_coord = Divisionshp,
+                              newVarName = "Landings (1000t)",
+                              addToTitle = NA,
+                              value_of_threshold = NA,
+                              plot_labels = FALSE,
+                              Catch_group_name = NA,
+                              addExtraShp = FALSE,
+                              extraShp = NA,
+                              color_palette = koloryRDBES,
+                              filter_column  = NA,
+                              filter_type = NA,
+                              filter_threshold = NA,
+                              filter_func = NA)
+
+result
+
+```
+
+### Landings by metier, area 34 {.tabset}
+#### metier lvl5
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap='**Figure 45**: Total landings by metier level 5 (top 20).'}
+#data prep
+sub_cl_top <- cl%>%
+  filter(substr(AreaMap,1,2)==34)%>%
+  mutate(CLmetier5 = substr(CLmetier6, 1, 7))%>%
+  group_by(CLyear, CLmetier5) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20)
+
+
+barplot(data = sub_cl_top,
+      x = "CLmetier5",
+      y = "CLscientificWeight_1000ton",
+     # title = "Landings (1000 t) by Metier Lvl5",
+      ylab = "Proportion of Landings (1000 t)")
+```
+
+#### metier lvl5 and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=7,fig.height=7, fig.cap='**Figure 46**: Proportion of countries landings by metier level 5 (top 20).'}
+#data prep
+sub_cl_2<- cl%>%
+  filter(substr(AreaMap,1,2)==34)%>%
+  mutate(CLmetier5 = substr(CLmetier6, 1, 7))%>%
+  group_by(CLyear, CLmetier5, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_1000ton2 = sum(CLscientificWeight_1000ton))
+
+sub_cl_top$Top <- "TOP"
+sub_cl_2_top <- left_join(sub_cl_2,sub_cl_top,by="CLmetier5")
+
+sub_cl_2_top <- sub_cl_2_top %>%
+  filter(Top=='TOP')
+
+barplot(data = sub_cl_2_top, 
+      x = "CLmetier5",
+      y = "CLscientificWeight_1000ton2",
+      group = "CLvesselFlagCountry",
+      groupNiceName = 'Vessel flag country',
+      #title = "Landings (1000 t) by Metier Lvl5 and Country",
+      ylab = "Proportion of Landings (%)",
+      asPct = T)
+
+```
+
+#### metier lvl6
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 47**: Total landings by metier level 6 (top 20).'}
+sub_cl_top<- cl%>%
+  filter(substr(AreaMap,1,2)==34)%>%
+  group_by(CLyear, CLmetier6) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20, wt=CLscientificWeight_1000ton)
+
+barplot(data = sub_cl_top, 
+      x = "CLmetier6",
+      y = "CLscientificWeight_1000ton",
+     # title = "Landings (1000 t) by Metier Lvl6",
+      ylab = "Sum of Landings (1000 t)")
+```
+
+#### metier lvl6 and country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 48**: Proportion of countries landings by metier level 6 (top 20).'}
+sub_cl_2<- cl%>%
+  filter(substr(AreaMap,1,2)==34)%>%
+  group_by(CLyear, CLmetier6, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_1000ton2 = sum(CLscientificWeight_1000ton))
+
+sub_cl_top$Top <- "TOP"
+sub_cl_2_top <- left_join(sub_cl_2,sub_cl_top,by="CLmetier6")
+
+sub_cl_2_top <- sub_cl_2_top %>%
+  filter(Top=='TOP')
+
+barplot(data = sub_cl_2_top, 
+        x = "CLmetier6",
+        y = "CLscientificWeight_1000ton2",
+        #title = "Landings (1000 t) by Metier Lvl6 and Country",
+        group = "CLvesselFlagCountry",
+        groupNiceName = 'Vessel flag country',
+        ylab = "Proportion of Landings (%)",
+        asPct = T )
+```
+
+### Landings by harbour, area 34 {.tabset}
+#### harbour
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 49**: Total landings of the main harbours (top 20).'}
+sub_cl_top<- cl%>%
+  filter(substr(AreaMap,1,2)==34)%>%
+  group_by(CLyear, CLlandingLocation) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20, wt=CLscientificWeight_1000ton)
+
+barplot(data = sub_cl_top, 
+      x = "CLlandingLocation",
+      y = "CLscientificWeight_1000ton",
+      #title = "Landings (1000 t) by Harbours",
+      ylab = "Sum of Landings (1000 t)")
+```
+
+#### harbour and flag country
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 50**: Proportion of flag country landings by harbour (top 20).'}
+sub_cl_2 <- cl%>%
+  filter(substr(AreaMap,1,2)==34)%>%
+  group_by(CLyear, CLlandingLocation, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_1000ton2 = sum(CLscientificWeight_1000ton))
+
+sub_cl_top$Top <- "TOP"
+sub_cl_2_top <- left_join(sub_cl_2,sub_cl_top,by = "CLlandingLocation")
+
+sub_cl_2_top <- sub_cl_2_top %>%
+  filter(Top=='TOP')
+
+barplot(data = sub_cl_2_top, 
+        x = "CLlandingLocation",
+        y = "CLscientificWeight_1000ton2",
+       # title = "Landings (1000 t) by Harbour and Flag Country",
+        group = "CLvesselFlagCountry",
+       groupNiceName = 'Vessel flag country',
+        ylab = "Proportion of Landings (1000 t)",
+        asPct = T)
+```
+
+#### map - harbour
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 51**: Map with the landing weight by main harbours (top 20).'}
+sub_cl_top %>%  mutate(
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA
+       )-> df
+
+
+result <- pointsMap_func2(df,
+                          title = '',#'Landings (1000 t) by Harbour',
+                          var_name = 'CLscientificWeight_1000ton',
+                          facet_name = 'CLyear',
+                          var_spatial_name = 'CLlandingLocation',
+                          spatial_dataset_name = 'Harbours',
+                          spatial_dataset_var_name = 'Harbour',
+                          plot_labels = TRUE,
+                          saveResults = FALSE,
+                          #outputPath,
+                          Catch_group_name = NA,
+                          extraShp_name = 'Divisionshp',
+                          newVarName = NA,
+                          addToTitle = NA,
+                          RCGregion = 'BA'
+                         )
+
+  
+result
+
+
+```
+
+#### map - division & flag country
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 52**: Sum of landings(1000 t) by Harbour'}
+# data prep
+cl %>%
+  mutate(Harbour = CLlandingLocation)%>%
+  filter(substr(AreaMap,1,2)==34)%>%
+  group_by(CLyear, Harbour, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  mutate(pr= CLscientificWeight_1000ton/sum(CLscientificWeight_1000ton, na.rm = TRUE)*100,
+         analysis_type = 'percent',
+         type_of_threshold = '95',
+         value_of_threshold = NA,
+         Region = 'LDF')-> df
+
+# map
+result <- scatterpieMap_func(
+  df = df,
+  var = "CLscientificWeight_1000ton",
+  groupBy = "Harbour",
+  groupBy2 = "CLvesselFlagCountry",
+  facet = NA,
+  func = 'sum',
+  points_coord = Harbours,
+  newVarName = "Landings (1000t)",
+  addToTitle = NA,
+  value_of_threshold = NA,
+  plot_labels = FALSE,
+  Catch_group_name = NA,
+  addExtraShp = TRUE,
+  extraShp = Divisionshp,
+  color_palette = koloryRDBES,
+  filter_column  = NA,
+  filter_type = NA,
+  filter_threshold = NA,
+  filter_func = NA
+)
+
+result
+
+```
+
+### Landings abroad, area 34
+Plot below shows the CLscientificWeight_ton between CLvesselFlagCountry (left), Harbour Country * (center) and CLlandingCountry(right).
+
+```{r , echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9, fig.cap = '**Figure 53**:River plot of total landings (1000t) between vessel Flag Country (left), Harbour Country (center) and landing Country(right). Width of line is proportional to landings. Harbour Country is the Country from the CLlandingLocation.'}
+    
+cl %>%
+  filter(substr(AreaMap,1,2)==34)%>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
+
+result<-func_riverplot(df = cl_river,
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
+result
+```
+
+

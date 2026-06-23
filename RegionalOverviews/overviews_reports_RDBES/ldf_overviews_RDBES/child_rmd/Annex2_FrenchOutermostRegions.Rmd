@@ -1,0 +1,134 @@
+## Landings (tons) in the French outermost regions by year
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+
+clOrg %>%
+  filter(CLyear %in% params$allYears & CLvesselFlagCountry == "FR") %>%
+  group_by(CLvesselFlagCountry, CLyear) %>%
+  summarise(LandingWeight_ton = round(sum(CLscientificWeight_ton, na.rm = TRUE))) %>%
+  ungroup() %>%
+  # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(LandingWeight_ton = as.character(LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton =  ifelse(is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton = ifelse(LandingWeight_ton == '0', '<1', LandingWeight_ton)) %>%
+  pivot_wider(names_from = CLyear, values_from = LandingWeight_ton) -> tableOR
+
+kable(tableOR)
+write_csv(tableOR, paste(table_dir,'OR_landings_country_year.csv',
+                      sep = ""))
+
+```
+
+## Landings (tons) in the French outermost regions by area
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+
+clOrg %>%
+  filter(CLyear %in% params$allYears & CLvesselFlagCountry == "FR") %>%
+  group_by(CLvesselFlagCountry, CLarea) %>%
+  summarise(LandingWeight_ton = round(sum(CLscientificWeight_ton, na.rm = TRUE))) %>%
+  ungroup() %>%
+  # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(LandingWeight_ton = as.character(LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton =  ifelse(is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton = ifelse(LandingWeight_ton == '0', '<1', LandingWeight_ton)) %>%
+  pivot_wider(names_from = CLarea, values_from = LandingWeight_ton) -> tableOR
+
+kable(tableOR)
+write_csv(tableOR, paste(table_dir,'OR_landings_country_area.csv',
+                      sep = ""))
+
+```
+
+## Landings (tons) in the French outermost regions by species and area
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+
+clOrg %>%
+  filter(CLyear %in% params$allYears & CLvesselFlagCountry == "FR") %>%
+  group_by(CLvesselFlagCountry, CLarea,SpeciesLaName) %>%
+  summarise(LandingWeight_ton = round(sum(CLscientificWeight_ton, na.rm = TRUE))) %>%
+  ungroup() %>%
+  # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(LandingWeight_ton = as.character(LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton =  ifelse(is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton = ifelse(LandingWeight_ton == '0', '<1', LandingWeight_ton)) %>%
+  pivot_wider(names_from = CLarea, values_from = LandingWeight_ton) -> tableOR
+
+kable(tableOR)
+write_csv(tableOR, paste(table_dir,'OR_landings_country_species_area.csv',
+                      sep = ""))
+
+```
+
+## Landings (tons) in the French outermost regions by catch group and area
+
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+
+clOrg %>%
+  filter(CLyear %in% params$allYears & CLvesselFlagCountry == "FR") %>%
+  group_by(CLvesselFlagCountry, CLarea,CatchGroup) %>%
+  summarise(LandingWeight_ton = round(sum(CLscientificWeight_ton, na.rm = TRUE))) %>%
+  ungroup() %>%
+  # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(LandingWeight_ton = as.character(LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton =  ifelse(is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton = ifelse(LandingWeight_ton == '0', '<1', LandingWeight_ton)) %>%
+  pivot_wider(names_from = CLarea, values_from = LandingWeight_ton) -> tableOR
+
+kable(tableOR)
+write_csv(tableOR, paste(table_dir,'OR_landings_country_catch_group_area.csv',
+                      sep = ""))
+
+```
+
+## Effort (fishing days) in the French outermost regions
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+
+ ceOrg %>%
+   filter(CEyear %in% params$allYears) %>%
+   filter(CEvesselFlagCountry == "FR") %>%
+   filter(is.na(CEscientificDaysAtSea)) -> brakDanych
+
+ ceOrg %>%
+ # filter((Subpolygon!='Angola' | is.na(Subpolygon) )) %>%
+   filter(CEyear %in% params$allYears)  %>%
+   filter(CEvesselFlagCountry == "FR") %>%
+   group_by(CEvesselFlagCountry, CEarea, CEyear ) %>%
+   summarise(FishingDays = round(sum(CEscientificDaysAtSea, na.rm = TRUE))) %>%
+   ungroup() %>%
+# replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+   mutate(FishingDays = as.character(FishingDays)) %>%
+   mutate(FishingDays =  ifelse(FishingDays=='0' | is.na(FishingDays) , 'NA', FishingDays)) %>%
+   pivot_wider(names_from = CEyear, values_from = c(FishingDays))%>%
+   rename(Country = CEvesselFlagCountry)-> tableOR
+
+ kable(tableOR)
+ write_csv(tableOR, paste(table_dir,'OR_effort_area_country.csv',
+                      sep = ""))
+
+ if(nrow(brakDanych)>0){
+   cat('Number of records with missing FishingDays per FlagCountry' )
+
+   ceOrg %>%
+   filter(CEyear %in% params$allYears) %>%
+   filter(CEvesselFlagCountry=="FR") %>%
+   filter(is.na(CEscientificDaysAtSea)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
+   group_by(CEvesselFlagCountry) %>%
+   summarise(numRecords = n())-> tabela
+
+ kable(tabela)
+
+ }else{
+
+   cat('No missing data for Fishing Days')
+
+ }
+
+```
+
+
+
+\newpage

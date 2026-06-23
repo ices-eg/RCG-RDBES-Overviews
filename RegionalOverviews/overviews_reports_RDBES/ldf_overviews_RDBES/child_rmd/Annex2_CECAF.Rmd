@@ -1,0 +1,74 @@
+## Landings by species (tons) in West Africa (CECAF area).
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+
+# 34 without Madera i Canaries
+cl2$CLvesselFlagCountry<-as.character(cl2$CLvesselFlagCountry)
+cl2 %>%
+  filter(CLyear==params$year) %>%
+  filter((Area=="34" & CLjurisdictionArea!='Canaries'  & CLjurisdictionArea!='Madeira' ) | (Area == '34' & is.na(CLjurisdictionArea)) | CLjurisdictionArea == 'Angola' )%>%
+  group_by(CLvesselFlagCountry, Species2, CLspeciesFaoCode) %>%
+  summarise(LandingWeight_ton = sum(CLscientificWeight_ton)) %>%
+  ungroup() %>%
+  mutate(LandingWeight_ton2 = ifelse(LandingWeight_ton<1, '<1', paste(round(LandingWeight_ton)))) %>%
+  select(CLvesselFlagCountry, Species2, LandingWeight_ton2, CLspeciesFaoCode) %>%
+              # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(LandingWeight_ton2 = as.character(LandingWeight_ton2)) %>%
+  mutate(LandingWeight_ton2 =  ifelse(LandingWeight_ton2=='0' | is.na(LandingWeight_ton2), 'NA', LandingWeight_ton2)) %>%
+  pivot_wider(names_from = CLvesselFlagCountry, values_from = LandingWeight_ton2, values_fill = '') %>%
+  arrange(Species2) %>%
+  select(-CLspeciesFaoCode)-> annex2_1
+
+kable(annex2_1)
+write_csv(annex2_1, paste(table_dir,'CECAF_landings_country_species.csv',
+                      sep = ""))
+
+```
+
+\newpage
+## Landings by species (tons) in Canaries (CECAF area).
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+cl2 %>%
+  filter(CLyear== params$year) %>%
+  filter( CLjurisdictionArea=='Canaries' ) %>%
+  group_by(CLvesselFlagCountry, Species2) %>%
+  summarise(LandingWeight_ton = sum(CLscientificWeight_ton)) %>%
+  ungroup() %>%
+  mutate(LandingWeight_ton2 = ifelse(LandingWeight_ton<1, '<1', paste(round(LandingWeight_ton)))) %>%
+  select(CLvesselFlagCountry, Species2, LandingWeight_ton2) %>%
+                # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(LandingWeight_ton2 = as.character(LandingWeight_ton2)) %>%
+  mutate(LandingWeight_ton2 =  ifelse(LandingWeight_ton2=='0' | is.na(LandingWeight_ton2), 'NA', LandingWeight_ton2)) %>%
+  pivot_wider(names_from = CLvesselFlagCountry, values_from = LandingWeight_ton2, values_fill = '') %>%
+  arrange(Species2) -> annex2_2
+
+kable(annex2_2)
+write_csv(annex2_1, paste(table_dir,'Canaries_landings_country_species.csv',
+                      sep = ""))
+```
+
+
+\newpage
+## Landings by species (tons) in Madeira (CECAF area).
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+cl2 %>%
+  filter(CLyear==params$year) %>%
+  filter( CLjurisdictionArea=='Madeira' ) %>%
+  group_by(CLvesselFlagCountry, Species2) %>%
+  summarise(LandingWeight_ton = sum(CLscientificWeight_ton)) %>%
+  ungroup() %>%
+  mutate(LandingWeight_ton2 = ifelse(LandingWeight_ton<1, '<1', paste(round(LandingWeight_ton)))) %>%
+  select(CLvesselFlagCountry, Species2, LandingWeight_ton2) %>%
+                # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(LandingWeight_ton2 = as.character(LandingWeight_ton2)) %>%
+  mutate(LandingWeight_ton2 =  ifelse(LandingWeight_ton2=='0' | is.na(LandingWeight_ton2), 'NA', LandingWeight_ton2)) %>%
+  pivot_wider(names_from = CLvesselFlagCountry, values_from = LandingWeight_ton2, values_fill = '') %>%
+  arrange(Species2) -> annex2_3
+
+kable(annex2_3)
+write_csv(annex2_3, paste(table_dir,'Madeira_landings_country_species.csv',
+                      sep = ""))
+
+```

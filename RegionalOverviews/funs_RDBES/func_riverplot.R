@@ -40,7 +40,13 @@ func_riverplot <-
         df$left <-ifelse(is.na(df$left),"NA",as.character(df$left))
         
     #colors
-    colourCountryTab <- data.table(colours)
+        # temporal solution
+        if(regionSelected == "LDF"){
+          colourCountryTab <- data.table(koloryRDBES)
+        }else{
+          colourCountryTab <- data.table(colours)
+        }
+        
     colourCountryTab$ISO2Code <- colourCountryTab$country
     colourCountryTab$colour5 <- colourCountryTab$color
     

@@ -1,0 +1,46 @@
+## Area - Species - Flag country.
+
+Landings (tons) by species, area, flag country.
+
+```{r, results = 'asis',echo = FALSE, warning = FALSE, message = FALSE}
+cl2 %>% filter(CLyear== params$year) %>%
+  group_by(Species2, Area = AreaMap, CLvesselFlagCountry) %>%
+  summarise(LandingWeight_ton = round(sum(CLscientificWeight_ton, na.rm = TRUE), digits = 0)) %>%
+                  # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(LandingWeight_ton = as.character(LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton =  ifelse(LandingWeight_ton=='0' | is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>%
+  spread(CLvesselFlagCountry, LandingWeight_ton, fill = NA) %>%
+  arrange(Area, Species2) -> AreaSpeciesFlagcountry
+
+kable(AreaSpeciesFlagcountry)
+write_csv(AreaSpeciesFlagcountry,  paste(table_dir,'AreaSpeciesFlagcountry_LandingWeight_ton.csv',
+                      sep = ""))
+
+```
+
+\newpage
+
+## Area - Metier - Flag country Landings.
+
+Landings (tons) by metier, area, flag country.
+```{r, results = 'asis',echo = FALSE, warning = FALSE, message = FALSE}
+cl2 %>% filter(CLyear==params$year) %>%
+  group_by(CLmetier6, AreaMap, CLvesselFlagCountry) %>%
+  summarise(LandingWeight_ton = round(sum(CLscientificWeight_ton, na.rm = TRUE), digits = 0)) %>%
+                    # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(LandingWeight_ton = as.character(LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton =  ifelse(LandingWeight_ton=='0' | is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>%
+  #pivot_wider(names_from = FlagCountry, values_from = LandingWeight_ton, values_fill = list(NA)) %>%
+  spread(CLvesselFlagCountry, LandingWeight_ton, fill = NA) %>%
+  arrange(AreaMap, CLmetier6) -> AreaMetierFlagcountry
+
+AreaMetierFlagcountry <- rename(AreaMetierFlagcountry, FishingActivityLvl6 = CLmetier6)
+
+kable(AreaMetierFlagcountry)
+write_csv(AreaMetierFlagcountry, na="", paste(table_dir,'AreaMetierFlagcountry_LandingWeight_ton.csv', sep = ""))
+
+```
+
+
+
+\newpage
