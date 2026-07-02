@@ -1,0 +1,429 @@
+## Section 4.1
+
+West Africa
+
+```{r, results = "asis", eval = T,echo = FALSE, warning = FALSE, message = FALSE}
+
+clOrg %>% filter((substr(CLarea,1,2)=="34" & is.na(CLjurisdictionArea)) | (substr(CLarea,1,2)=="47" & is.na(CLjurisdictionArea))) %>% 
+  group_by(CLvesselFlagCountry, CLyear) %>% 
+  summarise(numRecords = n(),
+            Landings = sum(CLscientificWeight_ton, na.rm = TRUE)) -> CLmissing
+
+kable(CLmissing, caption = 'CL records with missing Subplygon and Area 34')
+#kable_styling() %T>% save_kable(paste(table_dir, 'WestAfrica_CL_missing_subpolygon.pdf', sep = ''))
+
+write_csv(CLmissing, paste(table_dir,'WestAfrica_CL_missing_subpolygon.csv',
+                      sep = ""))
+
+
+```
+
+```{r, results = "asis", eval = T, echo = FALSE, warning = FALSE, message = FALSE}
+
+ceOrg %>% filter(substr(CEarea,1,2)=="34" & is.na(CEjurisdictionArea) | (substr(CEarea,1,2)=="47" & is.na(CEjurisdictionArea))) %>% 
+  group_by(CEvesselFlagCountry, CEyear) %>% 
+  summarise(numRecords = n(),
+            FishingDays = sum(CEscientificDaysAtSea, na.rm = TRUE))->CEmissing
+
+kable(CEmissing, caption = 'CE records with missing Subplygon and Area 34')
+
+write_csv(CEmissing, paste(table_dir,'WestAfrica_CE_missing_subpolygon.csv',
+                      sep = ""))
+
+
+```
+
+All records with Area 34 and Subpolygon missing were assigned to the West Africa. Angola is included in the West Africa (CECAF), even though it is FAO area 47 not 34. 
+
+  
+
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+clOrg %>% 
+  mutate(FisheryTemp = CLmetier6,
+         CLjurisdictionArea=ifelse(is.na(CLjurisdictionArea),'',CLjurisdictionArea)) %>% 
+  separate(FisheryTemp, c('x1', 'Fishery', 'x2', 'x3', 'x4')) %>% 
+  select(-c(x1, x2, x3, x4)) %>% 
+  filter((substr(CLarea,1,2)=="34" & CLjurisdictionArea!='Canaries'  & CLjurisdictionArea!='Madeira' ) | CLjurisdictionArea=='Angola' | substr(CLarea,1,2)=="47") %>% 
+  filter(CLyear == params$year) %>% 
+  distinct(Fishery, CLjurisdictionArea, CLvesselFlagCountry) %>% 
+  group_by(Fishery, CLjurisdictionArea) %>%
+  mutate(Countries = paste(CLvesselFlagCountry, collapse = ", ")) %>% 
+  distinct(Fishery, CLjurisdictionArea, Countries) %>% 
+  arrange(desc(Fishery), CLjurisdictionArea)->table_4_1
+
+kable(table_4_1, caption = paste('<b>Table 4.1 </b>General types of fisheries in relevant CECAF areas by MS (', params$year ,'data) ', sep = '') )
+# kable_styling() %T>% save_kable(paste(table_dir, 'Table_4_1_CECAF_fisheries_Area_country.pdf', sep = ''))
+
+write_csv(table_4_1, paste(table_dir,'Table 4.1_CECAF_fisheries_Area_country.csv',
+                      sep = ""))
+
+```
+
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+
+ceOrg %>%
+  filter(
+    (substr(Division,1,2) == "34" & 
+       CEjurisdictionArea!='Canaries' & 
+       CEjurisdictionArea!='Madeira' 
+     ) | 
+      (substr(Division,1,2) == '34' & 
+          is.na(CEjurisdictionArea)) |
+      CEjurisdictionArea=='Angola' | 
+      (substr(Division,1,2) == 47)
+    )%>%
+  filter(CEyear %in% params$allYears)  %>% 
+  filter(is.na(CEscientificDaysAtSea)) -> brakDanych 
+
+ceOrg %>%
+  filter((substr(AreaMap,1,2) == '34' & CEjurisdictionArea!='Canaries'  & CEjurisdictionArea!='Madeira' ) | (substr(AreaMap,1,2) == '34' & is.na(CEjurisdictionArea)) | CEjurisdictionArea=='Angola'  | substr(AreaMap,1,2) == 47) %>%
+  filter(CEyear %in% params$allYears)  %>%
+  group_by( CEmetier6, CEvesselFlagCountry,CEyear ) %>%
+  summarise(FishingDays = sum(CEscientificDaysAtSea, na.rm = TRUE)) %>% # co tu się zadziało???
+  ungroup() %>%
+  # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(FishingDays = as.character(FishingDays)) %>%
+  mutate(FishingDays =  ifelse(FishingDays=='0' | is.na(FishingDays), 'NA', FishingDays)) %>%
+  pivot_wider(names_from = CEyear, values_from = c(FishingDays)#,
+             # values_fill = list(FishingDays = 0)
+              ) %>%
+   rename(Metier_lvl6 = CEmetier6, Country = CEvesselFlagCountry)-> table_4_2
+
+
+kable(table_4_2, caption = paste('<b>Table 4.2 </b>Effort (fishing days) by country and metiers from ', params$allYears[1] , ' to ' , rev(params$allYears)[1], ' (Fishing ground: West Africa)', sep = ''))
+
+
+write_csv(table_4_2, paste(table_dir,'CECAF_effort_country_metiers.csv',
+                      sep = ""))
+
+if(nrow(brakDanych)>0){
+
+ceOrg %>%
+  filter((substr(Division,1,2) == 34 & CEjurisdictionArea!='Canaries' & CEjurisdictionArea!='Madeira' ) | (substr(Division,1,2) == '34' & is.na(CEjurisdictionArea)) | CEjurisdictionArea=='Angola'  | substr(Division,1,2) == 47) %>%
+  filter(Ceyear %in% params$allYears)  %>% 
+  filter(is.na(CEscientificDaysAtSea)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
+  group_by(CEvesselFlagCountry) %>%
+  summarise(numRecords = n()) -> tabela
+
+kable(tabela, caption = 'Number of records with missing FishingDays per FlagCountry')
+
+}else{
+  cat("No missing data for FishingDays")
+
+
+}
+
+```
+
+```{r, results = "asis", echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+
+
+clOrg %>%
+  filter(
+    (substr(Division,1,2) == '34' & CLjurisdictionArea != 'Canaries'  & CLjurisdictionArea != 'Madeira' ) |
+      (substr(Division,1,2) == '34' & is.na(CLjurisdictionArea)) |
+         CLjurisdictionArea == 'Angola' | 
+      substr(Division,1,2) == 47
+    ) %>%
+  filter(CLyear %in% params$allYears) %>% 
+  filter(is.na(CLscientificWeight_ton)) -> brakDanych
+
+j = 1
+for(i in unique(clOrg$CLyear)){
+
+clOrg %>%
+  filter((substr(Division,1,2) == "34" & CLjurisdictionArea != 'Canaries'  & CLjurisdictionArea != 'Madeira' ) | (substr(Division,1,2) == '34' & is.na(CLjurisdictionArea)) | CLjurisdictionArea == 'Angola'  | substr(Division,1,2) == "47") %>%
+   filter(CLyear==i) %>%  
+  #filter(Year %in% c(2014:2020)) %>% 
+  group_by(CLyear, CLvesselFlagCountry, CLmetier6 ) %>% 
+  summarise(LandingWeight_ton = round(sum(CLscientificWeight_ton, na.rm = TRUE))) %>% 
+    # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(LandingWeight_ton = as.character(LandingWeight_ton)) %>% 
+  mutate(LandingWeight_ton =  ifelse(LandingWeight_ton=='0' | is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>% 
+  ungroup() %>% 
+  pivot_wider(names_from = CLvesselFlagCountry, values_from = LandingWeight_ton) %>% 
+    arrange(CLmetier6) %>% 
+    rename( !!paste('Metier',i, sep = ' ') := CLmetier6) %>% 
+    select(-CLyear)-> table_4_3
+cat("\n\n")
+
+print(kable(table_4_3, caption = paste('<b>Table 4.3.',j,' </b>Landings (tons) by country and metiers ', i,' (Fishing ground: West Africa)', sep = '')))
+cat("\n\n")
+write_csv(table_4_3, paste(table_dir,'CECAF_landings_country_metiers_',i,'_.csv',
+                      sep = ""))
+
+j = j+1
+}
+
+if(nrow(brakDanych)>0){
+
+clOrg %>%
+  filter((substr(Division,1,2) == "34" & CLjurisdictionArea != 'Canaries'  & CLjurisdictionArea != 'Madeira' ) | (substr(Division,1,2) == '34' & is.na(CLjurisdictionArea)) | CLjurisdictionArea == 'Angola'  | substr(Division,1,2) == "47") %>%
+  filter(Clyear %in% params$allYears) %>% 
+  filter(is.na(CLscientificWeight_ton)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
+  group_by(CLvesselFlagCountry) %>% 
+  summarise(numRecords = n())-> tabela
+
+kable(tabela, caption = 'Number of records with missing LandingWeight per FlagCountry')
+  
+}else{
+  cat('No missing data for LandingWeight')
+  
+}
+
+
+```
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+
+clOrg %>%
+  filter((substr(Division,1,2) == "34" & CLjurisdictionArea != 'Canaries' & CLjurisdictionArea != 'Madeira' ) | (substr(Division,1,2) == '34' & is.na(CLjurisdictionArea)) | CLjurisdictionArea == 'Angola' | substr(Division,1,2) == "47") %>%
+  filter(CLyear %in% params$allYears) %>%
+  group_by(CLyear) %>%
+  summarise(LandingWeight_ton = sum(CLscientificWeight_ton, na.rm = TRUE)) %>%
+  rename(Total_EU_landings_t = LandingWeight_ton)->table_4_4
+
+kable(table_4_4, caption = paste('<b>Table 4.4 </b>Total EU landings (tons) in the West Africa waters of the CECAF area from ', params$allYears[1],' to ', rev(params$allYears)[1] ,'. Data provided through the RDBES', sep = ''))
+
+write_csv(table_4_4, paste(table_dir,'CECAF_landings.csv',
+                      sep = ""))
+
+
+
+```
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+
+ceOrg %>%
+  filter((substr(Division,1,2) == "34" & CEjurisdictionArea != 'Canaries' & CEjurisdictionArea != 'Madeira' ) | (substr(Division,1,2) == '34' & is.na(CEjurisdictionArea)) | CEjurisdictionArea=='Angola' | substr(Division,1,2) == '47') %>%
+  filter(CEyear %in% params$allYears) %>%
+  group_by(CEmetier6) %>%
+  summarise(FishingDays = round(sum(CEscientificDaysAtSea, na.rm = TRUE)/3,2)) %>%
+  ungroup() %>%
+  mutate(EffortPerc = round(FishingDays/sum(FishingDays)*100, 2)) %>%
+  arrange(EffortPerc) %>%
+  rename(Metier = CEmetier6)-> table_4_5
+
+kable(table_4_5, caption = paste('<b>Table 4.5 </b>Percentage of average effort of different metiers operating in the CECAF area (West Africa) (period ', params$allYears[1] ,'-', rev(params$allYears)[1],'). ', sep = ''))
+write_csv(table_4_5, paste(table_dir,'CECAF_avg_effort_metier.csv',
+                      sep = ""))
+
+ceOrg %>%
+  filter((substr(Division,1,2) == "34" & CEjurisdictionArea != 'Canaries' & CEjurisdictionArea != 'Madeira' ) | (substr(Division,1,2) == '34' & is.na(CEjurisdictionArea)) | CEjurisdictionArea=='Angola' | substr(Division,1,2) == '47') %>%
+  filter(CEyear %in% params$allYears) %>%
+  group_by(CEmetier6,CEarea,CEjurisdictionArea) %>%
+  summarise(FishingDays = round(sum(CEscientificDaysAtSea, na.rm = TRUE)/3,2))->temp
+
+```
+  
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+
+
+clOrg %>%
+  filter((substr(Division,1,2) == "34" & CLjurisdictionArea != 'Canaries' & CLjurisdictionArea != 'Madeira') | (substr(Division,1,2) == '34' & is.na(CLjurisdictionArea)) | CLjurisdictionArea == 'Angola' | substr(Division,1,2) == '47')%>%
+  filter(CLyear %in% params$allYears) %>%
+  group_by(CLmetier6) %>%
+  summarise(LandingWeight_ton = round(sum(CLscientificWeight_ton, na.rm = TRUE)/3,2)) %>%
+  ungroup() %>%
+  mutate(LandingsPerc = round(LandingWeight_ton/sum(LandingWeight_ton)*100, 2)) %>%
+  arrange(LandingsPerc)%>%
+  rename(Metier = CLmetier6) -> table_4_6
+
+clOrg %>%
+  filter((substr(Division,1,2) == "34" & CLjurisdictionArea != 'Canaries' & CLjurisdictionArea != 'Madeira') | (substr(Division,1,2) == '34' & is.na(CLjurisdictionArea)) | CLjurisdictionArea == 'Angola' | substr(Division,1,2) == '47') -> temp
+
+kable(table_4_6, caption = paste('<b>Table 4.6 </b>Percentage of average landings (period', params$allYears[1],'-',rev(params$allYears)[1],') of different métiers operating in the CECAF area (West Africa).', sep = ''))
+write_csv(table_4_6, paste(table_dir,'CECAF_avg_landings_metier.csv',
+                      sep = ""))
+
+```
+
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+# Tabele 4.9, 4.10 - Canaries - in 2022 ESP submitted data for Canaries 2019-2021
+```
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+ceOrg %>%
+  filter( CEjurisdictionArea=='Canaries' ) %>%
+  filter(CEyear %in% params$allYears)  %>%
+  filter(is.na(CEscientificDaysAtSea)) -> brakDanych
+
+ceOrg %>%
+  filter( CEjurisdictionArea=='Canaries' ) %>%
+  filter(CEyear %in% params$allYears)  %>%
+  group_by(CEvesselFlagCountry, CEyear, CEmetier6, CEarea ) %>%
+  summarise(FishingDays = sum(CEscientificDaysAtSea, na.rm = TRUE)) %>%
+  ungroup() %>%
+      # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(FishingDays = as.character(FishingDays)) %>%
+  mutate(FishingDays =  ifelse(FishingDays=='0' | is.na(FishingDays), 'NA', FishingDays)) %>%
+  pivot_wider(names_from = CEyear, values_from = c(FishingDays)) %>%
+  rename(Metier = CEmetier6,
+         Country = CEvesselFlagCountry) %>%
+  select(-CEarea)-> table_4_9
+
+
+
+kable(table_4_9, caption = paste('<b>Table 4.9 </b>Effort (fishing days) by metiers for Canaries ',params$allYears[1],'-',rev(params$allYears)[1], sep = ''))
+write_csv(table_4_9, paste(table_dir,'Canaires_effort_metiers.csv',
+                      sep = ""))
+
+if(nrow(brakDanych)>0){
+
+ceOrg %>%
+  filter( CEjurisdictionArea=='Canaries' ) %>%
+  filter(CEyear %in% params$allYears)  %>%
+  filter(is.na(CEscientificDaysAtSea)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
+  group_by(CEvesselFlagCountry) %>%
+  summarise(numRecords = n()) -> tabela
+
+kable(tabela, caption = 'Number of records with missing FishingDays per FlagCountry')
+
+}else{
+  cat('No missing data for FishingDays')
+
+}
+```
+
+```{r, results = "asis", echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+clOrg %>%
+  filter( CLjurisdictionArea=='Canaries' ) %>%
+  filter(CLyear %in% params$allYears)  %>%
+  filter(is.na(CLscientificWeight_ton)) -> brakDanych
+
+clOrg %>%
+  filter( CLjurisdictionArea=='Canaries' ) %>%
+  filter(CLyear %in% params$allYears)  %>%
+  group_by(CLyear, CLarea, CLvesselFlagCountry, CLmetier6 ) %>%
+  summarise(LandingWeight_ton = round(sum(CLscientificWeight_ton, na.rm = TRUE))) %>%
+  ungroup() %>%
+        # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(LandingWeight_ton = as.character(LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton =  ifelse(LandingWeight_ton=='0' | is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>%
+  pivot_wider(names_from = CLyear, values_from = LandingWeight_ton) %>%
+  rename(Metier = CLmetier6,
+         Country = CLvesselFlagCountry) %>%
+  select(-CLarea)-> table_4_10
+
+
+kable(table_4_10, caption = paste('<b>Table 4.10 </b>Landings (tons) by metier for Canaries', params$allYears[1],'-',rev(params$allYears)[1], sep = ''))
+write_csv(table_4_10, paste(table_dir,'Canaires_landings_metiers.csv',
+                      sep = ""))
+
+
+if(nrow(brakDanych)>0){
+
+clOrg %>%
+  filter( CLjurisdictionArea=='Canaries' ) %>%
+  filter(CLyear %in% params$allYears)  %>%
+  filter(is.na(CLscientificWeight_ton)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
+  group_by(CLvesselFlagCountry) %>%
+  summarise(numRecords = n())-> tabela
+
+kable(tabela, caption = 'Number of records with missing LandingWeight per FlagCountry')
+
+}else{
+  cat('No missing data for LandingWeight')
+
+}
+```
+  
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+
+ceOrg %>%
+  filter( CEjurisdictionArea=='Madeira' ) %>%
+  filter(CEyear %in% params$allYears)  %>%
+  filter(is.na(CEscientificDaysAtSea)) -> brakDanych
+
+ceOrg %>%
+  filter( CEjurisdictionArea=='Madeira' ) %>%
+  filter(CEyear %in% params$allYears)  %>%
+  group_by(CEvesselFlagCountry, CEyear, CEmetier6, CEarea ) %>%
+  summarise(FishingDays = sum(CEscientificDaysAtSea, na.rm = TRUE)) %>%
+  ungroup() %>%
+      # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(FishingDays = as.character(FishingDays)) %>%
+  mutate(FishingDays =  ifelse(FishingDays=='0' | is.na(FishingDays), 'NA', FishingDays)) %>%
+  pivot_wider(names_from = CEyear, values_from = c(FishingDays)) %>%
+  rename(Metier = CEmetier6,
+         Country = CEvesselFlagCountry) %>%
+  select(-CEarea)-> table_4_11
+
+if(nrow(table_4_11)==0){
+   cat('/n Table.11 No data /n ')
+}else{
+
+kable(table_4_11, caption = paste('<b>Table 4.11 </b>Effort (fishing days) by metiers for Madeira', params$allYears[1],'-',rev(params$allYears)[1] ,sep=''))
+write_csv(table_4_11, paste(table_dir,'Madeira_effort_metiers.csv',
+                      sep = ""))
+}
+
+
+if(nrow(brakDanych)>0){
+
+ceOrg %>%
+  filter( CEjurisdictionArea=='Madeira' ) %>%
+  filter(CEyear %in% params$allYears)  %>%
+  filter(is.na(CEscientificDaysAtSea)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
+  group_by(CEvesselFlagCountry) %>%
+  summarise(numRecords = n()) -> tabela
+
+kable(tabela, caption = 'Number of records with missing FishingDays per FlagCountry')
+
+}else{
+  cat('No missing data for FishingDays')
+
+}
+
+```
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+
+
+clOrg %>%
+  filter( CLjurisdictionArea=='Madeira' ) %>%
+  filter(CLyear %in% params$allYears)  %>%
+  filter(is.na(CLscientificWeight_ton)) -> brakDanych
+
+clOrg %>%
+  filter( CLjurisdictionArea=='Madeira' ) %>%
+  filter(CLyear %in% params$allYears)  %>%
+  group_by(CLyear, CLarea, CLvesselFlagCountry, CLmetier6 ) %>%
+  summarise(LandingWeight_ton = round(sum(CLscientificWeight_ton, na.rm = TRUE))) %>%
+  ungroup() %>%
+        # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(LandingWeight_ton = as.character(LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton =  ifelse(LandingWeight_ton=='0' | is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>%
+  pivot_wider(names_from = CLyear, values_from = LandingWeight_ton) %>%
+  rename(Metier = CLmetier6,
+         Country = CLvesselFlagCountry) %>%
+  select(-CLarea)-> table_4_12
+
+
+kable(table_4_12, caption = paste('<b>Table 4.12 </b>Landings (tons) by metier for Madeira ',params$allYears[1],'-',rev(params$allYears)[1], sep = ''))
+write_csv(table_4_12, paste(table_dir,'Madeira_landings_metiers.csv',
+                      sep = ""))
+
+if(nrow(brakDanych)>0){
+
+clOrg %>%
+  filter( CLjurisdictionArea=='Madeira' ) %>%
+  filter(CLyear %in% params$allYears)  %>%
+  filter(is.na(CLscientificWeight_ton)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
+  group_by(CLvesselFlagCountry) %>%
+  summarise(numRecords = n())-> tabela
+
+kable(tabela, caption = 'Number of records with missing LandingWeight per FlagCountry')
+
+}else{
+  cat('No missing data for LandingWeight')
+
+}
+
+
+```
+
+\newpage

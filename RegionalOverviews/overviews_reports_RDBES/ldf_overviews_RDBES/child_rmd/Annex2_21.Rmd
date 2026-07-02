@@ -1,0 +1,198 @@
+## Landings by species (tons) and countries in 21 (Northwest Atlantic) area.
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+
+# table314 <- clOrg[Year %in% c(2014:2021) & Area==21,]
+# table314$Stock[which(table314$Stock == '')] <- 'Other'
+# table314$Division[which(is.na(table314$Division))] <- '21.3'
+#
+# table314 <- table314[, .(LandingWeight_ton = round(sum(LandingWeight_ton, na.rm = TRUE))),
+#          by=c('Division', 'FlagCountry', 'Year')]
+
+
+clOrg %>%
+  filter(CLyear %in% params$allYears & substr(CLarea,1,2)=='21') %>%
+  group_by(SpeciesLaName, CLvesselFlagCountry, CLyear) %>%
+  summarise(LandingWeight_ton = round(sum(CLscientificWeight_ton, na.rm = TRUE))) %>%
+  ungroup() %>%
+  # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(LandingWeight_ton = as.character(LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton =  ifelse(is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton = ifelse(LandingWeight_ton == '0', '<1', LandingWeight_ton)) %>%
+  pivot_wider(names_from = CLyear, values_from = LandingWeight_ton) -> table314
+
+# Rearrange the columns
+#table314 <- table314[,c(1,2,10,11,3,4,5,6,7,8,9)]
+#table314$Stock[which(table314$Stock == '')] <- 'Other'
+
+kable(table314)
+write_csv(table314, paste(table_dir,'NAFO_landings_country_species.csv',
+                      sep = ""))
+
+```
+
+\newpage
+## Landings by species (tons), divisions and countries in 21 (Northwest Atlantic) area.
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+
+clOrg %>%
+# filter((Subpolygon!='Angola' | is.na(Subpolygon) )) %>%
+  filter(CLyear %in% params$allYears & substr(CLarea,1,2)=='21') %>%
+  group_by(SpeciesLaName, AreaMap, CLvesselFlagCountry, CLyear) %>%
+  summarise(LandingWeight_ton = round(sum(CLscientificWeight_ton, na.rm = TRUE))) %>%
+  ungroup() %>%
+  # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(LandingWeight_ton = as.character(LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton =  ifelse(is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton = ifelse(LandingWeight_ton == '0', '<1', LandingWeight_ton)) %>%
+  pivot_wider(names_from = CLyear, values_from = LandingWeight_ton) %>%
+  # filter(Area == 21) %>%
+    rename(Country = CLvesselFlagCountry)-> table314
+
+# Rearrange the columns
+# table314 <- table314[,c(1,2,3,11,12,4,5,6,7,8,9,10)]
+# table314$Division[which(is.na(table314$Division))] <- '21.3'
+# table314$Stock[which(table314$Stock == '')] <- 'Other'
+
+kable(table314)
+write_csv(table314, paste(table_dir,'NAFO_landings_country_area_species.csv',
+                      sep = ""))
+
+```
+
+
+\newpage
+## Landings by stocks (tons) in 21 (Northwest Atlantic) area.
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+clOrg %>%
+  filter(CLyear %in% params$allYears & substr(CLarea,1,2)=='21') %>%
+  inner_join(NAFOstocksRef, by = c("SpeciesLaName","CLarea")) %>% 
+  mutate(Stock = paste(SpeciesLaName, Stock, sep = " ")) %>% 
+  group_by(Stock, CLyear) %>%
+  summarise(LandingWeight_ton = round(sum(CLscientificWeight_ton, na.rm = TRUE))) %>%
+  ungroup() %>%
+  # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(LandingWeight_ton = as.character(LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton =  ifelse(is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton = ifelse(LandingWeight_ton == '0', '<1', LandingWeight_ton)) %>%
+  pivot_wider(names_from = CLyear, values_from = LandingWeight_ton) -> tableNAFO1
+
+kable(tableNAFO1)
+write_csv(tableNAFO1, paste(table_dir,'NAFO_landings_stock.csv',
+                      sep = ""))
+
+```
+
+
+\newpage
+## Landings by stocks (tons) and countries in 21 (Northwest Atlantic) area.
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+clOrg %>%
+  filter(CLyear %in% params$allYears & substr(CLarea,1,2)=='21') %>%
+  inner_join(NAFOstocksRef, by = c("SpeciesLaName","CLarea")) %>% 
+  mutate(Stock = paste(SpeciesLaName, Stock, sep = " ")) %>% 
+  group_by(Stock, CLvesselFlagCountry, CLyear) %>%
+  summarise(LandingWeight_ton = round(sum(CLscientificWeight_ton, na.rm = TRUE))) %>%
+  ungroup() %>%
+  # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(LandingWeight_ton = as.character(LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton =  ifelse(is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton = ifelse(LandingWeight_ton == '0', '<1', LandingWeight_ton)) %>%
+  pivot_wider(names_from = CLyear, values_from = LandingWeight_ton) -> tableNAFO2
+
+# Rearrange the columns
+#table314 <- table314[,c(1,2,10,11,3,4,5,6,7,8,9)]
+#table314$Stock[which(table314$Stock == '')] <- 'Other'
+
+kable(tableNAFO2)
+write_csv(tableNAFO2, paste(table_dir,'NAFO_landings_stock_country.csv',
+                      sep = ""))
+
+```
+
+\newpage
+## Landings by stocks (tons), divisions and countries in 21 (Northwest Atlantic) area.
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+
+clOrg %>%
+# filter((Subpolygon!='Angola' | is.na(Subpolygon) )) %>%
+  inner_join(NAFOstocksRef, by = c("SpeciesLaName","CLarea")) %>% 
+  mutate(Stock = paste(SpeciesLaName, Stock, sep = " ")) %>% 
+  group_by(Stock, AreaMap, CLvesselFlagCountry, CLyear) %>%
+  summarise(LandingWeight_ton = round(sum(CLscientificWeight_ton, na.rm = TRUE))) %>%
+  ungroup() %>%
+  # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+  mutate(LandingWeight_ton = as.character(LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton =  ifelse(is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton = ifelse(LandingWeight_ton == '0', '<1', LandingWeight_ton)) %>%
+  pivot_wider(names_from = CLyear, values_from = LandingWeight_ton) %>%
+  # filter(Area == 21) %>%
+    rename(Country = CLvesselFlagCountry)-> table314
+
+# Rearrange the columns
+# table314 <- table314[,c(1,2,3,11,12,4,5,6,7,8,9,10)]
+# table314$Division[which(is.na(table314$Division))] <- '21.3'
+# table314$Stock[which(table314$Stock == '')] <- 'Other'
+
+kable(table314)
+write_csv(table314, paste(table_dir,'NAFO_landings_stock_area_country.csv',
+                      sep = ""))
+
+```
+
+
+\newpage
+
+## Effort (fishing days) in area 21 (Northwest Atlantic) by country
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+
+ ceOrg %>%
+   filter(CEyear %in% params$allYears) %>%
+   filter(substr(CEarea,1,2) == "21") %>%
+   filter(is.na(CEscientificDaysAtSea)) -> brakDanych
+
+ ceOrg %>%
+ # filter((Subpolygon!='Angola' | is.na(Subpolygon) )) %>%
+   filter(CEyear %in% params$allYears)  %>%
+   filter(substr(CEarea,1,2) == "21") %>%
+   group_by(CEvesselFlagCountry, AreaMap, CEyear ) %>%
+   summarise(FishingDays = sum(CEscientificDaysAtSea, na.rm = TRUE)) %>%
+   ungroup() %>%
+# replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+   mutate(FishingDays = as.character(FishingDays)) %>%
+   mutate(FishingDays =  ifelse(FishingDays=='0' | is.na(FishingDays) , 'NA', FishingDays)) %>%
+   pivot_wider(names_from = CEyear, values_from = c(FishingDays))%>%
+ # filter(Area %in% c(41, 47, 21, 88, 51, 58, 48, 57)) %>%
+   rename(Country = CEvesselFlagCountry)-> table313
+
+ # table313 <- table313[,c(1,2,11,3,4,5,6,7,8,9,10)]
+ # table313$Division[which(is.na(table313$Division))] <- '21.3'
+
+ kable(table313)
+ write_csv(table313, paste(table_dir,'NAFO_effort_area_country.csv',
+                      sep = ""))
+
+ if(nrow(brakDanych)>0){
+   cat('Number of records with missing FishingDays per FlagCountry' )
+
+   ceOrg %>%
+   filter(CEyear %in% params$allYears) %>%
+   filter(substr(CEarea,1,2) == "21") %>%
+   filter(is.na(CEscientificDaysAtSea)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
+   group_by(CEvesselFlagCountry) %>%
+   summarise(numRecords = n())-> tabela
+
+ kable(tabela)
+
+ }else{
+
+   cat('No missing data for Fishing Days')
+
+ }
+
+```

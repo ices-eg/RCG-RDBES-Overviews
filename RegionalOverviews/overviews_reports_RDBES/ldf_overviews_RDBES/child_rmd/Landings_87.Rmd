@@ -1,0 +1,156 @@
+## Area 87 landings
+### Landings by country, area 87
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6,fig.cap='**Figure 59**:Landings (1000 t) by Country'}
+
+barplot(data = cl %>%
+  filter(substr(AreaMap,1,2)==87), 
+      x = "CLvesselFlagCountry",
+      y = "CLscientificWeight_1000ton",
+      #title = "Landings (1000 t) by Country",
+      ylab = "Sum of Landings (1000 t)",
+      col_cou = T)
+```
+
+### Landings by species, area 87 {.tabset}
+#### species
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 60**: Landings of the 20 main Species.'}
+
+sub_cl<- cl%>%
+  filter(substr(AreaMap,1,2)==87)%>%
+  group_by(CLyear,SpeciesLaName) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20, wt=CLscientificWeight_1000ton)
+barplot(data = sub_cl, 
+      x = "SpeciesLaName",
+      y = "CLscientificWeight_1000ton",
+      #title = "Landings (1000 t) by Species",
+      ylab = "Sum of Landings (1000 t)")
+
+```
+
+#### species catch group
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 61**: Sum of the landings by species catch group.'}
+
+barplot(data = cl%>%
+  filter(substr(AreaMap,1,2)==87), 
+      x = "CatchGroup",
+      y = "CLscientificWeight_1000ton",
+      #title = "Landings (1000 t) by Species Catch Group",
+      ylab = "Landings (1000 t)")
+```
+
+### Landings by subarea, area 87 {.tabset}
+#### division
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 62**: Landings (all species) distribution by division'}
+barplot(data = cl%>%
+  filter(substr(AreaMap,1,2)=="87")%>%
+    rename(Subarea = AreaMap), 
+      x = "Subarea",
+      y = "CLscientificWeight_1000ton",
+      #title = "Landings (1000 t) by Area",
+      ylab = "Sum of Landings (1000 t)")
+
+```
+
+#### map - subarea
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 63**: Sum of landings(1000 t) by Area 87'}
+# do we need information on for how many rows(%) there was a missing CLscientificWeight_ton? <-------------------------- to do
+
+# data prep
+cl %>%
+  filter(substr(AreaMap,1,2)=="87")%>%
+  group_by(CLyear, AreaMap) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton)) %>%
+  mutate(pr= CLscientificWeight_ton/sum(CLscientificWeight_ton, na.rm = TRUE)*100,
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA)-> df
+
+# map
+result = choroplethMap_func2(
+  df,
+  var_name = 'CLscientificWeight_ton',
+  var_spatial_name = 'AreaMap',
+  facet_name = 'CLyear',
+  spatial_dataset_name = 'Subareashp',
+  spatial_dataset_var_name = 'Subarea',
+  spatial_dataset_labels = FALSE,
+  saveResults = FALSE,
+  outputPath,
+  extraShp_name = NA,
+  displayInR = TRUE,
+  var_name_new = "Landing weight (ton)",
+  addToTitle = NA
+)
+result[[1]]
+
+```
+
+### Landings by harbour, area 87 {.tabset}
+#### harbour
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 64**: Total landings of the main harbours (top 20).'}
+sub_cl_top<- cl%>%
+  filter(substr(AreaMap,1,2)==87)%>%
+  group_by(CLyear, CLlandingLocation) %>%
+  summarise(CLscientificWeight_1000ton = sum(CLscientificWeight_1000ton)) %>%
+  top_n(20, wt=CLscientificWeight_1000ton)
+
+barplot(data = sub_cl_top, 
+      x = "CLlandingLocation",
+      y = "CLscientificWeight_1000ton",
+      #title = "Landings (1000 t) by Harbours",
+      ylab = "Sum of Landings (1000 t)")
+```
+
+#### map - harbour
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 65**: Map with the landing weight by main harbours (top 20).'}
+sub_cl_top %>%  mutate(
+         analysis_type = 'sum',
+         type_of_threshold = 'none',
+         value_of_threshold = NA
+       )-> df
+
+
+result <- pointsMap_func2(df,
+                          title = '',#'Landings (1000 t) by Harbour',
+                          var_name = 'CLscientificWeight_1000ton',
+                          facet_name = 'CLyear',
+                          var_spatial_name = 'CLlandingLocation',
+                          spatial_dataset_name = 'Harbours',
+                          spatial_dataset_var_name = 'Harbour',
+                          plot_labels = TRUE,
+                          saveResults = FALSE,
+                          #outputPath,
+                          Catch_group_name = NA,
+                          extraShp_name = 'Divisionshp',
+                          newVarName = NA,
+                          addToTitle = NA
+                          #,
+                          # RCGregion = 'BA'
+                         )
+
+  
+result
+
+
+```
+
+### Landings abroad, area 87
+Plot below shows the CLscientificWeight_ton between CLvesselFlagCountry (left), Harbour Country * (center) and CLlandingCountry(right).
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE,results = "asis", dpi=100, fig.width=9,fig.height=9, fig.cap = '**Figure 66**:River plot of total landings (1000t) between vessel Flag Country (left), Harbour Country (center) and landing Country(right). Width of line is proportional to landings. Harbour Country is the Country from the CLlandingLocation.'}
+    
+cl %>%
+  filter(substr(AreaMap,1,2)==87)%>%
+  group_by(CLyear,CLlandingCountry, HarbourCountry2, CLvesselFlagCountry) %>%
+  summarise(CLscientificWeight_ton = sum(CLscientificWeight_ton))-> cl_river
+
+result<-func_riverplot(df = cl_river,
+                       left = 'CLvesselFlagCountry',
+                       center = 'HarbourCountry2',
+                       right = 'CLlandingCountry',
+                       threesteps = TRUE,
+                       value = 'CLscientificWeight_ton')
+result
+```
+

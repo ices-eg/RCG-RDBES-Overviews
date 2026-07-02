@@ -1,0 +1,226 @@
+---
+title: "RDBES Catch and Effort Overview Long Distance Fisheries"
+date: "`r format(Sys.time(), '%d.%m.%Y')`"
+output:
+  html_document:
+    toc: true
+    fig_caption: yes
+    
+params:
+  eval: TRUE
+  set_subtitle: "Title"
+  year: 2000
+  allYears: 2000
+  region: '' 
+  logo_path: '' 
+  data_dir: ''
+  table_dir: '' 
+  CLfileName: ''
+  CEfileName: ''
+---
+
+---
+subtitle: `r paste(params$region, params$year, sep = ", ")`
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+options(knitr.kable.NA = '')
+options(scipen=999)
+```
+
+```{r, echo=FALSE}
+htmltools::img(src = knitr::image_uri(params$logo_path),
+             alt = 'logo',
+             style = 'position:absolute; top:0; right:0; padding:10px;',width="300px", height="100px")
+```
+
+
+```{r eval_params, echo=FALSE, message=FALSE, warning=FALSE}
+#DEFINE EVAL_PARAMETERS IF NEEDED
+
+## establish conditions  - can use it if for example some chunks should be run only for selected Regions
+# eval_region_LDF <- params$region=='LDF' # when added to the chunk header, the chunk will be run only for LDF report
+
+```
+
+```{r GlobalSettings, echo=FALSE}
+# DEFINE GLOBAL PARAMETERS/FUNCTIONS FOR DISPLAYING TABLES/PLOTS/MAPS/...
+
+```
+
+```{r mapData,include = F}
+# LOAD DATA NEEDED FOR MAPS (shp, rdata, ...) FOR ALL RCGs
+source("scripts/prepareSpatialData.R")
+
+```
+
+```{r NAFOstocks, include = F}
+
+# to delete? why is it commented?
+# write.csv(cl_rcg[substr(CLarea,1,2)=="21",
+#                  .(t=sum(CLscientificWeight_ton)),
+#                  by=.(SpeciesLaName, CLarea)],
+#           file="NAFO_cl_summary.csv")
+# openxlsx::write.xlsx(cl_rcg[substr(CLarea,1,2)=="21",
+#                  .(t=sum(CLscientificWeight_ton)),
+#                  by=.(CLarea, CLmetier6, SpeciesLaName)],
+#           file="Area21_cl_summary.xlsx")
+NAFOstocksRef <- read.csv("../../data/NAFO_species_area_stock.csv")
+if(nrow(NAFOstocksRef)!=nrow(unique(NAFOstocksRef[,c("SpeciesLaName","CLarea")]))){
+  stop("ERROR. NAFO stocks reference table not unique")
+}
+
+```
+
+
+```{r, results='asis', echo = FALSE,  warning=FALSE, message=FALSE}
+
+source('scripts/disclaimerText.R')
+```
+
+# Landings (CL)
+
+```{r, child = 'child_rmd/Landings_Overall.Rmd'}
+``` 
+
+```{r, child = 'child_rmd/Landings_SmallPelagics.Rmd'}
+``` 
+
+```{r, child = 'child_rmd/Landings_34.Rmd'}
+``` 
+
+```{r, child = 'child_rmd/Landings_47.Rmd'}
+``` 
+
+```{r, child = 'child_rmd/Landings_87.Rmd'}
+``` 
+
+```{r, child = 'child_rmd/Landings_21.Rmd'}
+``` 
+
+```{r, child = 'child_rmd/Landings_Canaries.Rmd'}
+``` 
+
+```{r, child = 'child_rmd/Landings_Madeira.Rmd'}
+``` 
+
+# Effort (CE)
+
+```{r, child = 'child_rmd/Effort.Rmd'}
+``` 
+
+
+
+# Tables for the report
+
+```{r, results = "asis", eval = T, echo = FALSE, warning = FALSE, message = FALSE}
+cl_rcg %>% 
+  select(CLvesselFlagCountry, CLyear, CLarea, AreaMap, CLjurisdictionArea, CLspeciesFaoCode,CLmetier6, CLscientificWeight_ton, CLspeciesCode, SpeciesLaName, Species3ALPHA, CatchGroup)%>% #usunelam stock z pierwotnej wersji
+  mutate(Division=AreaMap)-> clOrg
+
+ce_rcg %>% 
+  select(CEvesselFlagCountry, CEyear, CEarea, AreaMap, CEjurisdictionArea, 
+         CEmetier6, CEscientificDaysAtSea)%>%
+  mutate(Division=AreaMap)-> ceOrg
+
+
+wormsScientific = read_csv("../../data/worms_3alpha.csv")
+wormsScientific %>%
+  filter(!is.na(AphiaID)) %>%
+  group_by(AphiaID) %>% 
+  mutate(duplikaty = rank(Scientific_name, ties.method = "first")) %>% # in this file there are duplicated values for worms codes, maybe better to try with fishpi
+  filter(duplikaty ==1) %>% 
+  select(AphiaID, Scientific_name, Alpha = '3A_CODE') -> wormsScientific
+
+# Angola for LTU
+clOrg %>% 
+  mutate(CLjurisdictionArea = ifelse(CLvesselFlagCountry=='LTU' & CLarea==47 & is.na(CLjurisdictionArea) & CLyear %in% c(2015, 2016), 'Angola',CLjurisdictionArea
+                             ) )->clOrg # check CLarea is correct here
+
+clOrg %>% 
+  #left_join(wormsScientific, by = c("CLspeciesCode" = "AphiaID")) %>%
+  mutate(Species2 = ifelse(!is.na(Species3ALPHA),
+                           paste(SpeciesLaName, ' (', Species3ALPHA, ')', sep = ''), 
+                           paste(SpeciesLaName))
+  )->cl2 # data for annex
+
+
+
+```
+
+```{r, child = 'child_rmd/Tables_Section_4_1.Rmd'}
+``` 
+
+```{r, child = 'child_rmd/Tables_Section_4_2.Rmd'}
+``` 
+
+```{r, child = 'child_rmd/Tables_Section_4_3.Rmd'}
+``` 
+
+# Annex 2 - Landings by species by area reported by MS
+
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+# wormsAlpha = read_csv("D:/Do przegrania na PC/IntersessionalWork/RCG LDF/data/worms_3alpha.csv")
+# wormsAlpha %>%
+#   filter(!is.na(AphiaID)) %>%
+#   group_by(AphiaID) %>% 
+#   mutate(duplikaty = rank(Scientific_name, ties.method = "first")) %>% # w pliku sa duplikaty dla kodow wormsowych, w przyszlym roku sprobowac z fishpi
+#   filter(duplikaty ==1) %>% 
+#   select(AphiaID, Alpha = '3A_CODE') -> wormsAlpha
+# 
+# cl %>% 
+#   filter(Year == 2020) %>% nrow()-> clTest
+# cl %>% 
+#   filter(Year == 2020)%>% left_join(wormsAlpha, by = c("SpeciesAphiaID" = "AphiaID"))  %>% nrow()->clWormsTest
+# 
+# if (clTest!= clWormsTest){
+#   cat('Sth wrong when mergind CL with Worms codes file. To be checked!')
+# }
+# 
+cl %>%
+  filter(CLyear == params$year)%>%
+ # left_join(wormsAlpha, by = c("SpeciesAphiaID" = "AphiaID")) %>%
+ # filter(is.na(Alpha)) %>% distinct(Species, SpeciesAphiaID) %>% arrange(Species)
+  mutate(Species3ALPHA = case_when(
+    CLspeciesCode==299565~'MKW',# Muraena augusti (MKW)
+    CLspeciesCode==151174~'VMA',# Scomber colias (VMA)
+    TRUE~Species3ALPHA
+  )) %>%
+  mutate(Species2 = ifelse(!is.na(Species3ALPHA),
+                           paste(SpeciesLaName, ' (', Species3ALPHA, ')', sep = ''),
+                           paste(SpeciesLaName))
+  )-> cl2
+```
+
+```{r, child = 'child_rmd/Annex2_CECAF.Rmd'}
+``` 
+
+```{r, child = 'child_rmd/Annex2_SPRFMO.Rmd'}
+``` 
+
+```{r, child = 'child_rmd/Annex2_47.Rmd'}
+``` 
+
+```{r, child = 'child_rmd/Annex2_21.Rmd'}
+```
+
+```{r, child = 'child_rmd/Annex2_FrenchOutermostRegions.Rmd'}
+```
+
+```{r, child = 'child_rmd/Annex2_GlobalTables.Rmd'}
+```
+
+# Annex A. Reading the graphs
+## Barplots
+
+In (bar)plots, subtitles indicate if all RDB data could be used and are displayed.  Some data can not be displayed in the plots, e.g. due to missing or incorrect values or due to missing referring data (e.g. if no statistical rectangle is given or harbor names are missing, landings in the respective plots can’t be displayed).
+The factor x:% in subtitle indicates the percentage of RDB data that are displayed  in the x-variable. y:% in subtitle indicates the percentage of RDB data in the respective y-variable. z:% in subtitle indicate the percentage of complete (i.e., non-missing) RDBES rows in variable. 
+
+## Maps
+
+The maps are generated based on complete and available data from the RDBES. The subtitles of the header state the subselection that is displayed (e.g. “all Data”, “pelagics”, etc.).  if data cannot be shown on a map (e.g. due to missing information on the area or harbor code), the missing values is given in the figure text below. 
+
+```{r, child = 'child_rmd/Appendix.Rmd'}
+```

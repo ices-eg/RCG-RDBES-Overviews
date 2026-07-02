@@ -17,13 +17,19 @@ barplot <- function(data = data,
                      xlab = "",
                      col_cou= F,
                      save_plot_to_list=TRUE,
+                    groupNiceName = "",
                      facet =  ""){ # is available only with asPac=T
   
  #need to be exported in rdbesvisualise package
  # RDBESvisualise::colourCountryTab
 
-  
-  colours <- data.table(colours)
+  # temporal solution
+    if(regionSelected == "LDF"){
+      colours <- data.table(koloryRDBES)
+    }else{
+      colours <- data.table(colours)
+    }
+
   colours$ISO2Code <- colours$country
   colours$colour5 <- colours$color
   col <- colours[ ,c("ISO2Code","colour5")]
@@ -93,6 +99,10 @@ barplot <- function(data = data,
       ylab(paste(ylab)) + 
       labs(fill = group)
     
+    if(groupNiceName != ''){
+      p <- p + guides(fill=guide_legend(groupNiceName))
+    }
+    
     if(facet != ""){
 
       p<- p +facet_wrap(~facet)
@@ -142,7 +152,9 @@ barplot <- function(data = data,
         theme_bw() +
         theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
         xlab(paste(xlab)) +
-        ylab(paste("")) 
+        ylab(paste("")) +
+        scale_x_discrete(label = function(x) stringr::str_trunc(x, 12))
+      
       
       if(group %like% "Country" || col_cou == T){
         p2 <- p2_0 +
