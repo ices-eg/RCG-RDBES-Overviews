@@ -44,20 +44,14 @@ getwd()
 
 target_region <- "RCG_LDF"
 year_start <- 2021
-year_end <- 2024
+year_end <- 2025
 time_tag<-format(Sys.time(), "%Y%m%d")
 
 ## =========================== 
 ## Create directory structure
 ## =========================== 
 
-dir_output_all<-paste("RegionalOverviews/data_RDBES/002_prepared/", time_tag, sep="")
 dir_output_rcg<-paste("RegionalOverviews/data_RDBES/002_prepared/", time_tag ,"/",target_region, sep="")
-
-if (!dir.exists(dir_output_all)){
-  dir.create(dir_output_all,recursive=TRUE, showWarnings=FALSE)
-  message("Dir created")
-}
 
 if (!dir.exists(dir_output_rcg)){
   dir.create(dir_output_rcg,recursive=TRUE, showWarnings=FALSE)
@@ -87,7 +81,7 @@ aux_countries<-read.table("RegionalOverviews/data/aux_countries.txt", sep=",", h
 aux_species <- read.csv("RegionalOverviews/data/ASFIS_WoRMS.csv", sep=",", header=T, colClasses="character", na.strings = "")
 
 # reads RDBES data
-RDBESdataPath = 'S:/Projekty/NPZDR/NPZDR dane alfresco/Data calls/2025/RDBES_LDF/RDBES data RCG LDF TM 2025'
+RDBESdataPath = 'RegionalOverviews/data_RDBES/001_raw/RCG_LDF'
 
 file_cl <- paste(RDBESdataPath, "/RDBES CL/CommercialLanding.csv" , sep = '') 
 file_ce <- paste(RDBESdataPath, "/RDBES CE/CommercialEffort.csv" , sep = '') 
@@ -135,8 +129,8 @@ ce[CEvesselFlagCountry=="ES" & CEarea=="34.1.2",CEjurisdictionArea:="Canaries"];
 cl[CLvesselFlagCountry=="LT" & substr(CLarea,1,2) =="34" ,CLjurisdictionArea:="Mauritania"];.Last.updated
 ce[CEvesselFlagCountry=="LT" & substr(CEarea,1,2) =="34" ,CEjurisdictionArea:="Mauritania"];.Last.updated
 
-cl[CLvesselFlagCountry=="LV" & substr(CLarea,1,2) =="34" ,CLjurisdictionArea:="Mauritania"];.Last.updated
-ce[CEvesselFlagCountry=="LV" & substr(CEarea,1,2) =="34" ,CEjurisdictionArea:="Mauritania"];.Last.updated
+# cl[CLvesselFlagCountry=="LV" & substr(CLarea,1,2) =="34" ,CLjurisdictionArea:="Mauritania"];.Last.updated
+# ce[CEvesselFlagCountry=="LV" & substr(CEarea,1,2) =="34" ,CEjurisdictionArea:="Mauritania"];.Last.updated
 
 # should this part be in this script or a separate one not to mess here every year? KK: in my opinion separate
 
@@ -273,7 +267,7 @@ if(target_region=="RCG_LDF")
 	ce_rcg[,AreaMap:=CEarea,]
 		
 	if(target_region=="RCG_LDF") #Division is the same as AreaMap ask Maksims??? In previes format is new variable DIVISION in my opinion is the same as AreaMap
-	{
+	{ # <- check it MA, MK, is everything approprietly assigned?
 	  cl_rcg[AreaMap %in% c("34.1.1.1", "34.1.1.2", "34.1.1.3",  "34.1.1"), AreaMap := "34.1.1"]
 	  ce_rcg[AreaMap %in% c("34.1.1.1", "34.1.1.2", "34.1.1.3",  "34.1.1"), AreaMap := "34.1.1"]
 	  
@@ -332,7 +326,7 @@ if(target_region=="RCG_LDF")
 	# QCA: visual
 		cl_rcg[, list(N=.N,ton1000 = round(sum(CLscientificWeight_1000ton),1)),list(AreaMap,CLarea)][order(AreaMap)]
 		cl_rcg[, list(N=.N,ton1000 = round(sum(CLscientificWeight_1000ton),1)),list(AreaMap,CLarea, CLvesselFlagCountry, CLyear)][order(AreaMap)][AreaMap=="NA" | is.na(AreaMap),]
-		
+		# <- check it MA, MK, FR reported area as 31, should it be fixed?
 		ce_rcg[, list(N=.N,TripsNumber = sum(CEnumberOfFractionalTrips)),list(AreaMap,CEarea)][order(AreaMap)]
 		ce_rcg[, list(N=.N,TripsNumber = sum(CEnumberOfFractionalTrips)),list(AreaMap,CEarea, CEvesselFlagCountry, CEyear)][order(AreaMap)][AreaMap=="NA" | is.na(AreaMap),]
 	
@@ -350,8 +344,11 @@ if(target_region=="RCG_LDF")
 		
 		DiffFracDomTrips_ctry <- cbind(FracTrips_ctry, DomTripsNumber = DomTrips_ctry$DomTripsNumber)
 		DiffFracDomTrips_ctry$Diff <- DiffFracDomTrips_ctry$FracTripsNumber/DiffFracDomTrips_ctry$DomTripsNumber
-		DiffFracDomTrips_ctry
-
+		DiffFracDomTrips_ctry #	<- check it MA, MK, fracTrips is much bigger then domTrips
+		# CEvesselFlagCountry     N FracTripsNumber DomTripsNumber      Diff
+		# <char> <int>           <num>          <int>     <num>
+		#   1:                  DE    57           27.82             56 0.4967857
+		# 
 ################################################################################################################################################################
 ################################################################################################################################################################
 #
@@ -366,6 +363,7 @@ cl_rcg[,SpeciesLaName:=aux_species$ScientificName[match(cl_rcg$CLspeciesCode, au
 cl_rcg[CLspeciesCode=="293578", SpeciesLaName:="Diplodus argenteus"]
 cl_rcg[CLspeciesCode=="987079", SpeciesLaName:="Maguimithrax spinosissimus"]
 cl_rcg[CLspeciesCode=="401693", SpeciesLaName:="Paracaesio xanthurus"]
+# IZO, 259252? How to fix? <- check it MA, MK, looks like (IZO Istiophorus platypterus 217712) doesn't match to (259252 Bathynomus giganteus BIG)
 nrow(cl_rcg[is.na(SpeciesLaName),]) == 0
 dim(cl_rcg[is.na(SpeciesLaName),])
 cl_rcg[is.na(SpeciesLaName),unique(CLspeciesCode)]
@@ -386,6 +384,7 @@ cl_rcg[CLspeciesCode=="368408", Species3ALPHA:="SKH"];.Last.updated #  is it ok?
 nrow(cl_rcg[is.na(Species3ALPHA),]) == 0
 dim(cl_rcg[is.na(SpeciesLaName),])
 cl_rcg[is.na(Species3ALPHA),unique(CLspeciesCode)]
+# IZO, 259252? How to fix?  <- check it MA, MK
 
 
 ################################################################################################################################################################
@@ -404,7 +403,7 @@ cl_rcg[SpeciesLaName=="Diplodus argenteus",CatchGroup:="demersal"]
 cl_rcg[SpeciesLaName=="Maguimithrax spinosissimus",CatchGroup:="crustaceans"]
 cl_rcg[SpeciesLaName=="Paracaesio xanthurus",CatchGroup:="other"]
 nrow(cl_rcg[is.na(CatchGroup),]) == 0
-unique(cl_rcg[is.na(CatchGroup),]$SpeciesLaName)
+unique(cl_rcg[is.na(CatchGroup),]$CLspeciesCode)
 
 # give it a check (see if it makes sense)
 			 # check demersal

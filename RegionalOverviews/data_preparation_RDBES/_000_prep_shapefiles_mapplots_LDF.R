@@ -1,3 +1,5 @@
+# run in only once, to create shapefiles
+
 # ==========================
 # Prepare and validate RCG shapefiles (to be used with mapplots::draw.shape and func_heatmap_ices_rect_one_var)
 # ==========================

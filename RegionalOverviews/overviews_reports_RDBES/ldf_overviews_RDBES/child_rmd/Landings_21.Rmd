@@ -70,8 +70,8 @@ cl %>%
 if (nrow(df)==0){
   c('No data')
 }else{
-  # map
-result = choroplethMap_func2(
+#map
+result = choroplethMap_func2( #<- to do MS
   df,
   var_name = 'CLscientificWeight_ton',
   var_spatial_name = 'Division ',

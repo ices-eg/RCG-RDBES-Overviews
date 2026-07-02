@@ -125,7 +125,7 @@ ce_rcg %>%
   mutate(Division=AreaMap)-> ceOrg
 
 
-wormsScientific = read_csv("../data/worms_3alpha.csv")
+wormsScientific = read_csv("../../data/worms_3alpha.csv")
 wormsScientific %>%
   filter(!is.na(AphiaID)) %>%
   group_by(AphiaID) %>% 

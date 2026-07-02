@@ -91,3 +91,8 @@
 "Panama","PA","PAN","591","Americas","FALSE","FALSE","FALSE","FALSE","Other",""
 "Reunion","RE","REU","638","Africa","FALSE","FALSE","FALSE","FALSE","Other",""
 "Martinique","MQ","MTQ","474","Americas","FALSE","FALSE","FALSE","FALSE","Other",""
+"Saint Pierre","PM","SPM","666","Americas","FALSE","FALSE","FALSE","FALSE","Other",""
+"Australia","AU","AUS","036","Australia","FALSE","FALSE","FALSE","FALSE","Other",""
+"Seychelles","SC","SYC","690","Africa","FALSE","FALSE","FALSE","FALSE","Other",""
+"Sierre Leone","SL","SLE","694","Africa","FALSE","FALSE","FALSE","FALSE","Other",""
+"Saint Martin","MF","MAF","663","Americas","FALSE","FALSE","FALSE","FALSE","Other",""
