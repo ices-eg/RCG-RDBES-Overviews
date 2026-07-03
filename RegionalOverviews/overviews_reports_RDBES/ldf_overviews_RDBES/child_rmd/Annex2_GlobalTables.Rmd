@@ -8,7 +8,8 @@ cl2 %>% filter(CLyear== params$year) %>%
   summarise(LandingWeight_ton = round(sum(CLscientificWeight_ton, na.rm = TRUE), digits = 0)) %>%
                   # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
   mutate(LandingWeight_ton = as.character(LandingWeight_ton)) %>%
-  mutate(LandingWeight_ton =  ifelse(LandingWeight_ton=='0' | is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton =  ifelse(is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton = ifelse(LandingWeight_ton == '0', '<1', LandingWeight_ton)) %>%
   spread(CLvesselFlagCountry, LandingWeight_ton, fill = NA) %>%
   arrange(Area, Species2) -> AreaSpeciesFlagcountry
 
@@ -29,8 +30,8 @@ cl2 %>% filter(CLyear==params$year) %>%
   summarise(LandingWeight_ton = round(sum(CLscientificWeight_ton, na.rm = TRUE), digits = 0)) %>%
                     # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
   mutate(LandingWeight_ton = as.character(LandingWeight_ton)) %>%
-  mutate(LandingWeight_ton =  ifelse(LandingWeight_ton=='0' | is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>%
-  #pivot_wider(names_from = FlagCountry, values_from = LandingWeight_ton, values_fill = list(NA)) %>%
+  mutate(LandingWeight_ton =  ifelse(is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton = ifelse(LandingWeight_ton == '0', '<1', LandingWeight_ton)) %>%  #pivot_wider(names_from = FlagCountry, values_from = LandingWeight_ton, values_fill = list(NA)) %>%
   spread(CLvesselFlagCountry, LandingWeight_ton, fill = NA) %>%
   arrange(AreaMap, CLmetier6) -> AreaMetierFlagcountry
 
