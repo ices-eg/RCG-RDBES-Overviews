@@ -32,7 +32,7 @@ barplot(data = sub_cl,
 #### species and country
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap = '**Figure 21**: Proportion of countries with small pelagics landings by species (top 20).'}
 sub_cl_2<- smallPelag%>%
-  group_by(CLyear, SpeciesLaName, CLlandingCountry) %>%
+  group_by(CLyear, SpeciesLaName, CLvesselFlagCountry) %>%
   summarise(CLscientificWeight_1000ton2 = sum(CLscientificWeight_1000ton))
 
 sub_cl_top <- sub_cl %>%
@@ -48,7 +48,7 @@ sub_cl_2_top <- sub_cl_2_top %>%
 barplot(data = sub_cl_2_top,
       x = "SpeciesLaName",
       y = "CLscientificWeight_1000ton2",
-      group = "CLlandingCountry",
+      group = "CLvesselFlagCountry",
       groupNiceName = 'Vessel flag country',
      # title = "Landings (1000 t) by Species and Country",
       ylab = "Proportion of Landings (%)",
@@ -106,7 +106,7 @@ barplot(data = cl%>%
 barplot(data = cl%>%
           mutate(Area = substr(CLarea,1,2))%>%
           filter(CatchGroup == 'small pelagic'),
-      x = "CLlandingCountry",
+      x = "CLvesselFlagCountry",
       y = "CLscientificWeight_1000ton",
       group = "Area",
      # title = "Landings (1000 t) by Country and Area",

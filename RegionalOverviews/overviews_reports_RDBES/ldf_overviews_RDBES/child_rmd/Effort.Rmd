@@ -65,9 +65,8 @@ barplot(data = sub_ce_top,
 ### area
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 94:** Number of trips by Area.'}
 
-barplot(data = ce%>%
-  mutate(AreaMap=substr(AreaMap,1,2)), 
-      x = "AreaMap",
+barplot(data = ce, 
+      x = "Area",
       y = "CEnumberOfDominantTrips",
       title = "Number of trips by Area",
       ylab = "Sum of Number of trips")
@@ -77,9 +76,8 @@ barplot(data = ce%>%
 ### area and country
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "asis", dpi=100, fig.width=6,fig.height=6, fig.cap='**Figure 96:** Number of trips by Country and Area.'}
 
-barplot(data = ce%>%
-  mutate(AreaMap=substr(AreaMap,1,2)),
-      x = "AreaMap",
+barplot(data = ce,
+      x = "Area",
       y = "CEnumberOfDominantTrips",
       group = "CEvesselFlagCountry",
       groupNiceName = 'Vessel flag country',
@@ -95,8 +93,8 @@ barplot(data = ce%>%
 
 # data prep
 ce %>%
-  mutate(AreaMap=substr(AreaMap,1,2))%>%
-  group_by(CEyear, AreaMap) %>%
+  mutate(AreaMap=substr(Area,1,2))%>%
+  group_by(CEyear, AreaMap) %>% 
   summarise(CEnumberOfDominantTrips = sum(CEnumberOfDominantTrips)) %>%
   mutate(pr= CEnumberOfDominantTrips/sum(CEnumberOfDominantTrips, na.rm = TRUE)*100,
          analysis_type = 'sum',
