@@ -141,7 +141,8 @@ clOrg %>%
   summarise(LandingWeight_ton = round(sum(CLscientificWeight_ton, na.rm = TRUE))) %>% 
     # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
   mutate(LandingWeight_ton = as.character(LandingWeight_ton)) %>% 
-  mutate(LandingWeight_ton =  ifelse(LandingWeight_ton=='0' | is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>% 
+  mutate(LandingWeight_ton =  ifelse(LandingWeight_ton=='0' , '<1', LandingWeight_ton)) %>% 
+  mutate(LandingWeight_ton =  ifelse(is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>% 
   ungroup() %>% 
   pivot_wider(names_from = CLvesselFlagCountry, values_from = LandingWeight_ton) %>% 
     arrange(CLmetier6) %>% 
@@ -396,7 +397,8 @@ clOrg %>%
   ungroup() %>%
         # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
   mutate(LandingWeight_ton = as.character(LandingWeight_ton)) %>%
-  mutate(LandingWeight_ton =  ifelse(LandingWeight_ton=='0' | is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton =  ifelse(LandingWeight_ton=='0' , '<1', LandingWeight_ton)) %>% 
+  mutate(LandingWeight_ton =  ifelse(is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>% 
   pivot_wider(names_from = CLyear, values_from = LandingWeight_ton) %>%
   rename(Metier = CLmetier6,
          Country = CLvesselFlagCountry) %>%

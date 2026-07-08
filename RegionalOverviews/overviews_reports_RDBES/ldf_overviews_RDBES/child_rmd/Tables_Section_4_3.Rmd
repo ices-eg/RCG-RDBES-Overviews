@@ -82,7 +82,8 @@ clOrg %>%
   ungroup() %>%
   # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
   mutate(LandingWeight_ton = as.character(LandingWeight_ton)) %>%
-  mutate(LandingWeight_ton =  ifelse(LandingWeight_ton=='0' | is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>%
+  mutate(LandingWeight_ton =  ifelse(LandingWeight_ton=='0' , '<1', LandingWeight_ton)) %>% 
+  mutate(LandingWeight_ton =  ifelse(is.na(LandingWeight_ton), 'NA', LandingWeight_ton)) %>% 
   pivot_wider(names_from = CLyear, values_from = LandingWeight_ton) %>%
   filter(CLarea %in% c("41", "21", "88", "51", "58", "48", "57") ) %>%
     rename(Country = CLvesselFlagCountry,
