@@ -266,8 +266,8 @@ if(target_region=="RCG_LDF")
 	cl_rcg[,AreaMap:=CLarea,]
 	ce_rcg[,AreaMap:=CEarea,]
 		
-	if(target_region=="RCG_LDF") #Division is the same as AreaMap ask Maksims??? In previes format is new variable DIVISION in my opinion is the same as AreaMap
-	{ # <- check it MA, MK, is everything approprietly assigned?
+	if(target_region=="RCG_LDF"){ #Division is the same as AreaMap ask Maksims??? In previes format is new variable DIVISION in my opinion is the same as AreaMap
+	 # <- check it MA, MK, is everything approprietly assigned?
 	  cl_rcg[AreaMap %in% c("34.1.1.1", "34.1.1.2", "34.1.1.3",  "34.1.1"), AreaMap := "34.1.1"]
 	  ce_rcg[AreaMap %in% c("34.1.1.1", "34.1.1.2", "34.1.1.3",  "34.1.1"), AreaMap := "34.1.1"]
 	  
@@ -364,6 +364,7 @@ cl_rcg[CLspeciesCode=="293578", SpeciesLaName:="Diplodus argenteus"]
 cl_rcg[CLspeciesCode=="987079", SpeciesLaName:="Maguimithrax spinosissimus"]
 cl_rcg[CLspeciesCode=="401693", SpeciesLaName:="Paracaesio xanthurus"]
 # IZO, 259252? How to fix? <- check it MA, MK, looks like (IZO Istiophorus platypterus 217712) doesn't match to (259252 Bathynomus giganteus BIG)
+cl_rcg[CLspeciesCode=="259252", SpeciesLaName:="Bathynomus giganteus"];.Last.updated
 nrow(cl_rcg[is.na(SpeciesLaName),]) == 0
 dim(cl_rcg[is.na(SpeciesLaName),])
 cl_rcg[is.na(SpeciesLaName),unique(CLspeciesCode)]
@@ -381,6 +382,7 @@ cl_rcg[CLspeciesCode=="889885", Species3ALPHA:="AUU"];.Last.updated
 cl_rcg[CLspeciesCode=="987079", Species3ALPHA:="MXI"];.Last.updated
 cl_rcg[CLspeciesCode=="401693", Species3ALPHA:="LRX"];.Last.updated
 cl_rcg[CLspeciesCode=="368408", Species3ALPHA:="SKH"];.Last.updated #  is it ok?
+cl_rcg[CLspeciesCode=="259252", Species3ALPHA:="IZO"];.Last.updated
 nrow(cl_rcg[is.na(Species3ALPHA),]) == 0
 dim(cl_rcg[is.na(SpeciesLaName),])
 cl_rcg[is.na(Species3ALPHA),unique(CLspeciesCode)]
@@ -402,6 +404,7 @@ unique(cl_rcg[is.na(CatchGroup),]$SpeciesLaName)
 cl_rcg[SpeciesLaName=="Diplodus argenteus",CatchGroup:="demersal"]
 cl_rcg[SpeciesLaName=="Maguimithrax spinosissimus",CatchGroup:="crustaceans"]
 cl_rcg[SpeciesLaName=="Paracaesio xanthurus",CatchGroup:="other"]
+cl_rcg[SpeciesLaName=="Bathynomus giganteus",CatchGroup:="other"]
 nrow(cl_rcg[is.na(CatchGroup),]) == 0
 unique(cl_rcg[is.na(CatchGroup),]$CLspeciesCode)
 
