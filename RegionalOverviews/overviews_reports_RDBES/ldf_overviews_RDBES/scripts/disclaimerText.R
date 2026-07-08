@@ -17,12 +17,12 @@ The respective scripts and calculations used for data displaying are publicly av
 (https://github.com/ices-eg/RCGs) and subject to change as the work of the group progresses.
 
 # Introduction
-The present Catch and Effort Overview displays summary figures and tables of the 2023 landings and effort data
+The present Catch and Effort Overview displays summary figures and tables of the 2025 landings and effort data
 found in tables CL and CE of the Regional Data Base (RDB). The RDB is a main resource used by the Regional Coordination
 Groups to coordinate data collection of EU fisheries. The RDB is hosted at the International Council for Exploration of
 the Sea (ICES) and its data is property of EU Member States with usage governed by the RDB data policy
 (https://www.ices.dk/data/Documents/Data_Policy_RDB.pdf). The data referring to the present year was collected under the
-RCG 2023 data call for the 2023 data for the Long Distance regions and download from the system on the 21th of June 2024.
+RCG 2026 data call for the 2025 data for the Long Distance regions and download from the system on the 8th of June 2026.
 Information how to read the main types of graphs and maps is displayed in Annex A.
 "
 )
