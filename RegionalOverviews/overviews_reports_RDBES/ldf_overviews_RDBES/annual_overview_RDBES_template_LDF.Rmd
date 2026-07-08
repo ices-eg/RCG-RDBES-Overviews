@@ -4,6 +4,7 @@ date: "`r format(Sys.time(), '%d.%m.%Y')`"
 output:
   html_document:
     toc: true
+    toc_float: true
     fig_caption: yes
     
 params:
