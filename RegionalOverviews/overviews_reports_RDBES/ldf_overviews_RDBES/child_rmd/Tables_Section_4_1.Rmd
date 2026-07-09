@@ -23,7 +23,7 @@ write_csv(CLmissing, paste(table_dir,'WestAfrica_CL_missing_subpolygon.csv',
 ceOrg %>% filter(substr(CEarea,1,2)=="34" & is.na(CEjurisdictionArea) | (substr(CEarea,1,2)=="47" & is.na(CEjurisdictionArea))) %>% 
   group_by(CEvesselFlagCountry, CEyear) %>% 
   summarise(numRecords = n(),
-            FishingDays = sum(CEscientificDaysAtSea, na.rm = TRUE))->CEmissing
+            FishingDays = sum(CEscientificFishingDays, na.rm = TRUE))->CEmissing
 
 kable(CEmissing, caption = 'CE records with missing Subplygon and Area 34')
 
@@ -75,13 +75,13 @@ ceOrg %>%
       (substr(Division,1,2) == 47)
     )%>%
   filter(CEyear %in% params$allYears)  %>% 
-  filter(is.na(CEscientificDaysAtSea)) -> brakDanych 
+  filter(is.na(CEscientificFishingDays)) -> brakDanych 
 
 ceOrg %>%
   filter((substr(AreaMap,1,2) == '34' & CEjurisdictionArea!='Canaries'  & CEjurisdictionArea!='Madeira' ) | (substr(AreaMap,1,2) == '34' & is.na(CEjurisdictionArea)) | CEjurisdictionArea=='Angola'  | substr(AreaMap,1,2) == 47) %>%
   filter(CEyear %in% params$allYears)  %>%
   group_by( CEmetier6, CEvesselFlagCountry,CEyear ) %>%
-  summarise(FishingDays = sum(CEscientificDaysAtSea, na.rm = TRUE)) %>% # co tu się zadziało???
+  summarise(FishingDays = sum(CEscientificFishingDays, na.rm = TRUE)) %>% # co tu się zadziało???
   ungroup() %>%
   # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
   mutate(FishingDays = as.character(FishingDays)) %>%
@@ -103,7 +103,7 @@ if(nrow(brakDanych)>0){
 ceOrg %>%
   filter((substr(Division,1,2) == 34 & CEjurisdictionArea!='Canaries' & CEjurisdictionArea!='Madeira' ) | (substr(Division,1,2) == '34' & is.na(CEjurisdictionArea)) | CEjurisdictionArea=='Angola'  | substr(Division,1,2) == 47) %>%
   filter(Ceyear %in% params$allYears)  %>% 
-  filter(is.na(CEscientificDaysAtSea)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
+  filter(is.na(CEscientificFishingDays)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
   group_by(CEvesselFlagCountry) %>%
   summarise(numRecords = n()) -> tabela
 
@@ -201,7 +201,7 @@ ceOrg %>%
   filter((substr(Division,1,2) == "34" & CEjurisdictionArea != 'Canaries' & CEjurisdictionArea != 'Madeira' ) | (substr(Division,1,2) == '34' & is.na(CEjurisdictionArea)) | CEjurisdictionArea=='Angola' | substr(Division,1,2) == '47') %>%
   filter(CEyear %in% params$allYears) %>%
   group_by(CEmetier6) %>%
-  summarise(FishingDays = round(sum(CEscientificDaysAtSea, na.rm = TRUE)/3,2)) %>%
+  summarise(FishingDays = round(sum(CEscientificFishingDays, na.rm = TRUE)/length(params$allYears),2)) %>%
   ungroup() %>%
   mutate(EffortPerc = round(FishingDays/sum(FishingDays)*100, 2)) %>%
   arrange(EffortPerc) %>%
@@ -215,7 +215,7 @@ ceOrg %>%
   filter((substr(Division,1,2) == "34" & CEjurisdictionArea != 'Canaries' & CEjurisdictionArea != 'Madeira' ) | (substr(Division,1,2) == '34' & is.na(CEjurisdictionArea)) | CEjurisdictionArea=='Angola' | substr(Division,1,2) == '47') %>%
   filter(CEyear %in% params$allYears) %>%
   group_by(CEmetier6,CEarea,CEjurisdictionArea) %>%
-  summarise(FishingDays = round(sum(CEscientificDaysAtSea, na.rm = TRUE)/3,2))->temp
+  summarise(FishingDays = round(sum(CEscientificFishingDays, na.rm = TRUE)/length(params$allYears),2))->temp
 
 ```
   
@@ -226,7 +226,7 @@ clOrg %>%
   filter((substr(Division,1,2) == "34" & CLjurisdictionArea != 'Canaries' & CLjurisdictionArea != 'Madeira') | (substr(Division,1,2) == '34' & is.na(CLjurisdictionArea)) | CLjurisdictionArea == 'Angola' | substr(Division,1,2) == '47')%>%
   filter(CLyear %in% params$allYears) %>%
   group_by(CLmetier6) %>%
-  summarise(LandingWeight_ton = round(sum(CLscientificWeight_ton, na.rm = TRUE)/3,2)) %>%
+  summarise(LandingWeight_ton = round(sum(CLscientificWeight_ton, na.rm = TRUE)/length(params$allYears),2)) %>%
   ungroup() %>%
   mutate(LandingsPerc = round(LandingWeight_ton/sum(LandingWeight_ton)*100, 2)) %>%
   arrange(LandingsPerc)%>%
@@ -250,13 +250,13 @@ write_csv(table_4_6, paste(table_dir,'CECAF_avg_landings_metier.csv',
 ceOrg %>%
   filter( CEjurisdictionArea=='Canaries' ) %>%
   filter(CEyear %in% params$allYears)  %>%
-  filter(is.na(CEscientificDaysAtSea)) -> brakDanych
+  filter(is.na(CEscientificFishingDays)) -> brakDanych
 
 ceOrg %>%
   filter( CEjurisdictionArea=='Canaries' ) %>%
   filter(CEyear %in% params$allYears)  %>%
   group_by(CEvesselFlagCountry, CEyear, CEmetier6, CEarea ) %>%
-  summarise(FishingDays = sum(CEscientificDaysAtSea, na.rm = TRUE)) %>%
+  summarise(FishingDays = sum(CEscientificFishingDays, na.rm = TRUE)) %>%
   ungroup() %>%
       # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
   mutate(FishingDays = as.character(FishingDays)) %>%
@@ -277,7 +277,7 @@ if(nrow(brakDanych)>0){
 ceOrg %>%
   filter( CEjurisdictionArea=='Canaries' ) %>%
   filter(CEyear %in% params$allYears)  %>%
-  filter(is.na(CEscientificDaysAtSea)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
+  filter(is.na(CEscientificFishingDays)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
   group_by(CEvesselFlagCountry) %>%
   summarise(numRecords = n()) -> tabela
 
@@ -337,13 +337,13 @@ kable(tabela, caption = 'Number of records with missing LandingWeight per FlagCo
 ceOrg %>%
   filter( CEjurisdictionArea=='Madeira' ) %>%
   filter(CEyear %in% params$allYears)  %>%
-  filter(is.na(CEscientificDaysAtSea)) -> brakDanych
+  filter(is.na(CEscientificFishingDays)) -> brakDanych
 
 ceOrg %>%
   filter( CEjurisdictionArea=='Madeira' ) %>%
   filter(CEyear %in% params$allYears)  %>%
   group_by(CEvesselFlagCountry, CEyear, CEmetier6, CEarea ) %>%
-  summarise(FishingDays = sum(CEscientificDaysAtSea, na.rm = TRUE)) %>%
+  summarise(FishingDays = sum(CEscientificFishingDays, na.rm = TRUE)) %>%
   ungroup() %>%
       # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
   mutate(FishingDays = as.character(FishingDays)) %>%
@@ -368,7 +368,7 @@ if(nrow(brakDanych)>0){
 ceOrg %>%
   filter( CEjurisdictionArea=='Madeira' ) %>%
   filter(CEyear %in% params$allYears)  %>%
-  filter(is.na(CEscientificDaysAtSea)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
+  filter(is.na(CEscientificFishingDays)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
   group_by(CEvesselFlagCountry) %>%
   summarise(numRecords = n()) -> tabela
 

@@ -246,8 +246,7 @@ nrow(ce[is.na(HarbourCountry) & !is.na(HarbourCountry2),]) == 0
 # subsets data and RCG specific preparations
 # ========================	
 
-if(target_region=="RCG_LDF") 
-{
+if(target_region=="RCG_LDF") {
   print(paste(".subsetting",target_region))
   
   cl_rcg <- cl[ !grepl('27.',CLarea)]

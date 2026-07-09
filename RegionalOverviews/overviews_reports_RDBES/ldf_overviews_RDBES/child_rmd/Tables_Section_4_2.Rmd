@@ -15,12 +15,12 @@
 ceOrg %>%
   filter(CEyear %in% params$allYears) %>%
   filter(substr(CEarea,1,2) %in% c("87")) %>%
-  filter(is.na(CEscientificDaysAtSea))  -> brakDanych
+  filter(is.na(CEscientificFishingDays))  -> brakDanych
 
 ceOrg %>%
   filter(CEyear %in% params$allYears) %>%
   group_by(CEyear, CEarea=substr(CEarea,1,2), CEvesselFlagCountry ) %>% #FishingActivityCategoryEuropeanLvl6
-  summarise(FishingDays = sum(CEscientificDaysAtSea, na.rm = TRUE)
+  summarise(FishingDays = sum(CEscientificFishingDays, na.rm = TRUE)
             #KWDays_1000x = sum(KWDays_1000x, na.rm = TRUE)
             ) %>%
   ungroup() %>%
@@ -42,7 +42,7 @@ if(nrow(brakDanych)>0){
   ceOrg %>%
   filter(CEyear %in% params$allYears) %>%
   filter(substr(CEarea,1,2) %in% c("87")) %>%
-  filter(is.na(CEscientificDaysAtSea)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
+  filter(is.na(CEscientificFishingDays)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
   group_by(CEvesselFlagCountry) %>%
   summarise(numRecords = n()) -> tabela
 

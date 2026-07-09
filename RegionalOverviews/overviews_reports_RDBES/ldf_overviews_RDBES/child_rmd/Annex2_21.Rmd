@@ -154,14 +154,14 @@ write_csv(table314, paste(table_dir,'NAFO_landings_stock_area_country.csv',
  ceOrg %>%
    filter(CEyear %in% params$allYears) %>%
    filter(substr(CEarea,1,2) == "21") %>%
-   filter(is.na(CEscientificDaysAtSea)) -> brakDanych
+   filter(is.na(CEscientificFishingDays)) -> brakDanych
 
  ceOrg %>%
  # filter((Subpolygon!='Angola' | is.na(Subpolygon) )) %>%
    filter(CEyear %in% params$allYears)  %>%
    filter(substr(CEarea,1,2) == "21") %>%
    group_by(CEvesselFlagCountry, AreaMap, CEyear ) %>%
-   summarise(FishingDays = sum(CEscientificDaysAtSea, na.rm = TRUE)) %>%
+   summarise(FishingDays = sum(CEscientificFishingDays, na.rm = TRUE)) %>%
    ungroup() %>%
 # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
    mutate(FishingDays = as.character(FishingDays)) %>%
@@ -183,7 +183,7 @@ write_csv(table314, paste(table_dir,'NAFO_landings_stock_area_country.csv',
    ceOrg %>%
    filter(CEyear %in% params$allYears) %>%
    filter(substr(CEarea,1,2) == "21") %>%
-   filter(is.na(CEscientificDaysAtSea)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
+   filter(is.na(CEscientificFishingDays)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
    group_by(CEvesselFlagCountry) %>%
    summarise(numRecords = n())-> tabela
 

@@ -121,8 +121,8 @@ cl_rcg %>%
   mutate(Division=AreaMap)-> clOrg
 
 ce_rcg %>% 
-  select(CEvesselFlagCountry, CEyear, CEarea, AreaMap, CEjurisdictionArea, 
-         CEmetier6, CEscientificDaysAtSea)%>%
+  select(CEvesselFlagCountry, CEyear, CEarea, AreaMap, CEjurisdictionArea,CElandingLocation, 
+         CEmetier6, CEscientificDaysAtSea, CEscientificFishingDays)%>%
   mutate(Division=AreaMap)-> ceOrg
 
 

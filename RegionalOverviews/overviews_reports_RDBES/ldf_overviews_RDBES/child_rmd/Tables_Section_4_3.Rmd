@@ -6,7 +6,7 @@
 ceOrg %>%
   filter(CEyear %in% params$allYears) %>%
   filter(substr(CEarea,1,2) %in% c("41", "21", "88", "51", "58", "48", "57") & (CEjurisdictionArea!='Angola' | is.na(CEjurisdictionArea) )) %>%
-  filter(is.na(CEscientificDaysAtSea)) -> brakDanych
+  filter(is.na(CEscientificFishingDays)) -> brakDanych
 
 # ceOrg %>%
 #   filter((Subpolygon!='Angola' | is.na(Subpolygon) )) %>%
@@ -22,7 +22,7 @@ ceOrg %>%
 # filter((Subpolygon!='Angola' | is.na(Subpolygon) )) %>%
   filter(CEyear %in% params$allYears)  %>%
   group_by(CEarea=substr(CEarea,1,2), CEvesselFlagCountry, CEmetier6, CEyear ) %>%
-  summarise(FishingDays = sum(CEscientificDaysAtSea, na.rm = TRUE)) %>%
+  summarise(FishingDays = sum(CEscientificFishingDays, na.rm = TRUE)) %>%
   ungroup() %>%
   # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
   mutate(FishingDays = as.character(FishingDays)) %>%
@@ -42,7 +42,7 @@ if(nrow(brakDanych)>0){
   ceOrg %>%
   filter(CEyear %in% params$allYears) %>%
   filter(substr(CEarea,1,2) %in% c("41", "21", "88", "51", "58", "48", "57") & (CEjurisdictionArea!='Angola' | is.na(CEjurisdictionArea))) %>%
-  filter(is.na(CEscientificDaysAtSea)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
+  filter(is.na(CEscientificFishingDays)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
   group_by(CEvesselFlagCountry) %>%
   summarise(numRecords = n())-> tabela
 

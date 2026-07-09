@@ -90,14 +90,14 @@ write_csv(tableOR, paste(table_dir,'OR_landings_country_catch_group_area.csv',
  ceOrg %>%
    filter(CEyear %in% params$allYears) %>%
    filter(CEvesselFlagCountry == "FR") %>%
-   filter(is.na(CEscientificDaysAtSea)) -> brakDanych
+   filter(is.na(CEscientificFishingDays)) -> brakDanych
 
  ceOrg %>%
  # filter((Subpolygon!='Angola' | is.na(Subpolygon) )) %>%
    filter(CEyear %in% params$allYears)  %>%
    filter(CEvesselFlagCountry == "FR") %>%
    group_by(CEvesselFlagCountry, CEarea, CEyear ) %>%
-   summarise(FishingDays = round(sum(CEscientificDaysAtSea, na.rm = TRUE))) %>%
+   summarise(FishingDays = round(sum(CEscientificFishingDays, na.rm = TRUE))) %>%
    ungroup() %>%
 # replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
    mutate(FishingDays = as.character(FishingDays)) %>%
@@ -115,7 +115,55 @@ write_csv(tableOR, paste(table_dir,'OR_landings_country_catch_group_area.csv',
    ceOrg %>%
    filter(CEyear %in% params$allYears) %>%
    filter(CEvesselFlagCountry=="FR") %>%
-   filter(is.na(CEscientificDaysAtSea)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
+   filter(is.na(CEscientificFishingDays)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
+   group_by(CEvesselFlagCountry) %>%
+   summarise(numRecords = n())-> tabela
+
+ kable(tabela)
+
+ }else{
+
+   cat('No missing data for Fishing Days')
+
+ }
+
+```
+
+
+## Effort (fishing days) in the French outermost regions by harbour country
+
+```{r, results = "asis",echo = FALSE, warning = FALSE, message = FALSE, eval = T}
+
+ ceOrg %>%
+   filter(CEyear %in% params$allYears) %>%
+   filter(CEvesselFlagCountry == "FR") %>%
+   filter(is.na(CEscientificFishingDays)) -> brakDanych
+
+ ceOrg %>%
+ # filter((Subpolygon!='Angola' | is.na(Subpolygon) )) %>%
+   filter(CEyear %in% params$allYears)  %>%
+   filter(CEvesselFlagCountry == "FR") %>%
+   mutate(HarbourCountry = substr(CElandingLocation,1,2)) %>% 
+   group_by(CEvesselFlagCountry, CEarea, HarbourCountry, CEyear) %>%
+   summarise(FishingDays = round(sum(CEscientificFishingDays, na.rm = TRUE))) %>%
+   ungroup() %>%
+# replace 0 with NA where the record were submitted - data not porivded because of confidentiality reasons
+   mutate(FishingDays = as.character(FishingDays)) %>%
+   mutate(FishingDays =  ifelse(FishingDays=='0' | is.na(FishingDays) , 'NA', FishingDays)) %>%
+   pivot_wider(names_from = CEyear, values_from = c(FishingDays))%>%
+   rename(Country = CEvesselFlagCountry)-> tableOR
+
+ kable(tableOR)
+ write_csv(tableOR, paste(table_dir,'OR_effort_area_harbourCountry_country.csv',
+                      sep = ""))
+
+ if(nrow(brakDanych)>0){
+   cat('Number of records with missing FishingDays per FlagCountry' )
+
+   ceOrg %>%
+   filter(CEyear %in% params$allYears) %>%
+   filter(CEvesselFlagCountry=="FR") %>%
+   filter(is.na(CEscientificFishingDays)) %>% # KWDays FishingActivityCategoryEuropeanLvl6
    group_by(CEvesselFlagCountry) %>%
    summarise(numRecords = n())-> tabela
 
